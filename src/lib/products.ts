@@ -1,0 +1,31 @@
+import { queryOptions } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+export const rarityClass: Record<string, string> = {
+  "Lendário": "text-legendary",
+  "Épico": "text-epic",
+  "Raro": "text-rare",
+  "Comum": "text-muted-foreground",
+};
+
+export const formatPrice = (cents: number) =>
+  (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+export const productsQuery = queryOptions({
+  queryKey: ["products"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("products").select("*").order("sales", { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+});
+
+export const productQuery = (slug: string) =>
+  queryOptions({
+    queryKey: ["product", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("products").select("*").eq("slug", slug).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });

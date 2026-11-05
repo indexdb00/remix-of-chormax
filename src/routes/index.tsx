@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/SiteHeader";
 import { useEffect, useState } from "react";
 import { ArrowRight, ArrowDownRight, Zap } from "lucide-react";
 import voxel from "@/assets/voxel-chrome.jpg";
@@ -51,12 +52,7 @@ function Index() {
 
   return (
     <main className="min-h-screen bg-background font-sans text-foreground">
-      <header className="flex items-center justify-between px-5 py-5 md:px-12">
-        <span className="font-display text-xl font-extrabold">chroma<span className="text-chrome">X</span></span>
-        <a href="#" className="inline-flex items-center gap-2 border border-border px-4 py-2 font-mono text-xs uppercase tracking-wider hover:bg-primary hover:text-primary-foreground">
-          Entrar <ArrowRight size={14} />
-        </a>
-      </header>
+      <SiteHeader />
 
       <PixelBand seed={1} />
 
@@ -72,9 +68,9 @@ function Index() {
             Compre, colecione e revenda plugins, templates e softwares. Cada ativo tem raridade — e mercado.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#vitrine" className="inline-flex items-center gap-2 bg-primary px-6 py-3 font-mono text-sm font-bold uppercase text-primary-foreground hover:bg-foreground">
+            <Link to="/explorar" className="inline-flex items-center gap-2 bg-primary px-6 py-3 font-mono text-sm font-bold uppercase text-primary-foreground hover:bg-foreground">
               Explorar <ArrowDownRight size={16} />
-            </a>
+            </Link>
             <a href="#" className="inline-flex items-center gap-2 border border-border px-6 py-3 font-mono text-sm uppercase hover:border-primary">
               Vender ativo
             </a>
@@ -132,9 +128,9 @@ function Index() {
 
       <section className="px-5 py-20 text-center md:px-12">
         <h2 className="font-display text-3xl font-extrabold uppercase md:text-5xl">Comece a <span className="text-chrome">negociar</span></h2>
-        <a href="#" className="mt-8 inline-flex items-center gap-2 bg-primary px-8 py-4 font-mono text-sm font-bold uppercase text-primary-foreground hover:bg-foreground">
+        <Link to="/auth" className="mt-8 inline-flex items-center gap-2 bg-primary px-8 py-4 font-mono text-sm font-bold uppercase text-primary-foreground hover:bg-foreground">
           Criar conta grátis <ArrowRight size={16} />
-        </a>
+        </Link>
       </section>
     </main>
   );
