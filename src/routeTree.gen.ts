@@ -13,6 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExplorarRouteImport } from './routes/explorar'
+import { Route as FeedRouteImport } from './routes/feed'
+import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
+import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
 
@@ -35,6 +38,21 @@ const ExplorarRoute = ExplorarRouteImport.update({
   path: '/explorar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCreatorRoute = AuthenticatedCreatorRouteImport.update({
+  id: '/creator',
+  path: '/creator',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -50,6 +68,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explorar': typeof ExplorarRoute
+  '/feed': typeof FeedRoute
+  '/chat': typeof AuthenticatedChatRoute
+  '/creator': typeof AuthenticatedCreatorRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
@@ -57,6 +78,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explorar': typeof ExplorarRoute
+  '/feed': typeof FeedRoute
+  '/chat': typeof AuthenticatedChatRoute
+  '/creator': typeof AuthenticatedCreatorRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
@@ -66,20 +90,42 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/explorar': typeof ExplorarRoute
+  '/feed': typeof FeedRoute
+  '/_authenticated/chat': typeof AuthenticatedChatRoute
+  '/_authenticated/creator': typeof AuthenticatedCreatorRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/produto/$slug': typeof ProdutoSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/explorar' | '/perfil' | '/produto/$slug'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/explorar'
+    | '/feed'
+    | '/chat'
+    | '/creator'
+    | '/perfil'
+    | '/produto/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/explorar' | '/perfil' | '/produto/$slug'
+  to:
+    | '/'
+    | '/auth'
+    | '/explorar'
+    | '/feed'
+    | '/chat'
+    | '/creator'
+    | '/perfil'
+    | '/produto/$slug'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/explorar'
+    | '/feed'
+    | '/_authenticated/chat'
+    | '/_authenticated/creator'
     | '/_authenticated/perfil'
     | '/produto/$slug'
   fileRoutesById: FileRoutesById
@@ -89,6 +135,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ExplorarRoute: typeof ExplorarRoute
+  FeedRoute: typeof FeedRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
 }
 
@@ -122,6 +169,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExplorarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/chat': {
+      id: '/_authenticated/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AuthenticatedChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creator': {
+      id: '/_authenticated/creator'
+      path: '/creator'
+      fullPath: '/creator'
+      preLoaderRoute: typeof AuthenticatedCreatorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -140,10 +208,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedChatRoute: typeof AuthenticatedChatRoute
+  AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedChatRoute: AuthenticatedChatRoute,
+  AuthenticatedCreatorRoute: AuthenticatedCreatorRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
 }
 
@@ -155,6 +227,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ExplorarRoute: ExplorarRoute,
+  FeedRoute: FeedRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
 }
 export const routeTree = rootRouteImport

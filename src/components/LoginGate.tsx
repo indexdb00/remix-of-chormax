@@ -47,11 +47,12 @@ export function LoginGate() {
     const beat = () => supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
     const poll = async () => {
       const { data } = await supabase.from("chat_messages").select("id, chat_id, body, kind, created_at").neq("sender_id", userId).gt("created_at", since).order("created_at");
-      if (data?.length) {
-        since = data[data.length - 1].created_at;
+      const last = data?.[data.length - 1];
+      if (data && last) {
+        since = last.created_at;
         const onChat = window.location.pathname.startsWith("/chat");
         playNotify(data.some((m) => m.kind === "sale") ? "sale" : "chat");
-        if (!onChat) toast("Nova mensagem", { description: data[data.length - 1].body.slice(0, 80) });
+        if (!onChat) toast("Nova mensagem", { description: last.body.slice(0, 80) });
       }
     };
     beat();
