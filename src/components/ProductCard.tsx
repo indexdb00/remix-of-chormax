@@ -16,12 +16,13 @@ export function PixelArt({ seed, big = false }: { seed: number; big?: boolean })
 
 export const seedOf = (s: string) => [...s].reduce((a, c) => a + c.charCodeAt(0), 0) % 50;
 
-type P = { slug: string; name: string; category: string; rarity: string; price_cents: number };
+type P = { slug: string; name: string; category: string; rarity: string; price_cents: number; images?: string[] | null };
 
 export function ProductCard({ p }: { p: P }) {
+  const img = p.images?.[0];
   return (
     <Link to="/produto/$slug" params={{ slug: p.slug }} className="group block border border-border bg-card p-5 transition hover:-translate-y-1 hover:border-primary">
-      <PixelArt seed={seedOf(p.slug)} />
+      {img ? <img src={img} alt={p.name} loading="lazy" className="aspect-square w-full object-cover" /> : <PixelArt seed={seedOf(p.slug)} />}
       <p className={`mt-4 font-mono text-xs uppercase ${rarityClass[p.rarity] ?? ""}`}>■ {p.rarity}</p>
       <h3 className="mt-1 font-display text-base font-extrabold">{p.name}</h3>
       <div className="mt-3 flex items-center justify-between font-mono text-sm">
