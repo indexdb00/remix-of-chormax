@@ -14,15 +14,239 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcement_dismissals: {
+        Row: {
+          announcement_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_dismissals_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      announcements: {
+        Row: {
+          active: boolean
+          body: string
+          button_label: string
+          button_link: string
+          created_at: string
+          id: string
+          image_url: string | null
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string
+          button_label?: string
+          button_link?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          title: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          button_label?: string
+          button_link?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          body: string
+          chat_id: string
+          created_at: string
+          id: string
+          kind: string
+          offer_cents: number | null
+          sender_id: string
+        }
+        Insert: {
+          body?: string
+          chat_id: string
+          created_at?: string
+          id?: string
+          kind?: string
+          offer_cents?: number | null
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          chat_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          offer_cents?: number | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chats: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          id: string
+          last_message_at: string
+          product_id: string | null
+          seller_id: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          product_id?: string | null
+          seller_id: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          product_id?: string | null
+          seller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chats_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_posts: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          kind: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          kind?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friendships: {
+        Row: {
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      product_deliverables: {
+        Row: {
+          content: string | null
+          created_at: string
+          creator_id: string
+          file_path: string | null
+          product_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          creator_id: string
+          file_path?: string | null
+          product_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          creator_id?: string
+          file_path?: string | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_deliverables_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
           created_at: string
+          creator_id: string | null
+          deliverable_type: string
           description: string
           id: string
+          images: string[]
           name: string
           price_cents: number
           rarity: string
+          sale_mode: string
           sales: number
           seller_name: string
           slug: string
@@ -30,11 +254,15 @@ export type Database = {
         Insert: {
           category: string
           created_at?: string
+          creator_id?: string | null
+          deliverable_type?: string
           description?: string
           id?: string
+          images?: string[]
           name: string
           price_cents: number
           rarity: string
+          sale_mode?: string
           sales?: number
           seller_name?: string
           slug: string
@@ -42,11 +270,15 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          creator_id?: string | null
+          deliverable_type?: string
           description?: string
           id?: string
+          images?: string[]
           name?: string
           price_cents?: number
           rarity?: string
+          sale_mode?: string
           sales?: number
           seller_name?: string
           slug?: string
@@ -55,25 +287,64 @@ export type Database = {
       }
       profiles: {
         Row: {
+          banner_public: boolean
+          banner_url: string | null
           bio: string | null
           created_at: string
           display_name: string | null
           id: string
+          last_seen_at: string | null
+          logo_url: string | null
+          terms_accepted_at: string | null
+          total_bought_cents: number
+          total_sold_cents: number
           username: string | null
         }
         Insert: {
+          banner_public?: boolean
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id: string
+          last_seen_at?: string | null
+          logo_url?: string | null
+          terms_accepted_at?: string | null
+          total_bought_cents?: number
+          total_sold_cents?: number
           username?: string | null
         }
         Update: {
+          banner_public?: boolean
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          last_seen_at?: string | null
+          logo_url?: string | null
+          terms_accepted_at?: string | null
+          total_bought_cents?: number
+          total_sold_cents?: number
           username?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -82,10 +353,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_chat_member: { Args: { _chat: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -212,6 +490,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
