@@ -32,18 +32,18 @@ function Creator() {
   const [deliverFile, setDeliverFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [f, setF] = useState({
-    name: "", category: CATS[0], rarity: RARS[0], price: "", description: "",
+    name: "", category: CATS[0]!, rarity: RARS[0]!, price: "", description: "",
     deliverable_type: "text" as "text" | "file", content: "", sale_mode: "auto" as "auto" | "chat",
   });
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     const cents = Math.round(parseFloat(f.price.replace(",", ".")) * 100);
-    if (!f.name.trim()) return toast.error("Dê um nome ao item");
-    if (images.length < 3) return toast.error("Envie no mínimo 3 fotos de prévia");
-    if (!cents || cents < 100) return toast.error("Preço mínimo R$ 1,00");
-    if (f.deliverable_type === "text" && !f.content.trim()) return toast.error("Escreva o conteúdo que será entregue");
-    if (f.deliverable_type === "file" && !deliverFile) return toast.error("Anexe o arquivo que será entregue");
+    if (!f.name.trim()) { toast.error("Dê um nome ao item"); return; }
+    if (images.length < 3) { toast.error("Envie no mínimo 3 fotos de prévia"); return; }
+    if (!cents || cents < 100) { toast.error("Preço mínimo R$ 1,00"); return; }
+    if (f.deliverable_type === "text" && !f.content.trim()) { toast.error("Escreva o conteúdo que será entregue"); return; }
+    if (f.deliverable_type === "file" && !deliverFile) { toast.error("Anexe o arquivo que será entregue"); return; }
     setBusy(true);
     try {
       const urls = await Promise.all(images.map((img) => uploadMedia(user.id, img)));
