@@ -152,6 +152,7 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          image_url: string | null
           kind: string
         }
         Insert: {
@@ -159,6 +160,7 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          image_url?: string | null
           kind?: string
         }
         Update: {
@@ -166,6 +168,7 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           kind?: string
         }
         Relationships: [
@@ -329,6 +332,45 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      saved_items: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string | null
+          product_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          product_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          product_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_items_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "feed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
