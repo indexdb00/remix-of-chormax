@@ -32,7 +32,7 @@ function Config() {
 
   async function toggle(k: Key) {
     if (!p) return;
-    const { error } = await supabase.from("profiles").update({ [k]: !p[k] }).eq("id", user.id);
+    const { error } = await supabase.from("profiles").update({ [k]: !p[k] } as Partial<Record<Key, boolean>>).eq("id", user.id);
     if (error) toast.error("Erro ao salvar");
     else qc.invalidateQueries({ queryKey: ["profile", user.id] });
   }

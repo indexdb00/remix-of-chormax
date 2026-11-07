@@ -179,7 +179,7 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
     setBusy(kind);
     try {
       const url = await uploadMedia(userId, file);
-      const { error } = await supabase.from("profiles").update({ [kind]: url }).eq("id", userId);
+      const { error } = await supabase.from("profiles").update(kind === "logo_url" ? { logo_url: url } : { banner_url: url }).eq("id", userId);
       if (error) throw error;
       refresh();
     } catch (e) { toast.error("Falha no envio", { description: (e as Error).message }); }
@@ -188,7 +188,7 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
 
   async function save() {
     setBusy("save");
-    const patch: Record<string, string | null> = { username: f.username.trim().toLowerCase() || null, bio: f.bio.trim() };
+    const patch: { username: string | null; bio: string; display_name?: string } = { username: f.username.trim().toLowerCase() || null, bio: f.bio.trim() };
     if (f.display_name.trim() !== (profile.display_name ?? "")) patch.display_name = f.display_name.trim();
     const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
     setBusy(null);

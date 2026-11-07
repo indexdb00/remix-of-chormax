@@ -46,7 +46,7 @@ export const Route = createFileRoute("/explorar")({
 });
 
 type Tile =
-  | { kind: "product"; id: string; img?: string; title: string; slug: string; price: number; t: string }
+  | { kind: "product"; id: string; img: string | undefined; title: string; slug: string; price: number; t: string }
   | { kind: "post"; id: string; img: string; title: string; t: string };
 
 function Explorar() {
