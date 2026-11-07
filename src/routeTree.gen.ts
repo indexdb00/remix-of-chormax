@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExplorarRouteImport } from './routes/explorar'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as SalvosRouteImport } from './routes/salvos'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
@@ -43,6 +44,11 @@ const FeedRoute = FeedRouteImport.update({
   path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SalvosRoute = SalvosRouteImport.update({
+  id: '/salvos',
+  path: '/salvos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/explorar': typeof ExplorarRoute
   '/feed': typeof FeedRoute
+  '/salvos': typeof SalvosRoute
   '/chat': typeof AuthenticatedChatRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/explorar': typeof ExplorarRoute
   '/feed': typeof FeedRoute
+  '/salvos': typeof SalvosRoute
   '/chat': typeof AuthenticatedChatRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/explorar': typeof ExplorarRoute
   '/feed': typeof FeedRoute
+  '/salvos': typeof SalvosRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/creator': typeof AuthenticatedCreatorRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explorar'
     | '/feed'
+    | '/salvos'
     | '/chat'
     | '/creator'
     | '/perfil'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explorar'
     | '/feed'
+    | '/salvos'
     | '/chat'
     | '/creator'
     | '/perfil'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explorar'
     | '/feed'
+    | '/salvos'
     | '/_authenticated/chat'
     | '/_authenticated/creator'
     | '/_authenticated/perfil'
@@ -136,6 +148,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ExplorarRoute: typeof ExplorarRoute
   FeedRoute: typeof FeedRoute
+  SalvosRoute: typeof SalvosRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
 }
 
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salvos': {
+      id: '/salvos'
+      path: '/salvos'
+      fullPath: '/salvos'
+      preLoaderRoute: typeof SalvosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/chat': {
@@ -228,6 +248,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ExplorarRoute: ExplorarRoute,
   FeedRoute: FeedRoute,
+  SalvosRoute: SalvosRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,31 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowRight, User } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Plus, Bookmark, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCommunity } from "./CommunityProvider";
 
 export function SiteHeader() {
-  const [signedIn, setSignedIn] = useState(false);
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSignedIn(!!s));
-    return () => data.subscription.unsubscribe();
-  }, []);
+  const { user, compose } = useCommunity();
 
   return (
-    <header className="flex items-center justify-between gap-4 px-5 py-5 md:px-12">
-      <Link to="/" className="font-display text-xl font-extrabold">chroma<span className="text-chrome">X</span></Link>
-      <nav className="flex items-center gap-4 font-mono text-xs uppercase tracking-wider">
-        <Link to="/explorar" className="hover:text-accent" activeProps={{ className: "text-accent" }}>Explorar</Link>
-        {signedIn ? (
-          <Link to="/perfil" className="inline-flex items-center gap-2 border border-border px-4 py-2 hover:bg-primary hover:text-primary-foreground">
-            <User size={14} /> Perfil
-          </Link>
-        ) : (
-          <Link to="/auth" className="inline-flex items-center gap-2 border border-border px-4 py-2 hover:bg-primary hover:text-primary-foreground">
-            Entrar <ArrowRight size={14} />
-          </Link>
-        )}
-      </nav>
+    <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-xl">
+      <div className="mx-auto grid h-20 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
+        <div><Button asChild variant="ghost" size="icon" className="rounded-full hover:bg-secondary hover:text-foreground"><Link to={user ? "/perfil" : "/auth"} aria-label={user ? "Meu perfil" : "Entrar"} title={user ? "Meu perfil" : "Entrar"}><User /></Link></Button></div>
+        <Link to="/" className="font-display text-xl font-extrabold text-chrome sm:text-2xl">chromaX</Link>
+        <nav className="flex justify-end gap-1 sm:gap-3" aria-label="Ações rápidas"><Button variant="ghost" size="icon" className="rounded-full hover:bg-secondary hover:text-foreground" aria-label="Criar post" title="Criar post" onClick={compose}><Plus /></Button><Button asChild variant="ghost" size="icon" className="rounded-full hover:bg-secondary hover:text-foreground"><Link to="/salvos" aria-label="Salvos" title="Salvos"><Bookmark /></Link></Button></nav>
+      </div>
     </header>
   );
 }

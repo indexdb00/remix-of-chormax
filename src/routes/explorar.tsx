@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ProductCard } from "@/components/ProductCard";
@@ -10,7 +11,6 @@ import { productsQuery } from "@/lib/products";
 const schema = z.object({
   q: fallback(z.string(), "").default(""),
   cat: fallback(z.string(), "Todos").default("Todos"),
-  rar: fallback(z.string(), "Todas").default("Todas"),
   sort: fallback(z.string(), "populares").default("populares"),
 });
 
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/explorar")({
   head: () => ({
     meta: [
       { title: "Explorar ativos — chromaX" },
-      { name: "description", content: "Busque plugins, templates, softwares e assets por categoria e raridade." },
+      { name: "description", content: "Busque plugins, templates, softwares e assets por categoria." },
       { property: "og:title", content: "Explorar ativos — chromaX" },
       { property: "og:description", content: "Catálogo completo do marketplace chromaX." },
       { property: "og:type", content: "website" },
@@ -32,34 +32,32 @@ export const Route = createFileRoute("/explorar")({
   notFoundComponent: () => <p className="p-10">Nada encontrado.</p>,
 });
 
-const CATS = ["Todos", "Plugin", "Template", "Software", "Asset"];
-const RARS = ["Todas", "Lendário", "Épico", "Raro", "Comum"];
+const CATS = ["Todos", "Plugin", "Template", "Software", "Asset", "Conta de jogo", "Código"];
 
 function Chip({ on, children, onClick }: { on: boolean; children: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className={`border px-3 py-1.5 font-mono text-xs uppercase ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}>
+    <Button variant="ghost" onClick={onClick} className={`border px-3 py-1.5 font-mono text-xs uppercase ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}>
       {children}
-    </button>
+    </Button>
   );
 }
 
 function Explorar() {
   const { data } = useSuspenseQuery(productsQuery);
-  const { q, cat, rar, sort } = Route.useSearch();
+  const { q, cat, sort } = Route.useSearch();
   const navigate = useNavigate({ from: "/explorar" });
   const set = (patch: Partial<z.infer<typeof schema>>) => navigate({ search: (p) => ({ ...p, ...patch }), replace: true });
 
   let list = data.filter(
     (p) =>
       (cat === "Todos" || p.category === cat) &&
-      (rar === "Todas" || p.rarity === rar) &&
       p.name.toLowerCase().includes(q.toLowerCase()),
   );
   if (sort === "menor") list = [...list].sort((a, b) => a.price_cents - b.price_cents);
   if (sort === "maior") list = [...list].sort((a, b) => b.price_cents - a.price_cents);
 
   return (
-    <main className="min-h-screen bg-background font-sans text-foreground">
+    <main className="min-h-screen bg-background pb-32 font-sans text-foreground">
       <SiteHeader />
       <section className="px-5 py-10 md:px-12">
         <p className="font-mono text-sm text-accent">[ CATÁLOGO ]</p>
@@ -71,7 +69,6 @@ function Explorar() {
         </label>
 
         <div className="mt-5 flex flex-wrap gap-2">{CATS.map((c) => <Chip key={c} on={cat === c} onClick={() => set({ cat: c })}>{c}</Chip>)}</div>
-        <div className="mt-2 flex flex-wrap gap-2">{RARS.map((r) => <Chip key={r} on={rar === r} onClick={() => set({ rar: r })}>{r}</Chip>)}</div>
 
         <div className="mt-6 flex items-center justify-between font-mono text-xs uppercase text-muted-foreground">
           <span>{list.length} ativos</span>

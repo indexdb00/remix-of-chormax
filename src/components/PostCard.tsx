@@ -1,0 +1,9 @@
+import { type CommunityPost } from "@/lib/community";
+import { SaveButton } from "./SaveButton";
+import { Users, LifeBuoy, ShoppingBag } from "lucide-react";
+export function PostCard({ post }: { post: CommunityPost }) {
+  const p = post.profiles;
+  const name = p?.display_name || p?.username || "Membro chromaX";
+  const KindIcon = post.kind === "ajuda" ? LifeBuoy : post.kind === "pre-venda" ? ShoppingBag : Users;
+  return <article className="border-b border-border px-5 py-6 sm:px-7"><div className="flex gap-3"><div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary font-semibold">{p?.logo_url ? <img src={p.logo_url} alt={name} className="h-full w-full object-cover" /> : name.slice(0, 1).toUpperCase()}</div><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-sm font-semibold">{name}</p><p className="text-xs text-muted-foreground">@{p?.username || "membro"} <span className="mx-1">·</span><time dateTime={post.created_at}>{new Date(post.created_at).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}</time></p></div><SaveButton postId={post.id} /></div><p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7">{post.body}</p>{post.image_url && <img src={post.image_url} alt="Imagem da publicação" loading="lazy" className="mt-4 max-h-96 w-full rounded-lg border border-border object-contain" />}<p className="mt-4 flex items-center gap-2 text-[11px] text-muted-foreground"><KindIcon size={13} />{post.kind === "ajuda" ? "Pedido de ajuda" : post.kind === "pre-venda" ? "Pré-venda" : "Conversa"}</p></div></div></article>;
+}

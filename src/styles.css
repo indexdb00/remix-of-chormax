@@ -108,6 +108,20 @@
   --legendary: oklch(0.82 0.16 80);
   --gradient-chrome: linear-gradient(180deg, oklch(1 0 0), oklch(0.78 0.01 255) 50%, oklch(0.95 0.005 255));
   --gradient-fade: linear-gradient(180deg, var(--background), var(--void));
+  --glass-background: oklch(0.22 0 0 / 76%);
+  --glass-border: oklch(0.92 0 0 / 22%);
+  --shadow-glass: 0 12px 48px oklch(0 0 0 / 45%), inset 0 1px 0 oklch(1 0 0 / 16%);
+}
+
+.glass-menu {
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(24px) saturate(130%);
+}
+body { letter-spacing: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
 @layer base {

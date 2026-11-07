@@ -5,7 +5,7 @@ import { useState } from "react";
 import { BumpPayLogo } from "@/components/BumpPayLogo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PixelArt, seedOf } from "@/components/ProductCard";
-import { formatPrice, productQuery, rarityClass } from "@/lib/products";
+import { formatPrice, productQuery } from "@/lib/products";
 
 export const Route = createFileRoute("/produto/$slug")({
   loader: async ({ context, params }) => {
@@ -87,7 +87,7 @@ function Produto() {
             ) : <PixelArt seed={seedOf(p.slug)} big />}
           </div>
           <div>
-            <p className={`font-mono text-sm uppercase ${rarityClass[p.rarity] ?? ""}`}>■ {p.rarity} · {p.category}</p>
+            <p className="font-mono text-sm uppercase text-muted-foreground">{p.category}</p>
             <h1 className="mt-2 font-display text-3xl font-extrabold uppercase md:text-5xl">{p.name}</h1>
             <p className="mt-6 text-muted-foreground">{p.description}</p>
             <dl className="mt-8 grid grid-cols-2 gap-4 border-y border-border py-6 font-mono text-sm">

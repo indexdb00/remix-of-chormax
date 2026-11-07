@@ -1,27 +1,29 @@
 import { Link } from "@tanstack/react-router";
-import { Home, MessageSquare, Rss, Sparkles, User } from "lucide-react";
+import { Home, MessageSquare, Globe2, Search, User } from "lucide-react";
 
 const items = [
   { to: "/", label: "Início", icon: Home },
-  { to: "/feed", label: "Feed", icon: Rss },
-  { to: "/creator", label: "Creator", icon: Sparkles },
+  { to: "/feed", label: "Feed", icon: Globe2 },
+  { to: "/explorar", label: "Explorar", icon: Search },
   { to: "/chat", label: "Chat", icon: MessageSquare },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
 export function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur">
-      <ul className="mx-auto grid max-w-xl grid-cols-5">
+    <nav aria-label="Menu principal" className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
+      <ul className="glass-menu mx-auto grid max-w-lg grid-cols-5 rounded-full px-2 py-2">
         {items.map(({ to, label, icon: Icon }) => (
           <li key={to}>
             <Link
               to={to}
               activeOptions={{ exact: to === "/" }}
-              className="flex flex-col items-center gap-1 py-3 font-mono text-[10px] uppercase text-muted-foreground"
-              activeProps={{ className: "text-accent" }}
+              aria-label={label}
+              title={label}
+              className="group flex h-14 flex-col items-center justify-center gap-1 rounded-full text-[10px] text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "bg-primary/10 text-primary" }}
             >
-              <Icon size={18} />
+              <span className={to === "/explorar" ? "flex h-11 w-11 items-center justify-center rounded-full border border-border bg-primary text-primary-foreground shadow-sm" : "flex h-6 items-center justify-center"}><Icon size={to === "/explorar" ? 22 : 20} /></span>
               {label}
             </Link>
           </li>

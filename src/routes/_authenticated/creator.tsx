@@ -22,7 +22,6 @@ export const Route = createFileRoute("/_authenticated/creator")({
 });
 
 const CATS = ["Plugin", "Template", "Software", "Asset", "Conta de jogo", "Código"];
-const RARS = ["Comum", "Raro", "Épico", "Lendário"];
 
 function Creator() {
   const { user } = Route.useRouteContext();
@@ -32,7 +31,7 @@ function Creator() {
   const [deliverFile, setDeliverFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [f, setF] = useState({
-    name: "", category: CATS[0]!, rarity: RARS[0]!, price: "", description: "",
+    name: "", category: "Plugin", price: "", description: "",
     deliverable_type: "text" as "text" | "file", content: "", sale_mode: "auto" as "auto" | "chat",
   });
 
@@ -50,7 +49,7 @@ function Creator() {
       const slug = `${f.name.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${crypto.randomUUID().slice(0, 6)}`;
       const { data: prof } = await supabase.from("profiles").select("username,display_name").eq("id", user.id).maybeSingle();
       const { data: prod, error } = await supabase.from("products").insert({
-        slug, name: f.name.trim(), category: f.category, rarity: f.rarity, price_cents: cents,
+        slug, name: f.name.trim(), category: f.category, rarity: "Comum", price_cents: cents,
         description: f.description.trim(), creator_id: user.id, sale_mode: f.sale_mode, images: urls,
         deliverable_type: f.deliverable_type, seller_name: prof?.username || prof?.display_name || "creator",
       }).select("id").single();
@@ -102,9 +101,8 @@ function Creator() {
             </div>
           </div>
           <label className={label}>Nome<input className={input} maxLength={80} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3">
             <label className={label}>Categoria<select className={input} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })}>{CATS.map((c) => <option key={c}>{c}</option>)}</select></label>
-            <label className={label}>Raridade<select className={input} value={f.rarity} onChange={(e) => setF({ ...f, rarity: e.target.value })}>{RARS.map((c) => <option key={c}>{c}</option>)}</select></label>
           </div>
           <label className={label}>Preço (R$)<input className={input} inputMode="decimal" placeholder="49,90" value={f.price} onChange={(e) => setF({ ...f, price: e.target.value.replace(/[^0-9.,]/g, "") })} /></label>
           <label className={label}>Descrição<textarea className={input} rows={4} maxLength={1000} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></label>

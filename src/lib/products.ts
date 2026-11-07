@@ -1,13 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export const rarityClass: Record<string, string> = {
-  "Lendário": "text-legendary",
-  "Épico": "text-epic",
-  "Raro": "text-rare",
-  "Comum": "text-muted-foreground",
-};
-
 export const formatPrice = (cents: number) =>
   (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
