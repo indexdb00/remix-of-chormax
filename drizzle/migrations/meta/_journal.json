@@ -1,13 +1,5 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1794011250612,
-      "tag": "0000_community_media_and_saved_items",
-      "breakpoints": true
-    }
-  ]
+  "entries": []
 }
