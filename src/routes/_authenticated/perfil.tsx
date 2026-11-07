@@ -38,7 +38,7 @@ function Perfil() {
   const { data: myProducts } = useQuery({
     queryKey: ["my-products", user.id],
     queryFn: async () =>
-      (await supabase.from("products").select("id,name,slug,price_cents,images,sales,rarity").eq("creator_id", user.id).order("created_at", { ascending: false })).data ?? [],
+      (await supabase.from("products").select("id,name,slug,price_cents,images,sales").eq("creator_id", user.id).order("created_at", { ascending: false })).data ?? [],
   });
 
   const [form, setForm] = useState({ display_name: "", username: "", bio: "" });
@@ -167,7 +167,7 @@ function Perfil() {
                     )}
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-mono text-sm">{p.name}</span>
-                      <span className="font-mono text-[10px] uppercase text-muted-foreground">{p.rarity} · {p.sales} vendas</span>
+                      <span className="font-mono text-[10px] uppercase text-muted-foreground">{p.sales} vendas</span>
                     </span>
                     <span className="font-mono text-sm font-bold text-chrome">{brl(p.price_cents)}</span>
                   </Link>

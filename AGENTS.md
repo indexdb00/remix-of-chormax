@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Shared community session, quick post dialog and bottom navigation mount once in the root, so every page keeps consistent navigation and account state.
+- Community timeline queries derive home authors from accepted friendships, while global posts stay publicly readable; the two audiences must not share a query key.
+- Saved posts and products live in one owner-scoped saved_items table with exactly one target per row, so saves persist across devices.
+- Keep the deprecated products.rarity column for schema compatibility but never expose it in the UI; new listings use a neutral legacy value.
