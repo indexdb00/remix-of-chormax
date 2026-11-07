@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SaveButton } from "./SaveButton";
 import { useCommunity } from "./CommunityProvider";
 
-export function PostCard({ post, repostedBy }: { post: CommunityPost; repostedBy?: string }) {
+export function PostCard({ post, repostedBy }: { post: CommunityPost; repostedBy?: string | undefined }) {
   const { user } = useCommunity();
   const qc = useQueryClient();
   const ups = post.post_ups ?? [];
@@ -23,7 +23,7 @@ export function PostCard({ post, repostedBy }: { post: CommunityPost; repostedBy
   const KindIcon = post.kind === "ajuda" ? LifeBuoy : post.kind === "pre-venda" ? ShoppingBag : Users;
 
   async function toggle(kind: "up" | "rep") {
-    if (!user) return toast("Entre para interagir");
+    if (!user) { toast("Entre para interagir"); return; }
     const table = kind === "up" ? "post_ups" : "post_reposts";
     const on = kind === "up" ? up : rep;
     const set = kind === "up" ? setUp : setRep;
