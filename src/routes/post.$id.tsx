@@ -10,7 +10,7 @@ const postQuery = (id: string) =>
   queryOptions({
     queryKey: ["post", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("feed_posts").select("*, profiles(display_name,username,logo_url)").eq("id", id).maybeSingle();
+      const { data, error } = await supabase.from("feed_posts").select("*, profiles(display_name,username,logo_url), post_ups(user_id), post_reposts(user_id)").eq("id", id).maybeSingle();
       if (error) throw error;
       return data as CommunityPost | null;
     },

@@ -1,5 +1,20 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794021991826,
+      "tag": "0000_profile_settings_and_post_archive",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794062754341,
+      "tag": "0001_post_ups_reposts",
+      "breakpoints": true
+    }
+  ]
 }

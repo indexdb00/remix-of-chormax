@@ -16,7 +16,7 @@ function SavedContent({ userId }: { userId: string }) {
     if (result.error) throw result.error;
     const postIds = result.data.flatMap((r) => r.post_id ? [r.post_id] : []);
     const productIds = result.data.flatMap((r) => r.product_id ? [r.product_id] : []);
-    const [posts, products] = await Promise.all([postIds.length ? supabase.from("feed_posts").select("*,profiles(display_name,username,logo_url)").in("id", postIds) : Promise.resolve({ data: [], error: null }), productIds.length ? supabase.from("products").select("*").in("id", productIds) : Promise.resolve({ data: [], error: null })]);
+    const [posts, products] = await Promise.all([postIds.length ? supabase.from("feed_posts").select("*, profiles(display_name,username,logo_url), post_ups(user_id), post_reposts(user_id)").in("id", postIds) : Promise.resolve({ data: [], error: null }), productIds.length ? supabase.from("products").select("*").in("id", productIds) : Promise.resolve({ data: [], error: null })]);
     if (posts.error) throw posts.error;
     if (products.error) throw products.error;
     return { posts: posts.data ?? [], products: products.data ?? [] };

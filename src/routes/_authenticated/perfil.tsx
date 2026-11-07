@@ -2,10 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Archive, BadgeCheck, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, Undo2, X } from "lucide-react";
+import { Archive, ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, Undo2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
+import { PostCard } from "@/components/PostCard";
+import { POST_SELECT, type CommunityPost } from "@/lib/community";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -27,7 +29,7 @@ const DAY = 86400000;
 function Perfil() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<"produtos" | "posts" | "arquivados">("produtos");
+  const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups" | "arquivados">("posts");
   const [editing, setEditing] = useState(false);
 
   const { data: profile } = useQuery({
@@ -47,6 +49,26 @@ function Perfil() {
     queryFn: async () => (await supabase.from("friendships").select("id", { count: "exact", head: true }).eq("status", "accepted").or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)).count ?? 0,
   });
 
+  const { data: activity = { reposts: [], ups: [] } } = useQuery({
+    queryKey: ["profile-activity", user.id],
+    queryFn: async () => {
+      const [r, u] = await Promise.all([
+        supabase.from("post_reposts").select("post_id").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("post_ups").select("post_id").eq("user_id", user.id).order("created_at", { ascending: false }),
+      ]);
+      const load = async (ids: string[]) => ids.length ? ((await supabase.from("feed_posts").select(POST_SELECT).in("id", ids)).data ?? []) as unknown as CommunityPost[] : [];
+      return { reposts: await load((r.data ?? []).map((x) => x.post_id)), ups: await load((u.data ?? []).map((x) => x.post_id)) };
+    },
+  });
+
+  const { data: upsReceived = 0 } = useQuery({
+    queryKey: ["ups-received", user.id],
+    queryFn: async () => {
+      const ids = (await supabase.from("feed_posts").select("id").eq("author_id", user.id)).data?.map((x) => x.id) ?? [];
+      if (!ids.length) return 0;
+      return (await supabase.from("post_ups").select("post_id", { count: "exact", head: true }).in("post_id", ids)).count ?? 0;
+    },
+  });
   const isCreator = products.length > 0;
   const active = posts.filter((p) => !p.archived);
   const archived = posts.filter((p) => p.archived);
@@ -96,7 +118,7 @@ function Perfil() {
           </div>
 
           <div className="mt-5 grid grid-cols-3 border-y border-border py-3 text-center">
-            {[["Posts", active.length], ["Produtos", products.length], ["Amigos", friends]].map(([l, v]) => (
+            {[["Posts", active.length], ["Ups recebidos", upsReceived], ["Amigos", friends]].map(([l, v]) => (
               <div key={l as string}><p className="text-base font-bold">{v}</p><p className="text-xs text-muted-foreground">{l}</p></div>
             ))}
           </div>
@@ -106,9 +128,9 @@ function Perfil() {
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-3 border-b border-border">
-          {([["produtos", Grid3x3, "Produtos"], ["posts", MessageSquare, "Posts"], ["arquivados", Archive, "Arquivo"]] as const).map(([k, I, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={`flex items-center justify-center gap-1.5 py-3 text-xs ${tab === k ? "border-b-2 border-foreground font-semibold" : "text-muted-foreground"}`}><I size={15} /> {l}</button>
+        <div className="mt-5 grid grid-cols-5 border-b border-border">
+          {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"], ["arquivados", Archive, "Arquivo"]] as const).map(([k, I, l]) => (
+            <button key={k} onClick={() => setTab(k)} className={`flex flex-col items-center justify-center gap-1 py-3 text-[11px] sm:flex-row sm:text-xs ${tab === k ? "border-b-2 border-foreground font-semibold" : "text-muted-foreground"}`}><I size={15} /> {l}</button>
           ))}
         </div>
 
@@ -125,7 +147,12 @@ function Perfil() {
           ) : <Empty text="Nenhum produto ainda." cta />
         )}
 
-        {tab !== "produtos" && (
+        {(tab === "reposts" || tab === "ups") && (
+          activity[tab].length ? <div>{activity[tab].map((p) => <PostCard key={p.id} post={p} repostedBy={tab === "reposts" ? "Você" : undefined} />)}</div>
+            : <Empty text={tab === "reposts" ? "Você ainda não repostou nada." : "Você ainda não deu Up em nenhum post."} />
+        )}
+
+        {(tab === "posts" || tab === "arquivados") && (
           (tab === "posts" ? active : archived).length ? (
             <ul>
               {(tab === "posts" ? active : archived).map((p) => (
