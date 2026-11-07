@@ -6,7 +6,7 @@ import type { Database } from "@/integrations/supabase/types";
 export const postsQuery = (scope: "global" | "friends", userId?: string) => queryOptions({
   queryKey: ["posts", scope, userId],
   queryFn: async () => {
-    let query = supabase.from("feed_posts").select("*, profiles(display_name,username,logo_url)").order("created_at", { ascending: false }).limit(100);
+    let query = supabase.from("feed_posts").select("*, profiles(display_name,username,logo_url)").eq("archived", false).order("created_at", { ascending: false }).limit(100);
     if (scope === "friends") {
       if (!userId) return [];
       const { data, error } = await supabase.from("friendships").select("*").or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
