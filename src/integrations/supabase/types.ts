@@ -148,6 +148,7 @@ export type Database = {
       }
       feed_posts: {
         Row: {
+          archived: boolean
           author_id: string
           body: string
           created_at: string
@@ -156,6 +157,7 @@ export type Database = {
           kind: string
         }
         Insert: {
+          archived?: boolean
           author_id: string
           body: string
           created_at?: string
@@ -164,6 +166,7 @@ export type Database = {
           kind?: string
         }
         Update: {
+          archived?: boolean
           author_id?: string
           body?: string
           created_at?: string
@@ -296,8 +299,13 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          is_private: boolean
           last_seen_at: string | null
           logo_url: string | null
+          name_changed_at: string | null
+          show_totals: boolean
+          sound_chat: boolean
+          sound_sales: boolean
           terms_accepted_at: string | null
           total_bought_cents: number
           total_sold_cents: number
@@ -310,8 +318,13 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          is_private?: boolean
           last_seen_at?: string | null
           logo_url?: string | null
+          name_changed_at?: string | null
+          show_totals?: boolean
+          sound_chat?: boolean
+          sound_sales?: boolean
           terms_accepted_at?: string | null
           total_bought_cents?: number
           total_sold_cents?: number
@@ -324,8 +337,13 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          is_private?: boolean
           last_seen_at?: string | null
           logo_url?: string | null
+          name_changed_at?: string | null
+          show_totals?: boolean
+          sound_chat?: boolean
+          sound_sales?: boolean
           terms_accepted_at?: string | null
           total_bought_cents?: number
           total_sold_cents?: number

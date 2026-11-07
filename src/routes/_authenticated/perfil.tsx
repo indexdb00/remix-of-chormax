@@ -1,8 +1,8 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Camera, ImagePlus, LogOut, Package } from "lucide-react";
+import { Archive, BadgeCheck, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, Undo2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
     meta: [
       { title: "Meu perfil — chromaX" },
-      { name: "description", content: "Gerencie seu perfil no chromaX." },
+      { name: "description", content: "Seu perfil, posts e produtos no chromaX." },
       { property: "og:title", content: "Meu perfil — chromaX" },
       { property: "og:description", content: "Sua área de usuário no chromaX." },
       { property: "og:type", content: "website" },
@@ -21,185 +21,211 @@ export const Route = createFileRoute("/_authenticated/perfil")({
   component: Perfil,
 });
 
-const brl = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const DAY = 86400000;
 
 function Perfil() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
-  const navigate = useNavigate();
-  const logoInput = useRef<HTMLInputElement>(null);
-  const bannerInput = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState<"logo" | "banner" | null>(null);
+  const [tab, setTab] = useState<"produtos" | "posts" | "arquivados">("produtos");
+  const [editing, setEditing] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => (await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()).data,
   });
-  const { data: myProducts } = useQuery({
+  const { data: products = [] } = useQuery({
     queryKey: ["my-products", user.id],
-    queryFn: async () =>
-      (await supabase.from("products").select("id,name,slug,price_cents,images,sales").eq("creator_id", user.id).order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await supabase.from("products").select("id,name,slug,price_cents,images,sales").eq("creator_id", user.id).order("created_at", { ascending: false })).data ?? [],
+  });
+  const { data: posts = [] } = useQuery({
+    queryKey: ["my-posts", user.id],
+    queryFn: async () => (await supabase.from("feed_posts").select("*").eq("author_id", user.id).order("created_at", { ascending: false })).data ?? [],
+  });
+  const { data: friends = 0 } = useQuery({
+    queryKey: ["friend-count", user.id],
+    queryFn: async () => (await supabase.from("friendships").select("id", { count: "exact", head: true }).eq("status", "accepted").or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)).count ?? 0,
   });
 
-  const [form, setForm] = useState({ display_name: "", username: "", bio: "" });
-  useEffect(() => {
-    if (profile) setForm({ display_name: profile.display_name ?? "", username: profile.username ?? "", bio: profile.bio ?? "" });
-  }, [profile]);
+  const isCreator = products.length > 0;
+  const active = posts.filter((p) => !p.archived);
+  const archived = posts.filter((p) => p.archived);
+  const refreshPosts = () => qc.invalidateQueries({ queryKey: ["my-posts", user.id] }).then(() => qc.invalidateQueries({ queryKey: ["posts"] }));
 
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
-    const username = form.username.trim().toLowerCase() || null;
-    const { error } = await supabase.from("profiles").update({ display_name: form.display_name.trim(), username, bio: form.bio.trim() }).eq("id", user.id);
-    if (error) toast.error(error.code === "23505" ? "Esse usuário já existe" : "Erro ao salvar");
-    else { toast.success("Perfil salvo"); qc.invalidateQueries({ queryKey: ["profile", user.id] }); }
+  async function setArchived(id: string, v: boolean) {
+    const { error } = await supabase.from("feed_posts").update({ archived: v }).eq("id", id);
+    if (error) toast.error("Erro"); else { toast.success(v ? "Arquivado" : "Restaurado"); refreshPosts(); }
+  }
+  async function remove(id: string) {
+    if (!confirm("Apagar este post?")) return;
+    await supabase.from("saved_items").delete().eq("post_id", id);
+    const { error } = await supabase.from("feed_posts").delete().eq("id", id);
+    if (error) toast.error("Erro"); else { toast.success("Post apagado"); refreshPosts(); }
   }
 
-  async function upload(kind: "logo" | "banner", file: File | undefined) {
-    if (!file) return;
-    setUploading(kind);
-    try {
-      const url = await uploadMedia(user.id, file);
-      const { error } = await supabase.from("profiles").update(kind === "logo" ? { logo_url: url } : { banner_url: url }).eq("id", user.id);
-      if (error) throw error;
-      toast.success(kind === "logo" ? "Foto atualizada" : "Banner atualizado");
-      qc.invalidateQueries({ queryKey: ["profile", user.id] });
-    } catch (err) {
-      toast.error("Falha no envio", { description: (err as Error).message });
-    } finally { setUploading(null); }
-  }
-
-  async function toggleBannerPublic() {
-    if (!profile) return;
-    const { error } = await supabase.from("profiles").update({ banner_public: !profile.banner_public }).eq("id", user.id);
-    if (error) toast.error("Erro ao salvar");
-    else qc.invalidateQueries({ queryKey: ["profile", user.id] });
-  }
-
-  async function signOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
-
-  const input = "w-full border border-border bg-card px-4 py-3 font-mono text-sm outline-none focus:border-primary";
-  const label = "block font-mono text-xs uppercase text-muted-foreground";
-  const totalSales = (myProducts ?? []).reduce((s, p) => s + p.sales, 0);
+  const name = profile?.display_name || "Sem nome";
+  const showBanner = profile?.banner_url;
 
   return (
-    <main className="min-h-screen bg-background pb-28 font-sans text-foreground">
+    <main className="min-h-screen bg-background pb-32 text-foreground">
       <SiteHeader />
-
-      {/* Banner */}
-      <div className="relative h-44 w-full overflow-hidden border-b border-border bg-card sm:h-56">
-        {profile?.banner_url ? (
-          <img src={profile.banner_url} alt="Banner" className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center font-mono text-xs uppercase text-muted-foreground">Sem banner</div>
-        )}
-        <div className="absolute right-3 top-3 flex gap-2">
-          {profile?.banner_url && (
-            <button onClick={toggleBannerPublic} className="border border-border bg-background/90 px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground hover:text-foreground">
-              {profile.banner_public ? "Público" : "Privado"}
-            </button>
-          )}
-          <button onClick={() => bannerInput.current?.click()} disabled={uploading !== null} className="inline-flex items-center gap-1 border border-border bg-background/90 px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground hover:text-foreground disabled:opacity-50">
-            <ImagePlus size={12} /> {uploading === "banner" ? "Enviando..." : "Banner"}
-          </button>
-          <input ref={bannerInput} type="file" accept="image/*" hidden onChange={(e) => upload("banner", e.target.files?.[0])} />
+      <div className="mx-auto max-w-3xl">
+        <div className="h-36 w-full overflow-hidden bg-card sm:h-52">
+          {showBanner ? <img src={profile!.banner_url!} alt="Banner" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-gradient-to-br from-secondary to-background" />}
         </div>
-      </div>
 
-      <section className="mx-auto max-w-2xl px-5">
-        {/* Avatar + identidade */}
-        <div className="-mt-10 flex items-end gap-4">
-          <button onClick={() => logoInput.current?.click()} disabled={uploading !== null} className="group relative h-24 w-24 shrink-0 overflow-hidden border border-border bg-card disabled:opacity-50" aria-label="Trocar foto">
-            {profile?.logo_url ? (
-              <img src={profile.logo_url} alt="Foto de perfil" className="h-full w-full object-cover" />
-            ) : (
-              <span className="flex h-full items-center justify-center font-display text-2xl font-extrabold text-chrome">
-                {(profile?.display_name || user.email || "?").slice(0, 1).toUpperCase()}
-              </span>
-            )}
-            <span className="absolute inset-0 flex items-center justify-center bg-background/70 opacity-0 transition-opacity group-hover:opacity-100">
-              <Camera size={18} />
-            </span>
-          </button>
-          <input ref={logoInput} type="file" accept="image/*" hidden onChange={(e) => upload("logo", e.target.files?.[0])} />
-          <div className="pb-1">
-            <p className="font-mono text-sm text-accent">[ PERFIL ]</p>
-            <h1 className="font-display text-2xl font-extrabold uppercase sm:text-3xl">{profile?.display_name || "Sem nome"}</h1>
-            <p className="font-mono text-xs text-muted-foreground">
-              {profile?.username ? `@${profile.username} · ` : ""}{user.email}
-            </p>
+        <div className="px-4 sm:px-6">
+          <div className="-mt-12 flex items-end justify-between">
+            <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-background bg-card sm:h-28 sm:w-28">
+              {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold">{name[0]?.toUpperCase()}</span>}
+            </div>
+            <div className="flex gap-2 pb-1">
+              <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium"><Pencil size={14} /> Editar</button>
+              <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium"><Package size={14} /> Creator</Link>
+              <Link to="/configuracoes" aria-label="Configurações" className="rounded-lg border border-border bg-card p-2"><Settings size={16} /></Link>
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <h1 className="flex items-center gap-1.5 text-lg font-bold">
+              {name}
+              {isCreator && <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent"><BadgeCheck size={12} /> Creator</span>}
+            </h1>
+            <p className="text-sm text-muted-foreground">@{profile?.username || "sem_usuario"}</p>
+            {profile?.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
+          </div>
+
+          <div className="mt-5 grid grid-cols-3 border-y border-border py-3 text-center">
+            {[["Posts", active.length], ["Produtos", products.length], ["Amigos", friends]].map(([l, v]) => (
+              <div key={l as string}><p className="text-base font-bold">{v}</p><p className="text-xs text-muted-foreground">{l}</p></div>
+            ))}
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="rounded-xl border border-border bg-card p-3"><p className="text-[11px] text-muted-foreground">Total comprado</p><p className="font-bold">{brl(profile?.total_bought_cents ?? 0)}</p></div>
+            <div className="rounded-xl border border-border bg-card p-3"><p className="text-[11px] text-muted-foreground">Total vendido</p><p className="font-bold">{brl(profile?.total_sold_cents ?? 0)}</p></div>
           </div>
         </div>
 
-        {/* Totais reais */}
-        <div className="mt-8 grid grid-cols-3 gap-3">
-          {[
-            ["Total comprado", brl(profile?.total_bought_cents ?? 0)],
-            ["Total vendido", brl(profile?.total_sold_cents ?? 0)],
-            ["Vendas", String(totalSales)],
-          ].map(([l, v]) => (
-            <div key={l} className="border border-border bg-card p-4">
-              <p className="font-mono text-[10px] uppercase text-muted-foreground">{l}</p>
-              <p className="mt-1 font-mono text-lg font-bold text-chrome sm:text-xl">{v}</p>
-            </div>
+        <div className="mt-5 grid grid-cols-3 border-b border-border">
+          {([["produtos", Grid3x3, "Produtos"], ["posts", MessageSquare, "Posts"], ["arquivados", Archive, "Arquivo"]] as const).map(([k, I, l]) => (
+            <button key={k} onClick={() => setTab(k)} className={`flex items-center justify-center gap-1.5 py-3 text-xs ${tab === k ? "border-b-2 border-foreground font-semibold" : "text-muted-foreground"}`}><I size={15} /> {l}</button>
           ))}
         </div>
 
-        {/* Meus itens */}
-        <div className="mt-10">
-          <div className="flex items-center justify-between">
-            <p className={label}>Meus itens ({myProducts?.length ?? 0})</p>
-            <Link to="/creator" className="font-mono text-[10px] uppercase text-accent hover:underline">+ Anunciar</Link>
-          </div>
-          {myProducts && myProducts.length > 0 ? (
-            <ul className="mt-3 divide-y divide-border border border-border">
-              {myProducts.map((p) => (
-                <li key={p.id}>
-                  <Link to="/produto/$slug" params={{ slug: p.slug }} className="flex items-center gap-3 p-3 hover:bg-card">
-                    {p.images[0] ? (
-                      <img src={p.images[0]} alt="" className="h-12 w-12 border border-border object-cover" />
-                    ) : (
-                      <span className="flex h-12 w-12 items-center justify-center border border-border bg-card"><Package size={16} className="text-muted-foreground" /></span>
-                    )}
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-mono text-sm">{p.name}</span>
-                      <span className="font-mono text-[10px] uppercase text-muted-foreground">{p.sales} vendas</span>
-                    </span>
-                    <span className="font-mono text-sm font-bold text-chrome">{brl(p.price_cents)}</span>
-                  </Link>
+        {tab === "produtos" && (
+          products.length ? (
+            <div className="grid grid-cols-3 gap-0.5">
+              {products.map((p) => (
+                <Link key={p.id} to="/produto/$slug" params={{ slug: p.slug }} className="relative aspect-square overflow-hidden bg-card">
+                  {p.images[0] ? <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center"><Package className="text-muted-foreground" /></span>}
+                  <span className="absolute bottom-1 left-1 rounded bg-background/75 px-1.5 text-[10px] font-semibold">{brl(p.price_cents)}</span>
+                </Link>
+              ))}
+            </div>
+          ) : <Empty text="Nenhum produto ainda." cta />
+        )}
+
+        {tab !== "produtos" && (
+          (tab === "posts" ? active : archived).length ? (
+            <ul>
+              {(tab === "posts" ? active : archived).map((p) => (
+                <li key={p.id} className="flex gap-3 border-b border-border px-4 py-4">
+                  {p.image_url && <img src={p.image_url} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover" />}
+                  <div className="min-w-0 flex-1">
+                    <p className="whitespace-pre-wrap break-words text-sm">{p.body}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">{new Date(p.created_at).toLocaleDateString("pt-BR")}</p>
+                  </div>
+                  <div className="flex shrink-0 flex-col gap-2">
+                    <button onClick={() => setArchived(p.id, !p.archived)} aria-label={p.archived ? "Restaurar" : "Arquivar"} className="text-muted-foreground hover:text-foreground">{p.archived ? <Undo2 size={16} /> : <Archive size={16} />}</button>
+                    <button onClick={() => remove(p.id)} aria-label="Apagar" className="text-muted-foreground hover:text-destructive"><Trash2 size={16} /></button>
+                  </div>
                 </li>
               ))}
             </ul>
-          ) : (
-            <p className="mt-3 border border-dashed border-border p-6 text-center font-mono text-xs text-muted-foreground">
-              Você ainda não anunciou nada. Vá até a área Creator para publicar seu primeiro item.
-            </p>
-          )}
-        </div>
+          ) : <Empty text={tab === "posts" ? "Nenhum post ainda." : "Nada arquivado."} />
+        )}
+      </div>
 
-        {/* Editar dados */}
-        <form onSubmit={save} className="mt-10 space-y-3">
-          <p className={label}>Editar dados</p>
-          <label className={label}>Nome
-            <input className={`${input} mt-1`} value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} maxLength={60} />
-          </label>
-          <label className={label}>Usuário
-            <input className={`${input} mt-1`} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value.replace(/[^a-zA-Z0-9_.]/g, "") })} maxLength={30} placeholder="seu_usuario" />
-          </label>
-          <label className={label}>Bio
-            <textarea className={`${input} mt-1`} rows={3} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} maxLength={280} />
-          </label>
-          <button className="bg-primary px-6 py-3 font-mono text-sm font-bold uppercase text-primary-foreground hover:bg-foreground">Salvar</button>
-        </form>
-
-        <button onClick={signOut} className="mt-10 inline-flex items-center gap-2 font-mono text-xs uppercase text-muted-foreground hover:text-destructive">
-          <LogOut size={14} /> Sair
-        </button>
-      </section>
+      {editing && profile && <EditSheet userId={user.id} profile={profile} onClose={() => setEditing(false)} />}
     </main>
+  );
+}
+
+function Empty({ text, cta }: { text: string; cta?: boolean }) {
+  return (
+    <div className="p-10 text-center text-sm text-muted-foreground">
+      {text}
+      {cta && <Link to="/creator" className="mt-2 block font-semibold text-foreground">Anunciar no Creator</Link>}
+    </div>
+  );
+}
+
+type P = { display_name: string | null; username: string | null; bio: string | null; logo_url: string | null; banner_url: string | null; name_changed_at: string | null };
+
+function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [f, setF] = useState({ display_name: "", username: "", bio: "" });
+  const [busy, setBusy] = useState<string | null>(null);
+  const logo = useRef<HTMLInputElement>(null);
+  const banner = useRef<HTMLInputElement>(null);
+  useEffect(() => setF({ display_name: profile.display_name ?? "", username: profile.username ?? "", bio: profile.bio ?? "" }), [profile]);
+
+  const next = profile.name_changed_at ? new Date(profile.name_changed_at).getTime() + 15 * DAY : 0;
+  const locked = next > Date.now();
+  const refresh = () => qc.invalidateQueries({ queryKey: ["profile", userId] });
+
+  async function upload(kind: "logo_url" | "banner_url", file?: File) {
+    if (!file) return;
+    setBusy(kind);
+    try {
+      const url = await uploadMedia(userId, file);
+      const { error } = await supabase.from("profiles").update(kind === "logo_url" ? { logo_url: url } : { banner_url: url }).eq("id", userId);
+      if (error) throw error;
+      refresh();
+    } catch (e) { toast.error("Falha no envio", { description: (e as Error).message }); }
+    finally { setBusy(null); }
+  }
+
+  async function save() {
+    setBusy("save");
+    const patch: { username: string | null; bio: string; display_name?: string } = { username: f.username.trim().toLowerCase() || null, bio: f.bio.trim() };
+    if (f.display_name.trim() !== (profile.display_name ?? "")) patch.display_name = f.display_name.trim();
+    const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+    setBusy(null);
+    if (error) toast.error(error.message.includes("NAME_COOLDOWN") ? "Nome só pode mudar a cada 15 dias" : error.code === "23505" ? "Esse usuário já existe" : "Erro ao salvar");
+    else { toast.success("Perfil salvo"); refresh(); onClose(); }
+  }
+
+  const input = "mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-foreground disabled:opacity-50";
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 backdrop-blur-sm sm:items-center" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-border bg-card p-5 sm:rounded-2xl">
+        <div className="flex items-center justify-between"><h2 className="font-bold">Editar perfil</h2><button onClick={onClose} aria-label="Fechar"><X size={18} /></button></div>
+
+        <button onClick={() => banner.current?.click()} className="relative mt-4 block h-28 w-full overflow-hidden rounded-xl bg-secondary">
+          {profile.banner_url && <img src={profile.banner_url} alt="" className="h-full w-full object-cover" />}
+          <span className="absolute inset-0 flex items-center justify-center gap-1 bg-background/40 text-xs"><Camera size={14} /> {busy === "banner_url" ? "Enviando..." : "Trocar banner"}</span>
+        </button>
+        <button onClick={() => logo.current?.click()} className="relative -mt-8 ml-4 block h-20 w-20 overflow-hidden rounded-full border-4 border-card bg-secondary">
+          {profile.logo_url && <img src={profile.logo_url} alt="" className="h-full w-full object-cover" />}
+          <span className="absolute inset-0 flex items-center justify-center bg-background/40"><Camera size={14} /></span>
+        </button>
+        <input ref={banner} type="file" accept="image/*" hidden onChange={(e) => upload("banner_url", e.target.files?.[0])} />
+        <input ref={logo} type="file" accept="image/*" hidden onChange={(e) => upload("logo_url", e.target.files?.[0])} />
+
+        <label className="mt-4 block text-xs text-muted-foreground">Nome
+          <input className={input} value={f.display_name} disabled={locked} maxLength={60} onChange={(e) => setF({ ...f, display_name: e.target.value })} />
+          <span className="mt-1 block text-[11px]">{locked ? `Você poderá mudar o nome em ${new Date(next).toLocaleDateString("pt-BR")}.` : "O nome pode ser alterado a cada 15 dias."}</span>
+        </label>
+        <label className="mt-3 block text-xs text-muted-foreground">Usuário
+          <input className={input} value={f.username} maxLength={30} onChange={(e) => setF({ ...f, username: e.target.value.replace(/[^a-zA-Z0-9_.]/g, "") })} />
+        </label>
+        <label className="mt-3 block text-xs text-muted-foreground">Bio
+          <textarea className={input} rows={3} value={f.bio} maxLength={280} onChange={(e) => setF({ ...f, bio: e.target.value })} />
+        </label>
+        <button onClick={save} disabled={busy !== null} className="mt-5 w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy === "save" ? "Salvando..." : "Salvar"}</button>
+        <p className="mt-3 text-center text-[11px] text-muted-foreground">Para apagar ou arquivar posts, use as abas Posts e Arquivo do perfil.</p>
+      </div>
+    </div>
   );
 }
