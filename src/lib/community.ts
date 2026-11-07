@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { acceptedFriendIds } from "./community-rules";
+import type { Database } from "@/integrations/supabase/types";
 
 export const postsQuery = (scope: "global" | "friends", userId?: string) => queryOptions({
   queryKey: ["posts", scope, userId],
@@ -19,4 +20,4 @@ export const postsQuery = (scope: "global" | "friends", userId?: string) => quer
     return data;
   },
 });
-export type CommunityPost = Awaited<ReturnType<ReturnType<typeof postsQuery>["queryFn"] & (() => Promise<never>)>>;
+export type CommunityPost = Database["public"]["Tables"]["feed_posts"]["Row"] & { profiles: { display_name: string | null; username: string | null; logo_url: string | null } | null };
