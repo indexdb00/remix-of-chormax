@@ -28,8 +28,7 @@ const DAY = 86400000;
 
 function Perfil() {
   const { user } = Route.useRouteContext();
-  const qc = useQueryClient();
-  const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups">("posts");
+  const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups" | "assinantes">("posts");
   const [editing, setEditing] = useState(false);
 
   const { data: profile } = useQuery({
@@ -108,9 +107,9 @@ function Perfil() {
             {profile?.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           </div>
 
-          <div className="mt-5 grid grid-cols-4 border-y border-border py-3 text-center">
-            {[["Posts", active.length], ["Ups recebidos", upsReceived], ["Amigos", friends], ["Assinantes", "—"]].map(([l, v]) => (
-              <div key={l as string}><p className="text-base font-bold">{v}</p><p className="flex items-center justify-center gap-1 text-xs text-muted-foreground">{l === "Assinantes" && <Star size={11} />}{l}</p></div>
+          <div className="mt-5 grid grid-cols-3 border-y border-border py-3 text-center">
+            {[["Posts", active.length], ["Ups recebidos", upsReceived], ["Amigos", friends]].map(([l, v]) => (
+              <div key={l as string}><p className="text-base font-bold">{v}</p><p className="text-xs text-muted-foreground">{l}</p></div>
             ))}
           </div>
           {profile?.show_totals !== false && <div className="mt-3 grid grid-cols-2 gap-2">
@@ -119,11 +118,13 @@ function Perfil() {
           </div>}
         </div>
 
-        <div className="mt-5 grid grid-cols-4 border-b border-border">
-          {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"]] as const).map(([k, I, l]) => (
+        <div className="mt-5 grid grid-cols-5 border-b border-border">
+          {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
             <button key={k} onClick={() => setTab(k)} className={`flex flex-col items-center justify-center gap-1 py-3 text-[11px] sm:flex-row sm:text-xs ${tab === k ? "border-b-2 border-foreground font-semibold" : "text-muted-foreground"}`}><I size={15} /> {l}</button>
           ))}
         </div>
+
+        {tab === "assinantes" && <Empty text="Seus assinantes aparecerão aqui quando as assinaturas estiverem disponíveis." />}
 
         {tab === "produtos" && (
           products.length ? (
