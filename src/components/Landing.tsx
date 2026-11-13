@@ -1,54 +1,75 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Code2, CreditCard, Layers3, Package, Palette, Puzzle, Rocket, ShieldCheck, ShoppingBag, Sparkles, Wrench } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BrainCircuit, Code2, Compass, GraduationCap, Layers3, Palette, ShieldCheck, Sparkles, Terminal, Workflow } from "lucide-react";
 import voxel from "@/assets/voxel-chrome.jpg";
 
-const categories = [
-  { title: "SaaS & Micro-SaaS", copy: "Aplicações, assinaturas e ferramentas online.", icon: Rocket },
-  { title: "Serviços digitais", copy: "Desenvolvimento, design, consultoria e suporte.", icon: Wrench },
-  { title: "Templates & UI Kits", copy: "Interfaces, componentes e recursos visuais.", icon: Palette },
-  { title: "Plugins & automações", copy: "Extensões, integrações e fluxos inteligentes.", icon: Puzzle },
-  { title: "Software & código", copy: "Bibliotecas, scripts, licenças e utilitários.", icon: Code2 },
-  { title: "Produtos digitais", copy: "E-books, arquivos, materiais e conteúdos.", icon: Package },
+const schools = [
+  { title: "IA & Vibe Coding", copy: "Crie produtos, agentes e automações com inteligência artificial.", icon: BrainCircuit, number: "01" },
+  { title: "Frontend & Web", copy: "Interfaces modernas, acessíveis e responsivas, do zero ao avançado.", icon: Code2, number: "02" },
+  { title: "Backend & Engenharia", copy: "APIs, bancos de dados, arquitetura, integrações e deploy.", icon: Terminal, number: "03" },
+  { title: "Design & UX/UI", copy: "Pesquisa, prototipação, sistemas visuais e experiência de produto.", icon: Palette, number: "04" },
+  { title: "Cibersegurança", copy: "Redes, segurança web, defesa e laboratórios controlados.", icon: ShieldCheck, number: "05" },
+  { title: "Produto & Carreira", copy: "Portfólio, documentação, colaboração e prática profissional.", icon: Workflow, number: "06" },
+];
+
+const paths = [
+  { title: "Desenvolvedor com IA", meta: "IA · Frontend · Backend", copy: "Da primeira ideia ao produto full-stack." },
+  { title: "Designer de Produto", meta: "UX Research · UI · Design System", copy: "Transforme problemas reais em experiências." },
+  { title: "Fundamentos de Segurança", meta: "Redes · Linux · Web Security", copy: "Aprenda defesa digital com prática responsável." },
 ];
 
 export function Landing() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#090909] pb-12 text-white">
+    <main className="min-h-screen overflow-hidden bg-[#080808] pb-16 text-white">
       <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
         <Link to="/" className="font-display text-xl font-extrabold tracking-tight">chroma<span className="text-white/45">X</span></Link>
-        <nav className="hidden items-center gap-7 text-xs text-white/45 md:flex"><a href="#categorias" className="hover:text-white">Categorias</a><a href="#como-funciona" className="hover:text-white">Como funciona</a><a href="#seguranca" className="hover:text-white">Segurança</a></nav>
-        <Link to="/auth" className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2.5 text-xs font-semibold transition hover:bg-white hover:text-black">Acessar conta <ArrowUpRight size={14}/></Link>
+        <nav className="hidden items-center gap-7 text-xs text-white/45 md:flex">
+          <a href="#escolas" className="transition hover:text-white">Escolas</a>
+          <a href="#trilhas" className="transition hover:text-white">Trilhas</a>
+          <a href="#metodo" className="transition hover:text-white">Método</a>
+        </nav>
+        <Link to="/auth" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-bold text-black transition hover:bg-white/85">Entrar <ArrowUpRight size={14}/></Link>
       </header>
 
-      <section className="relative mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 sm:px-8 sm:py-20 lg:grid-cols-[1.05fr_.95fr]">
-        <div className="pointer-events-none absolute -left-32 top-10 h-80 w-80 rounded-full bg-white/[.035] blur-[100px]"/>
+      <section className="relative mx-auto grid max-w-7xl items-center gap-8 px-5 py-10 sm:px-8 sm:py-20 lg:grid-cols-[1.08fr_.92fr]">
+        <div className="pointer-events-none absolute -left-32 top-10 h-80 w-80 rounded-full bg-white/[.045] blur-[100px]"/>
         <div className="relative z-10">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[.2em] text-white/55"><span className="h-1.5 w-1.5 rounded-full bg-white"/> Marketplace & pagamentos digitais</span>
-          <h1 className="mt-6 max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">Seu negócio digital. <span className="text-white/45">Em um só lugar.</span></h1>
-          <p className="mt-6 max-w-xl text-sm leading-7 text-white/55 sm:text-base">A ChromaX conecta quem cria e quem compra SaaS, serviços e produtos digitais. Organize seu catálogo, apresente suas soluções e acompanhe sua operação em uma experiência simples e profissional.</p>
-          <div className="mt-8 flex flex-wrap gap-3"><Link to="/auth" className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3.5 text-xs font-bold text-black transition hover:bg-white/85">Começar agora <ArrowRight size={15}/></Link><a href="#categorias" className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-5 py-3.5 text-xs font-semibold text-white/75 hover:bg-white/[.06]">Explorar categorias <ShoppingBag size={15}/></a></div>
-          <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-[10px] text-white/35"><span className="flex items-center gap-2"><Layers3 size={13}/> Catálogo digital</span><span className="flex items-center gap-2"><CreditCard size={13}/> Gestão de cobranças</span><span className="flex items-center gap-2"><ShieldCheck size={13}/> Operação segura</span></div>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/[.07] px-3 py-1.5 font-mono text-[9px] uppercase tracking-[.2em] text-white/60"><span className="h-1.5 w-1.5 rounded-full bg-white"/> Escola digital · Tecnologia & criatividade</span>
+          <h1 className="mt-6 max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">Aprenda hoje. <span className="text-white/40">Construa o que vem depois.</span></h1>
+          <p className="mt-6 max-w-xl text-sm leading-7 text-white/55 sm:text-base">Uma jornada prática por inteligência artificial, desenvolvimento, design e segurança. Aprenda com projetos, evolua por trilhas e transforme conhecimento em trabalho que você pode compartilhar.</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/auth" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3.5 text-xs font-bold text-black transition hover:bg-white/85">Começar a aprender <ArrowRight size={15}/></Link>
+            <a href="#escolas" className="inline-flex items-center gap-2 rounded-full bg-white/[.07] px-5 py-3.5 text-xs font-semibold text-white/80 transition hover:bg-white/[.12]">Explorar escolas <Compass size={15}/></a>
+          </div>
+          <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-[10px] text-white/35"><span className="flex items-center gap-2"><Layers3 size={13}/> Trilhas guiadas</span><span className="flex items-center gap-2"><GraduationCap size={13}/> Certificados por critérios</span><span className="flex items-center gap-2"><Sparkles size={13}/> Aprendizagem prática</span></div>
         </div>
         <div className="relative mx-auto w-full max-w-lg">
-          <div className="absolute inset-10 rounded-full bg-white/[.07] blur-[85px]"/>
+          <div className="absolute inset-10 rounded-full bg-white/[.08] blur-[85px]"/>
           <img src={voxel} alt="Escultura geométrica cromada da identidade ChromaX" className="relative mx-auto w-full drop-shadow-[0_28px_65px_rgba(255,255,255,.08)]"/>
-          <div className="absolute bottom-2 left-1 rounded-2xl border border-white/10 bg-[#111]/95 p-4 shadow-2xl backdrop-blur-xl sm:bottom-8 sm:left-0"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-black"><Sparkles size={17}/></span><div><p className="text-[9px] uppercase tracking-widest text-white/40">Ecossistema digital</p><p className="mt-1 text-xs font-semibold">Crie · Venda · Gerencie</p></div></div></div>
+          <div className="absolute bottom-2 left-1 rounded-2xl bg-[#151515]/95 p-4 shadow-2xl backdrop-blur-xl sm:bottom-8 sm:left-0"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-black"><Sparkles size={17}/></span><div><p className="text-[9px] uppercase tracking-widest text-white/40">O próximo passo</p><p className="mt-1 text-xs font-semibold">Aprender · Praticar · Compartilhar</p></div></div></div>
         </div>
       </section>
 
-      <section id="categorias" className="border-y border-white/10 bg-[#101010] px-5 py-16 sm:px-8 sm:py-20">
-        <div className="mx-auto max-w-7xl"><div className="max-w-2xl"><p className="font-mono text-[9px] uppercase tracking-[.22em] text-white/40">O que você pode oferecer</p><h2 className="mt-3 font-display text-2xl font-bold sm:text-4xl">Tudo que movimenta o <span className="text-white/45">mercado digital.</span></h2><p className="mt-3 text-sm leading-6 text-white/45">Uma estrutura flexível para diferentes tipos de negócio, sem limitar o vendedor a um único segmento.</p></div>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{categories.map(({title,copy,icon:Icon},i)=><article key={title} className="group rounded-2xl bg-[#181818] p-5 transition hover:bg-[#202020]"><div className="flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white/[.07] text-white/75"><Icon size={19}/></span><span className="font-mono text-[9px] text-white/25">0{i+1}</span></div><h3 className="mt-5 text-sm font-semibold">{title}</h3><p className="mt-2 text-xs leading-5 text-white/40">{copy}</p></article>)}</div>
+      <section id="escolas" className="scroll-mt-8 bg-[#101010] px-5 py-16 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div className="max-w-2xl"><p className="font-mono text-[9px] uppercase tracking-[.22em] text-white/40">Seis escolas · Uma jornada</p><h2 className="mt-3 font-display text-2xl font-bold sm:text-4xl">Conhecimento para <span className="text-white/40">construir de verdade.</span></h2><p className="mt-3 text-sm leading-6 text-white/45">Escolha uma especialidade ou combine áreas para desenvolver habilidades completas.</p></div><Link to="/auth" className="inline-flex w-fit items-center gap-2 text-xs font-semibold text-white/75 transition hover:text-white">Acessar plataforma <ArrowUpRight size={14}/></Link></div>
+          <div className="mt-8 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {schools.map(({title,copy,icon:Icon,number})=><article key={title} className="group min-h-44 bg-[#181818] p-5 transition hover:bg-[#202020]"><div className="flex items-center justify-between"><span className="grid h-10 w-10 place-items-center bg-white/[.07] text-white/80"><Icon size={19}/></span><span className="font-mono text-[9px] text-white/25">{number}</span></div><h3 className="mt-5 text-sm font-semibold">{title}</h3><p className="mt-2 max-w-sm text-xs leading-5 text-white/45">{copy}</p></article>)}
+          </div>
         </div>
       </section>
 
-      <section id="como-funciona" className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-2 lg:items-center">
-        <div><p className="font-mono text-[9px] uppercase tracking-[.22em] text-white/40">Painel do vendedor</p><h2 className="mt-3 font-display text-3xl font-bold leading-tight sm:text-5xl">Mais clareza para cuidar do seu negócio.</h2><p className="mt-5 max-w-xl text-sm leading-7 text-white/50">A área logada foi pensada para quem vende: catálogo, visão geral da operação, cobranças e carteira em uma navegação direta, com prioridade para o uso no celular.</p><Link to="/auth" className="mt-7 inline-flex items-center gap-2 text-xs font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">Acessar painel <ArrowUpRight size={14}/></Link></div>
-        <div className="rounded-2xl bg-[#141414] p-4 sm:p-6"><div className="flex items-center justify-between border-b border-white/10 pb-4"><div><p className="text-[9px] uppercase tracking-widest text-white/35">CHROMAX / DASHBOARD</p><p className="mt-1 text-sm font-semibold">Visão geral</p></div><div className="rounded-lg bg-white px-3 py-2 text-[10px] font-bold text-black">Painel</div></div><div className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl bg-[#202020] p-4"><p className="text-[10px] text-white/40">Produtos</p><p className="mt-3 text-2xl font-semibold">—</p></div><div className="rounded-xl bg-[#202020] p-4"><p className="text-[10px] text-white/40">Vendas registradas</p><p className="mt-3 text-2xl font-semibold">—</p></div></div><div className="mt-3 rounded-xl bg-[#202020] p-4"><div className="flex items-center gap-2 text-xs font-medium"><CreditCard size={15}/> Cobranças e recebimentos</div><p className="mt-2 text-[10px] leading-5 text-white/40">Área preparada para integrar o provedor de pagamentos.</p></div></div>
+      <section id="trilhas" className="mx-auto max-w-7xl scroll-mt-8 px-5 py-16 sm:px-8 sm:py-20">
+        <div className="max-w-2xl"><p className="font-mono text-[9px] uppercase tracking-[.22em] text-white/40">Aprendizado com direção</p><h2 className="mt-3 font-display text-2xl font-bold sm:text-4xl">Não é só assistir. <span className="text-white/40">É chegar a algum lugar.</span></h2><p className="mt-3 text-sm leading-6 text-white/45">As trilhas conectam fundamentos, prática e projetos para você saber o que estudar e como evoluir.</p></div>
+        <div className="mt-8 grid gap-3 md:grid-cols-3">{paths.map((path,index)=><article key={path.title} className="bg-[#141414] p-5"><span className="font-mono text-[9px] text-white/35">TRILHA 0{index+1}</span><h3 className="mt-5 text-base font-semibold">{path.title}</h3><p className="mt-2 text-[10px] uppercase tracking-wider text-white/40">{path.meta}</p><p className="mt-4 text-xs leading-5 text-white/50">{path.copy}</p></article>)}</div>
       </section>
 
-      <section id="seguranca" className="border-y border-white/10 bg-[#101010] px-5 py-14 sm:px-8"><div className="mx-auto flex max-w-7xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex max-w-2xl gap-4"><ShieldCheck className="mt-1 shrink-0 text-white/65" size={25}/><div><h2 className="text-sm font-semibold">Transparência em cada etapa</h2><p className="mt-2 text-xs leading-6 text-white/45">A carteira e o processamento de pagamentos só serão apresentados como ativos depois que o gateway estiver conectado e validado. Sem saldos ou transações fictícias.</p></div></div><Link to="/auth" className="inline-flex w-fit items-center gap-2 rounded-lg bg-white px-5 py-3 text-xs font-bold text-black">Criar minha conta <ArrowRight size={14}/></Link></div></section>
-      <footer className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-7 text-[10px] text-white/30 sm:flex-row sm:justify-between sm:px-8"><span>chromaX · Marketplace digital</span><span>SaaS · Serviços · Produtos digitais</span></footer>
+      <section id="metodo" className="border-y border-white/10 bg-[#101010] px-5 py-14 sm:px-8 sm:py-16">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
+          <div><p className="font-mono text-[9px] uppercase tracking-[.22em] text-white/40">Aprendizagem aplicada</p><h2 className="mt-3 font-display text-3xl font-bold leading-tight sm:text-4xl">Conhecimento que aparece no seu portfólio.</h2><p className="mt-4 max-w-xl text-sm leading-7 text-white/50">Cada jornada deve aproximar teoria e prática: exercícios, projetos finais, feedback e uma comunidade para trocar experiências. Seus projetos continuam nas publicações e podem compor seu perfil compartilhável.</p></div>
+          <div className="grid gap-2 sm:grid-cols-2"><div className="bg-[#191919] p-5"><GraduationCap size={20} className="text-white/70"/><h3 className="mt-4 text-sm font-semibold">Certificação clara</h3><p className="mt-2 text-xs leading-5 text-white/45">Critérios de conclusão e avaliação definidos por curso.</p></div><div className="bg-[#191919] p-5"><ShieldCheck size={20} className="text-white/70"/><h3 className="mt-4 text-sm font-semibold">Segurança em primeiro lugar</h3><p className="mt-2 text-xs leading-5 text-white/45">Privacidade, controle de acesso e laboratórios autorizados.</p></div></div>
+        </div>
+      </section>
+      <footer className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-7 text-[10px] text-white/30 sm:flex-row sm:justify-between sm:px-8"><span>chromaX · Aprenda. Construa. Evolua.</span><span>IA · Código · Design · Segurança</span></footer>
     </main>
   );
 }
