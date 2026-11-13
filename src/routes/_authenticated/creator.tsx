@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowUpRight, Boxes, Check, ChevronRight, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, Gamepad2, GraduationCap, HardDrive, ImagePlus, Package, Plus, Search, Star, Trash2, Upload, X, Code2 } from "lucide-react";
+import { Activity, ArrowLeft, ArrowRight, ArrowUpRight, Boxes, Check, ChevronRight, Crown, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, Gamepad2, GraduationCap, HardDrive, ImagePlus, Package, Plus, Search, Star, Trash2, TrendingUp, Upload, Users, X, Code2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -79,7 +79,7 @@ function Creator() {
     supabase.from("creator_profiles").select("creator_type,creator_types,game,offering").eq("user_id", user.id).maybeSingle().then(({ data, error }) => {
       if (!alive) return;
       if (error) toast.error("Não foi possível carregar seu perfil Creator", { description: error.message });
-      if (data) { const selected = (data.creator_types?.length ? data.creator_types : [data.creator_type]).filter((value): value is CreatorKind => ["dev", "gamer", "mentoria"].includes(value)); setCreatorTypes(selected); setCreatorType(selected[0] ?? null); setGame(data.game ?? ""); setOffering(data.offering ?? ""); }
+      if (data) { const selected = (data.creator_types?.length ? data.creator_types : [data.creator_type]).filter((value): value is CreatorKind => ["dev", "gamer", "mentoria"].includes(value)); setCreatorTypes(selected); setGame(data.game ?? ""); setOffering(data.offering ?? ""); }
       else setSetupOpen(true);
       setSetupLoading(false);
     });
@@ -234,19 +234,56 @@ function Creator() {
   const filesHere = activeProject?.files.filter((x) => x.folderId === activeFolderId && x.name.toLowerCase().includes(search.toLowerCase())) ?? [];
 
   return (
-    <main className="min-h-screen bg-background pb-28 font-sans text-foreground">
+    <main className="min-h-screen bg-[#09090d] pb-10 font-sans text-foreground">
       <SiteHeader />
       <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         {setupLoading ? <div className="py-20 text-center text-sm text-muted-foreground">Carregando Creator...</div> : <>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div><p className="font-mono text-[10px] tracking-[.24em] text-muted-foreground">CHROMAX / CREATOR</p><h1 className="mt-2 text-3xl font-bold tracking-tight">{creatorTypes.length > 1 ? "Seu espaço de criação." : creatorTypes.includes("dev") ? "Seu espaço de criação." : creatorTypes.includes("gamer") ? "Seu espaço gamer." : "Sua área de mentoria."}</h1></div>
-          <div className="flex flex-wrap gap-2">
-            {creatorTypes.includes("dev") && <><button onClick={() => setSection("workspace")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "workspace" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><HardDrive className="mr-2 inline" size={14}/>Projetos</button><button onClick={() => setSection("publish")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "publish" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Package className="mr-2 inline" size={14}/>Marketplace</button><button onClick={() => setSection("subscribers")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "subscribers" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Star className="mr-2 inline" size={14}/>Assinantes</button></>}
-            <button onClick={() => setSetupOpen(true)} className="rounded-xl border border-border px-3 py-2.5 text-xs">Editar perfil</button>
+        <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-br from-[#171023] via-[#101016] to-[#0b0b10] p-5 sm:p-8">
+          <div className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-violet-500/20 bg-violet-600/10 blur-3xl"/>
+          <div className="relative flex flex-wrap items-start justify-between gap-5">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/25 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-300"><Crown size={14} className="fill-violet-400/20"/> Creator Hub</div>
+              <h1 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">{creatorTypes.length > 1 ? "Bem-vindo ao seu espaço de criação." : creatorTypes.includes("gamer") ? "Sua comunidade começa aqui." : creatorTypes.includes("mentoria") ? "Compartilhe o que você sabe." : "Bem-vindo de volta!"}</h1>
+              <p className="mt-2 max-w-2xl text-sm text-zinc-400 sm:text-base">Gerencie seus projetos, compartilhe seu trabalho e desenvolva sua presença no ChromaX.</p>
+            </div>
+            <button onClick={() => setSetupOpen(true)} className="relative rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs font-medium text-zinc-300 transition hover:bg-white/[0.08]">Configurar Creator</button>
+          </div>
+          <div className="relative mt-7 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+            {[
+              {label:"Projetos",value:String(projects.length),Icon:Boxes},
+              {label:"Arquivos",value:String(projects.reduce((total, project) => total + project.files.length, 0)),Icon:HardDrive},
+              {label:"Assinantes",value:String(subscriberRows.length),Icon:Users},
+              {label:"Áreas ativas",value:String(creatorTypes.length),Icon:TrendingUp},
+            ].map(({label,value,Icon}) => <div key={label} className="rounded-2xl border border-white/[0.07] bg-black/25 p-4"><div className="flex items-center justify-between text-zinc-400"><span className="text-[11px]">{label}</span><Icon size={16} className="text-violet-400"/></div><p className="mt-2 text-2xl font-semibold tracking-tight text-white">{value}</p></div>)}
           </div>
         </div>
-        {creatorTypes.includes("gamer") && <div className="mt-8 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-card p-5"><Gamepad2 size={22}/><p className="mt-3 text-xs text-muted-foreground">Jogo</p><h2 className="mt-1 text-lg font-semibold">{game || "Não definido"}</h2></div><div className="rounded-2xl bg-card p-5"><Star size={22}/><p className="mt-3 text-xs text-muted-foreground">O que oferece</p><p className="mt-1 text-sm">{offering || "Adicione sua oferta"}</p></div></div>}
-        {creatorTypes.includes("mentoria") && <div className="mt-8 rounded-2xl bg-card p-5"><GraduationCap size={22}/><p className="mt-3 text-xs text-muted-foreground">Sua mentoria</p><p className="mt-1 text-sm">{offering || "Configure sua mentoria"}</p></div>}
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.35fr_.85fr]">
+          <section className="rounded-3xl border border-white/[0.08] bg-[#101015] p-5 sm:p-6">
+            <div className="flex items-center justify-between gap-3"><div><h2 className="text-base font-semibold">Seu modo de criação</h2><p className="mt-1 text-xs text-zinc-500">Áreas que fazem parte do seu Creator Hub</p></div><Crown size={18} className="text-violet-400"/></div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {creatorTypes.map((kind) => {
+                const config = kind === "dev" ? {name:"Dev",detail:"Projetos e marketplace",Icon:Code2} : kind === "gamer" ? {name:"Gamer",detail:game || "Jogos e comunidade",Icon:Gamepad2} : {name:"Mentoria",detail:offering || "Ensine e compartilhe",Icon:GraduationCap};
+                const Icon = config.Icon;
+                return <div key={kind} className="rounded-2xl border border-violet-500/20 bg-violet-500/[0.06] p-4"><Icon size={20} className="text-violet-400"/><p className="mt-3 text-sm font-semibold">{config.name}</p><p className="mt-1 line-clamp-2 text-[11px] text-zinc-500">{config.detail}</p></div>;
+              })}
+              {!creatorTypes.length && <button onClick={() => setSetupOpen(true)} className="rounded-2xl border border-dashed border-white/15 p-5 text-left text-sm text-zinc-400">Escolher áreas do Creator <ArrowRight size={15} className="ml-2 inline"/></button>}
+            </div>
+          </section>
+          <section className="rounded-3xl border border-white/[0.08] bg-[#101015] p-5 sm:p-6">
+            <div className="flex items-center gap-2"><Activity size={17} className="text-violet-400"/><h2 className="text-base font-semibold">Acesso rápido</h2></div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {creatorTypes.includes("dev") && <><button onClick={() => { setSection("workspace"); setActiveProjectId(null); }} className="flex min-h-16 items-center gap-2 rounded-xl bg-white/[0.04] px-3 text-left text-xs transition hover:bg-violet-500/10"><Plus size={17} className="text-violet-400"/>Novo projeto</button><button onClick={() => setSection("publish")} className="flex min-h-16 items-center gap-2 rounded-xl bg-white/[0.04] px-3 text-left text-xs transition hover:bg-violet-500/10"><Package size={17} className="text-violet-400"/>Marketplace</button><button onClick={() => setSection("subscribers")} className="flex min-h-16 items-center gap-2 rounded-xl bg-white/[0.04] px-3 text-left text-xs transition hover:bg-violet-500/10"><Users size={17} className="text-violet-400"/>Assinantes</button></>}
+              <button onClick={() => setSetupOpen(true)} className="flex min-h-16 items-center gap-2 rounded-xl bg-white/[0.04] px-3 text-left text-xs transition hover:bg-violet-500/10"><Crown size={17} className="text-violet-400"/>Editar áreas</button>
+            </div>
+          </section>
+        </div>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {creatorTypes.includes("dev") && <><button onClick={() => { setSection("workspace"); setActiveProjectId(null); }} className={"rounded-xl px-4 py-2.5 text-xs font-semibold transition " + (section === "workspace" ? "bg-violet-600 text-white shadow-lg shadow-violet-950/40" : "border border-white/10 bg-white/[0.03] text-zinc-400")}><HardDrive className="mr-2 inline" size={14}/>Projetos</button><button onClick={() => setSection("publish")} className={"rounded-xl px-4 py-2.5 text-xs font-semibold transition " + (section === "publish" ? "bg-violet-600 text-white shadow-lg shadow-violet-950/40" : "border border-white/10 bg-white/[0.03] text-zinc-400")}><Package className="mr-2 inline" size={14}/>Marketplace</button><button onClick={() => setSection("subscribers")} className={"rounded-xl px-4 py-2.5 text-xs font-semibold transition " + (section === "subscribers" ? "bg-violet-600 text-white shadow-lg shadow-violet-950/40" : "border border-white/10 bg-white/[0.03] text-zinc-400")}><Star className="mr-2 inline" size={14}/>Assinantes</button></>}
+            {(creatorTypes.includes("gamer") || creatorTypes.includes("mentoria")) && <span className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-xs text-zinc-400">{creatorTypes.includes("gamer") ? "Área gamer" : "Mentoria"}</span>}
+          </div>
+          {activeProject && <span className="text-xs text-zinc-500">Projeto aberto: {activeProject.name}</span>}
+        </div>
 
         {creatorTypes.includes("dev") && section === "workspace" && (
           <div className="mt-8">
