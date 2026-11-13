@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Camera, Plus, Repeat2 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommunity } from "./CommunityProvider";
 
 type PreviewMode = "notes" | "stories";
 
 export function HomeSocialPreview() {
-  const { user, composeStory } = useCommunity();
+  const { user, compose, composeStory } = useCommunity();
   const [activeStory, setActiveStory] = useState<any>(null);
   const [mode, setMode] = useState<PreviewMode>("stories");
 
@@ -59,7 +58,7 @@ export function HomeSocialPreview() {
         <div key={mode} className="min-h-[66px] animate-in fade-in slide-in-from-right-2 duration-300">
           {mode === "notes" ? (
             <div className="scrollbar-none flex items-center gap-2 overflow-x-auto pb-0.5">
-              {user && <button type="button" onClick={() => composeStory()} className="flex h-11 min-w-[132px] shrink-0 items-center gap-2 rounded-full border border-white/15 bg-white/[.045] px-2.5 text-left transition hover:bg-white/[.08]">
+              {user && <button type="button" onClick={() => compose()} className="flex h-11 min-w-[132px] shrink-0 items-center gap-2 rounded-full border border-white/15 bg-white/[.045] px-2.5 text-left transition hover:bg-white/[.08]">
                 <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-dashed border-white/35 text-white/70"><Plus size={15}/></span>
                 <span className="text-[11px] font-medium text-white/75">Sua nota</span>
               </button>}
@@ -73,7 +72,7 @@ export function HomeSocialPreview() {
             </div>
           ) : (
             <div className="scrollbar-none flex items-start gap-4 overflow-x-auto pb-0.5">
-              {user && <button type="button" onClick={() => window.dispatchEvent(new Event("chromax:open-camera"))} className="flex w-14 shrink-0 flex-col items-center gap-1.5">
+              {user && <button type="button" onClick={() => window.dispatchEvent(new Event("chromax:open-story-camera"))} className="flex w-14 shrink-0 flex-col items-center gap-1.5">
                 <span className="relative grid h-12 w-12 place-items-center rounded-full border border-dashed border-white/45 bg-white/[.04] text-white/75"><Camera size={18}/><span className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full border border-[#0d0d11] bg-white text-[#0d0d11]"><Plus size={10}/></span></span>
                 <span className="max-w-full truncate text-[10px] text-white/55">Seu story</span>
               </button>}
