@@ -24,7 +24,31 @@ export function SiteHeader() {
       return (data ?? []).map((request) => ({ ...request, profile: profiles.data?.find((p) => p.id === request.requester_id) ?? null }));
     },
   });
-  const count = requests.data?.length ?? 0;
+  const activity = useQuery({
+    queryKey: ["post-activity-notifications", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data: ownPosts, error: ownError } = await supabase.from("feed_posts").select("id").eq("author_id", user!.id).limit(100);
+      if (ownError) throw ownError;
+      const ids = (ownPosts ?? []).map((p) => p.id);
+      if (!ids.length) return [];
+      const [ups, reposts] = await Promise.all([
+        supabase.from("post_ups").select("post_id,user_id,created_at").in("post_id", ids).neq("user_id", user!.id).order("created_at", { ascending: false }).limit(12),
+        supabase.from("post_reposts").select("post_id,user_id,created_at").in("post_id", ids).neq("user_id", user!.id).order("created_at", { ascending: false }).limit(12),
+      ]);
+      if (ups.error) throw ups.error;
+      if (reposts.error) throw reposts.error;
+      const rows = [
+        ...(ups.data ?? []).map((row) => ({ ...row, kind: "up" as const })),
+        ...(reposts.data ?? []).map((row) => ({ ...row, kind: "repost" as const })),
+      ].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 12);
+      const actorIds = [...new Set(rows.map((row) => row.user_id))];
+      const profiles = actorIds.length ? await supabase.from("profiles").select("id,display_name,username").in("id", actorIds) : { data: [], error: null };
+      if (profiles.error) throw profiles.error;
+      return rows.map((row) => ({ ...row, profile: profiles.data?.find((p) => p.id === row.user_id) ?? null }));
+    },
+  });
+  const count = (requests.data?.length ?? 0) + (activity.data?.length ?? 0);
 
   async function respond(id: string, status: "accepted" | "rejected") {
     const { error } = await supabase.from("friendships").update({ status }).eq("id", id).eq("addressee_id", user!.id);
@@ -56,7 +80,15 @@ export function SiteHeader() {
                     <button onClick={() => respond(request.id, "accepted")} aria-label="Aceitar pedido" className="rounded-full bg-white px-2.5 py-2 text-black"><Check size={14}/></button>
                     <button onClick={() => respond(request.id, "rejected")} aria-label="Recusar pedido" className="rounded-full border border-white/20 px-2.5 py-2 text-white/70"><X size={14}/></button>
                   </div>;
-                }) : <div className="px-5 py-10 text-center"><Bell size={22} className="mx-auto text-white/30"/><p className="mt-3 text-xs text-white/60">Você está em dia. Nenhuma solicitação pendente.</p></div>}
+                }) : null}
+                {activity.data?.map((item, index) => {
+                  const name = item.profile?.display_name || item.profile?.username || "Alguém";
+                  return <Link key={`${item.kind}-${item.post_id}-${item.user_id}-${index}`} to="/post/$id" params={{ id: item.post_id }} onClick={() => setOpen(false)} className="flex items-center gap-3 border-b border-white/[.07] p-3 hover:bg-white/[.04]">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 bg-white/[.05] text-xs">{item.kind === "up" ? "↑" : "↻"}</span>
+                    <span className="min-w-0"><span className="block truncate text-xs font-semibold">{name} {item.kind === "up" ? "deu Up" : "repostou"} em seu post</span><span className="text-[10px] text-white/45">{new Date(item.created_at).toLocaleDateString("pt-BR")}</span></span>
+                  </Link>;
+                })}
+                {!requests.isLoading && !activity.isLoading && count === 0 && <div className="px-5 py-10 text-center"><Bell size={22} className="mx-auto text-white/30"/><p className="mt-3 text-xs text-white/60">Você está em dia. Nenhuma notificação nova.</p></div>}
               </div>
             </div>}
           </> : <Button asChild variant="ghost" size="icon" className="rounded-full text-zinc-300 hover:bg-white/10 hover:text-white"><Link to="/auth" aria-label="Entrar" title="Entrar"><User/></Link></Button>}
