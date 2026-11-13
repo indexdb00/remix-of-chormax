@@ -184,6 +184,12 @@ export type Database = {
           },
         ]
       }
+      stories: {
+        Row: { id: string; author_id: string; media_url: string; media_type: string; created_at: string; expires_at: string }
+        Insert: { id?: string; author_id: string; media_url: string; media_type: string; created_at?: string; expires_at: string }
+        Update: { id?: string; author_id?: string; media_url?: string; media_type?: string; created_at?: string; expires_at?: string }
+        Relationships: [{ foreignKeyName: "stories_author_id_fkey"; columns: ["author_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }]
+      }
       friendships: {
         Row: {
           addressee_id: string
