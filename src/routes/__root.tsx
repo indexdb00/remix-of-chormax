@@ -13,7 +13,8 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { CommunityProvider } from "@/components/CommunityProvider";
 import { BottomNav } from "@/components/BottomNav";
-import { PostComposer } from "@/components/PostComposer";\nimport { CameraSwipe } from "@/components/CameraSwipe";
+import { PostComposer } from "@/components/PostComposer";
+import { CameraSwipe } from "@/components/CameraSwipe";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -130,7 +131,8 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <BottomNav />
-        <PostComposer />\n        <CameraSwipe />
+        <PostComposer />
+        <CameraSwipe />
       </CommunityProvider>
       <Toaster />
     </QueryClientProvider>
