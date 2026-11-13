@@ -9,9 +9,9 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Entrar — chromaX" },
-      { name: "description", content: "Entre ou crie sua conta no chromaX." },
+      { name: "description", content: "Acesse sua conta para gerenciar produtos e negócios digitais." },
       { property: "og:title", content: "Entrar — chromaX" },
-      { property: "og:description", content: "Acesse sua comunidade de projetos digitais no chromaX." },
+      { property: "og:description", content: "Acesse seu painel de produtos, cobranças e recebimentos digitais." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
