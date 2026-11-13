@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Layers3, Network, Sparkles } from "lucide-react";
 
@@ -19,10 +18,6 @@ export const Route = createFileRoute("/auth")({
   }),
   component: AuthPage,
 });
-
-const G = () => (
-  <svg aria-hidden="true" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-);
 
 const slides = [
   { eyebrow: "NETWORK DEV", title: "Conecte-se ao\nuniverso dev.", copy: "Encontre pessoas, troque ideias e construa conexões que fazem seus projetos avançarem.", icon: Network, tag: "Comunidade em movimento" },
@@ -70,24 +65,6 @@ function AuthPage() {
     setBusy(false);
   }
 
-  async function google() {
-    if (busy) return;
-    setBusy(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/auth",
-      });
-      if (result.error) {
-        console.error("[Google OAuth]", result.error);
-        toast.error("Não foi possível entrar com Google. Tente novamente.");
-        setBusy(false);
-      }
-    } catch (error) {
-      console.error("[Google OAuth] Erro inesperado:", error);
-      toast.error("Falha ao conectar com o Google. Tente novamente.");
-      setBusy(false);
-    }
-  }
 
   const slide = slides[activeSlide];
   const voxelPositions = [[42,5],[62,18],[22,25],[43,39],[82,43],[4,49],[63,61],[24,72],[44,83],[83,85],[3,8],[103,28]];
@@ -115,7 +92,7 @@ function AuthPage() {
         .auth-slide-in { animation:authSlide .55s cubic-bezier(.2,.7,.2,1) both; }
         @keyframes authSlide { from{opacity:0;transform:translateY(13px) scale(.985)} to{opacity:1;transform:translateY(0) scale(1)} }
         @media(max-height:720px){.auth-layout{min-height:0;padding-top:4px;padding-bottom:4px;gap:6px}.auth-stage{flex-basis:clamp(142px,23svh,180px)}.auth-glass{padding:12px 18px!important}.auth-glass-head{margin-bottom:8px!important}.auth-divider{margin-top:9px!important;margin-bottom:9px!important}.auth-form{gap:7px!important}.auth-label{margin-bottom:3px!important}.auth-input{padding-top:9px!important;padding-bottom:9px!important}.auth-switch{margin-top:9px!important;padding-top:8px!important}.auth-footer{display:none!important}}
-        @media(max-width:640px){.auth-stage{padding-left:10px;padding-right:10px}.voxel-scene{width:100px;height:100px}.voxel-cube{width:25px;height:25px}.auth-stage-copy h1{font-size:clamp(24px,7vw,34px)}.auth-stage-copy p{margin-top:7px;font-size:11px;line-height:1.45}.auth-stage-copy .auth-tag{margin-top:7px}.auth-glass{padding:15px!important}.auth-glass h2{font-size:19px}.auth-form{gap:8px!important}.auth-input{padding-top:10px!important;padding-bottom:10px!important}}
+        @media(max-width:640px){.auth-layout{height:calc(100svh - 56px);min-height:0;justify-content:center;gap:5px;padding:4px 12px}.auth-stage{flex:0 0 clamp(112px,19svh,150px);padding:5px 8px 17px;gap:10px;border-radius:20px}.voxel-scene{width:76px;height:76px}.voxel-cube{width:21px;height:21px}.auth-stage-copy{max-width:calc(100% - 82px)}.auth-stage-copy>span{margin-bottom:5px;padding:4px 7px;font-size:8px;letter-spacing:.14em}.auth-stage-copy h1{font-size:clamp(20px,6vw,28px);line-height:1.05}.auth-stage-copy p{margin-top:5px;font-size:10px;line-height:1.3}.auth-stage-copy .auth-tag{margin-top:5px;font-size:8px}.auth-stage>div[aria-label^="Slide"]{bottom:4px;right:9px;gap:7px}.auth-stage>button{padding:5px}.auth-glass{padding:11px 13px!important;border-radius:19px}.auth-glass-head{margin-bottom:7px!important}.auth-glass h2{font-size:17px}.auth-glass-head>div:last-child{padding:8px}.auth-form{gap:6px!important}.auth-label{font-size:9px!important}.auth-input{padding:8px 11px!important;font-size:12px!important;border-radius:9px!important}.auth-form>button{margin-top:1px;padding:10px 12px;font-size:10px}.auth-switch{margin-top:7px!important;padding-top:7px!important}.auth-divider{display:none!important}.auth-footer{display:none!important}}\n        @media(max-height:760px) and (max-width:640px){.auth-layout{gap:4px}.auth-stage{flex-basis:clamp(100px,16svh,124px)}.voxel-scene{width:66px;height:66px}.voxel-cube{width:18px;height:18px}.auth-stage-copy h1{font-size:clamp(18px,5.6vw,24px)}.auth-stage-copy p{font-size:9px;line-height:1.22}.auth-glass{padding:9px 12px!important}.auth-glass-head{margin-bottom:5px!important}.auth-form{gap:5px!important}.auth-input{padding-top:7px!important;padding-bottom:7px!important}.auth-switch{margin-top:5px!important;padding-top:5px!important}}
         @media(prefers-reduced-motion:reduce){.chrome-orb,.auth-slide-in{animation:none!important}}
       `}</style>
       <SiteHeader />
@@ -151,11 +128,6 @@ function AuthPage() {
             </div>
             <div className="rounded-2xl border border-white/15 bg-white/[.07] p-3 text-slate-200"><ArrowUpRight size={19}/></div>
           </div>
-
-          <button onClick={google} disabled={busy} className="flex w-full items-center justify-center gap-[10px] rounded-xl border border-white/20 bg-white/[.07] px-3 py-3 text-sm font-medium text-white transition hover:bg-white/[.13] disabled:cursor-not-allowed disabled:opacity-50">
-            <G /> {busy ? "Conectando..." : "Continuar com Google"}
-          </button>
-          <div className="auth-divider my-3 flex items-center gap-3 font-mono text-[10px] tracking-[.18em] text-slate-500"><span className="h-px flex-1 bg-white/15" />OU COM E-MAIL<span className="h-px flex-1 bg-white/15" /></div>
 
           <form onSubmit={submit} className="auth-form space-y-2">
             <label className="block">
