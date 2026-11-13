@@ -66,7 +66,7 @@ function Perfil() {
     queryKey: ["followers-count", user.id],
     queryFn: async () => (await supabase.from("profile_follows").select("id", { count: "exact", head: true }).eq("following_id", user.id)).count ?? 0,
   });
-  const { data: following = 0 } = useQuery({
+  const { data: subscriberCount = 0 } = useQuery({\n    queryKey: ["creator-subscriber-count", user.id],\n    queryFn: async () => (await supabase.from("creator_subscriptions").select("id", { count: "exact", head: true }).eq("creator_id", user.id).eq("status", "active")).count ?? 0,\n  });\n  const { data: following = 0 } = useQuery({
     queryKey: ["following-count", user.id],
     queryFn: async () => (await supabase.from("profile_follows").select("id", { count: "exact", head: true }).eq("follower_id", user.id)).count ?? 0,
   });
