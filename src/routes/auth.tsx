@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/auth")({
@@ -53,8 +52,31 @@ function AuthPage() {
   }
 
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-    if (r.error) toast.error("Não foi possível entrar com Google");
+    if (busy) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "select_account",
+          },
+        },
+      });
+
+      if (error) {
+        console.error("[Google OAuth] Não foi possível iniciar a autenticação:", error);
+        toast.error(error.message || "Não foi possível entrar com Google. Tente novamente.");
+        setBusy(false);
+      }
+      // Em caso de sucesso, o Supabase redireciona o navegador para o Google.
+    } catch (error) {
+      console.error("[Google OAuth] Erro inesperado:", error);
+      toast.error("Falha ao conectar com o Google. Verifique sua conexão e tente novamente.");
+      setBusy(false);
+    }
   }
 
   return (
@@ -64,8 +86,8 @@ function AuthPage() {
         <p className="font-mono text-sm text-accent">[ {mode === "in" ? "ACESSO" : "NOVA CONTA"} ]</p>
         <h1 className="mt-2 font-display text-3xl font-extrabold uppercase">{mode === "in" ? "Entrar" : "Criar conta"}</h1>
 
-        <button onClick={google} className="mt-8 flex w-full items-center justify-center gap-[10px] rounded-full border border-[#8E918F] bg-[#131314] px-3 py-2.5 text-sm font-medium text-[#E3E3E3]">
-          <G /> Continuar com Google
+        <button onClick={google} disabled={busy} className="mt-8 flex w-full items-center justify-center gap-[10px] rounded-full border border-[#8E918F] bg-[#131314] px-3 py-2.5 text-sm font-medium text-[#E3E3E3] disabled:cursor-not-allowed disabled:opacity-50">
+          <G /> {busy ? "Conectando..." : "Continuar com Google"}
         </button>
 
         <div className="my-6 flex items-center gap-3 font-mono text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />OU<span className="h-px flex-1 bg-border" /></div>
