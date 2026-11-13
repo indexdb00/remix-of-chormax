@@ -41,8 +41,8 @@ export function CameraSwipe() {
       }
       setSupported(true);
     } catch {
-      toast.error("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
-      setOpen(false);
+      setSupported(false);
+      toast.error("Não foi possível iniciar a câmera. Você ainda pode escolher uma mídia da galeria.");
     }
   }, [facing, stopCamera]);
 
