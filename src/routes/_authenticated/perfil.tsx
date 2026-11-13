@@ -86,23 +86,18 @@ function Perfil() {
   }
 
   const name = profile?.display_name || "Sem nome";
-  const showBanner = profile?.banner_url;
 
   return (
     <main className="min-h-screen bg-background pb-32 text-foreground">
       <SiteHeader />
       <div className="mx-auto max-w-3xl">
-        <div className="h-36 w-full overflow-hidden bg-card sm:h-52">
-          {showBanner ? <img src={profile!.banner_url!} alt="Banner" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-gradient-to-br from-secondary to-background" />}
-        </div>
-
-        <div className="px-4 sm:px-6">
-          <div className="-mt-12 flex items-end justify-between">
+        <div className="px-4 pt-6 sm:px-6">
+          <div className="flex items-end justify-between gap-3">
             <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-background bg-card sm:h-28 sm:w-28">
               {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold">{name[0]?.toUpperCase()}</span>}
             </div>
             <div className="flex gap-2 pb-1">
-              <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium"><Pencil size={14} /> Editar</button>
+              <button onClick={() => setEditing(true)} className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-gradient-to-b from-white/[0.14] to-white/[0.04] px-4 py-2.5 text-xs font-semibold text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,.16)] transition hover:border-white/40 hover:from-white/[0.2]"><Pencil size={14} /> Editar perfil</button>
               <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium"><Package size={14} /> Creator</Link>
               <Link to="/configuracoes" aria-label="Configurações" className="rounded-lg border border-border bg-card p-2"><Settings size={16} /></Link>
             </div>
@@ -187,26 +182,25 @@ function Empty({ text, cta }: { text: string; cta?: boolean }) {
   );
 }
 
-type P = { display_name: string | null; username: string | null; bio: string | null; logo_url: string | null; banner_url: string | null; name_changed_at: string | null };
+type P = { display_name: string | null; username: string | null; bio: string | null; logo_url: string | null; name_changed_at: string | null };
 
 function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; onClose: () => void }) {
   const qc = useQueryClient();
   const [f, setF] = useState({ display_name: "", username: "", bio: "" });
   const [busy, setBusy] = useState<string | null>(null);
   const logo = useRef<HTMLInputElement>(null);
-  const banner = useRef<HTMLInputElement>(null);
   useEffect(() => setF({ display_name: profile.display_name ?? "", username: profile.username ?? "", bio: profile.bio ?? "" }), [profile]);
 
   const next = profile.name_changed_at ? new Date(profile.name_changed_at).getTime() + 15 * DAY : 0;
   const locked = next > Date.now();
   const refresh = () => qc.invalidateQueries({ queryKey: ["profile", userId] });
 
-  async function upload(kind: "logo_url" | "banner_url", file?: File) {
+  async function upload(kind: "logo_url", file?: File) {
     if (!file) return;
     setBusy(kind);
     try {
       const url = await uploadMedia(userId, file);
-      const { error } = await supabase.from("profiles").update(kind === "logo_url" ? { logo_url: url } : { banner_url: url }).eq("id", userId);
+      const { error } = await supabase.from("profiles").update({ logo_url: url }).eq("id", userId);
       if (error) throw error;
       refresh();
     } catch (e) { toast.error("Falha no envio", { description: (e as Error).message }); }
@@ -229,15 +223,10 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
       <div onClick={(e) => e.stopPropagation()} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-border bg-card p-5 sm:rounded-2xl">
         <div className="flex items-center justify-between"><h2 className="font-bold">Editar perfil</h2><button onClick={onClose} aria-label="Fechar"><X size={18} /></button></div>
 
-        <button onClick={() => banner.current?.click()} className="relative mt-4 block h-28 w-full overflow-hidden rounded-xl bg-secondary">
-          {profile.banner_url && <img src={profile.banner_url} alt="" className="h-full w-full object-cover" />}
-          <span className="absolute inset-0 flex items-center justify-center gap-1 bg-background/40 text-xs"><Camera size={14} /> {busy === "banner_url" ? "Enviando..." : "Trocar banner"}</span>
-        </button>
         <button onClick={() => logo.current?.click()} className="relative -mt-8 ml-4 block h-20 w-20 overflow-hidden rounded-full border-4 border-card bg-secondary">
           {profile.logo_url && <img src={profile.logo_url} alt="" className="h-full w-full object-cover" />}
           <span className="absolute inset-0 flex items-center justify-center bg-background/40"><Camera size={14} /></span>
         </button>
-        <input ref={banner} type="file" accept="image/*" hidden onChange={(e) => upload("banner_url", e.target.files?.[0])} />
         <input ref={logo} type="file" accept="image/*" hidden onChange={(e) => upload("logo_url", e.target.files?.[0])} />
 
         <label className="mt-4 block text-xs text-muted-foreground">Nome
