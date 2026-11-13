@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Camera, CirclePlus, MessageCircle } from "lucide-react";
+import { Camera, CirclePlus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommunity } from "./CommunityProvider";
@@ -49,7 +49,7 @@ export function HomeSocialPreview() {
               <span className="min-w-0"><span className="block text-[11px] font-semibold text-white">Sua nota</span><span className="block text-[10px] text-white/45">Compartilhe um momento</span></span>
             </button>}
             {notes.data?.slice(0, 8).map((profile) => (
-              <Link key={profile.id} to="/u/$username" params={{ username: profile.username || "" }} className="flex min-w-[190px] max-w-[220px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-3">
+              <div key={profile.id} className="flex min-w-[190px] max-w-[220px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-3">
                 <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-white/20 bg-white/10 text-xs text-white">{profile.logo_url ? <img src={profile.logo_url} alt="" className="h-full w-full object-cover"/> : (profile.display_name || profile.username || "?").slice(0,1).toUpperCase()}</span>
                 <span className="min-w-0"><span className="block truncate text-[11px] font-semibold text-white">{profile.display_name || profile.username || "Membro"}</span><span className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-white/50">{profile.bio}</span></span>
               </Link>
