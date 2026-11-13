@@ -3,7 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { useState } from "react";
 import { z } from "zod";
-import { Search, Package, Play, Plus, SlidersHorizontal, X } from "lucide-react";
+import { Search, Package, Plus, SlidersHorizontal, X } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useCommunity } from "@/components/CommunityProvider";
 import { productsQuery, formatPrice } from "@/lib/products";
@@ -120,7 +120,7 @@ function Explorar() {
     <main className="min-h-screen bg-[#050505] pb-32 text-white">
       <SiteHeader />
       <section className="mx-auto max-w-6xl px-3 pb-10 pt-6 sm:px-6 sm:pt-8">
-        <div className="mb-4 flex justify-end">\n          <button type="button" onClick={compose} aria-label="Criar publicação" title="Criar publicação" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/25 text-white transition hover:border-white hover:bg-white hover:text-black"><Plus size={21} /></button>\n        </div>\n\n        <div className="relative">
+        <div className="relative">
           <label className="flex h-12 items-center gap-3 rounded-full border border-white/25 bg-white/[0.045] px-4 transition focus-within:border-white/70">
             <Search size={19} className="shrink-0 text-white/75" />
             <input value={q} onChange={(event) => set({ q: event.target.value })}
