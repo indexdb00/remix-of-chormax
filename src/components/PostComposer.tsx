@@ -11,7 +11,7 @@ import { uploadMedia } from "@/lib/media";
 import { isValidPost } from "@/lib/community-rules";
 
 export function PostComposer() {
-  const { user, composing, closeCompose } = useCommunity();
+  const { user, composing, draftFile, closeCompose } = useCommunity();
   const qc = useQueryClient();
   const [body, setBody] = useState("");
   const [kind, setKind] = useState("geral");
@@ -19,7 +19,7 @@ export function PostComposer() {
   const [preview, setPreview] = useState("");
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  useEffect(() => { if (!file) { setPreview(""); return; } const url = URL.createObjectURL(file); setPreview(url); return () => URL.revokeObjectURL(url); }, [file]);
+  useEffect(() => { if (composing && draftFile) setFile(draftFile); }, [composing, draftFile]);\n  useEffect(() => { if (!file) { setPreview(""); return; } const url = URL.createObjectURL(file); setPreview(url); return () => URL.revokeObjectURL(url); }, [file]);
   async function publish() {
     if (!user || !isValidPost(body)) return;
     setBusy(true);
