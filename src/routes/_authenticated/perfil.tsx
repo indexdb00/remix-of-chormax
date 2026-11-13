@@ -74,8 +74,8 @@ function Perfil() {
     queryKey: ["profile-activity", user.id],
     queryFn: async () => {
       const [r, u] = await Promise.all([
-        supabase.from("post_reposts").select("post_id").eq("user_id", user.id).order("created_at", { ascending: false }),
-        supabase.from("post_ups").select("post_id").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("post_reposts").select("post_id,created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("post_ups").select("post_id,created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
       ]);
       const load = async (ids: string[]) => ids.length ? ((await supabase.from("feed_posts").select(POST_SELECT).in("id", ids)).data ?? []) as unknown as CommunityPost[] : [];
       return { reposts: await load((r.data ?? []).map((x) => x.post_id)), ups: await load((u.data ?? []).map((x) => x.post_id)) };
@@ -92,6 +92,19 @@ function Perfil() {
   });
   const isCreator = products.length > 0;
   const active = posts.filter((p) => !p.archived);
+  const weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - 6);
+  weekStart.setHours(0, 0, 0, 0);
+  const weekPosts = active.filter((post) => new Date(post.created_at) >= weekStart).length;
+  const weekReposts = activity.reposts.filter((post) => new Date(post.created_at) >= weekStart).length;
+  const weekUps = activity.ups.filter((post) => new Date(post.created_at) >= weekStart).length;
+  const weeklyPoints = weekPosts * 20 + weekReposts * 10 + weekUps * 5;
+  const missions = [
+    { label: "Compartilhe uma publicação", detail: "Mostre o que você está criando", progress: Math.min(weekPosts, 1), target: 1, points: 20 },
+    { label: "Reposte algo interessante", detail: "Destaque conteúdo da comunidade", progress: Math.min(weekReposts, 1), target: 1, points: 10 },
+    { label: "Reconheça outros criadores", detail: "Distribua 3 Ups em publicações", progress: Math.min(weekUps, 3), target: 3, points: 15 },
+  ];
+  const completedMissions = missions.filter((mission) => mission.progress >= mission.target).length;
 
   async function remove(id: string) {
     if (!confirm("Apagar este post?")) return;
@@ -155,6 +168,25 @@ function Perfil() {
                 <p className="mt-3 text-[10px] text-white/30">Valores registrados na sua conta ChromaX</p>
               </div>
             </div>}
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-2xl bg-[#111111] p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div><p className="text-sm font-semibold text-white">Atividade</p><p className="mt-1 text-[11px] text-white/45">Seu ritmo na comunidade nos últimos 7 dias</p></div>
+            <div className="text-right"><p className="text-xl font-semibold tabular-nums text-white">{weeklyPoints} <span className="text-xs font-medium text-white/45">XP</span></p><p className="text-[10px] text-white/40">{completedMissions}/{missions.length} missões concluídas</p></div>
+          </div>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-white transition-all" style={{ width: ((completedMissions / missions.length) * 100) + "%" }} /></div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            {missions.map((mission) => {
+              const done = mission.progress >= mission.target;
+              return <div key={mission.label} className="rounded-xl bg-white/[0.045] p-3">
+                <div className="flex items-start justify-between gap-2"><p className="text-xs font-medium text-white">{mission.label}</p><span className={"shrink-0 text-[10px] " + (done ? "text-white" : "text-white/40")}>{done ? "Concluída" : "+" + mission.points + " XP"}</span></div>
+                <p className="mt-1 text-[10px] leading-4 text-white/40">{mission.detail}</p>
+                <div className="mt-3 flex items-center justify-between text-[10px] text-white/45"><span>Progresso</span><span className="tabular-nums">{mission.progress}/{mission.target}</span></div>
+                <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-white/75" style={{ width: (mission.progress / mission.target * 100) + "%" }} /></div>
+              </div>;
+            })}
           </div>
         </section>
 
