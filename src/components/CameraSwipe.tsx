@@ -108,7 +108,7 @@ export function CameraSwipe() {
         const file = new File([blob], `chromax-${Date.now()}.${extension}`, { type: blob.type });
         stopCamera();
         setOpen(false);
-        compose(file);
+        (storyMode ? composeStory : compose)(file);
       };
       recorderRef.current = recorder;
       recorder.start();
@@ -135,7 +135,7 @@ export function CameraSwipe() {
           {recording ? <Square size={25} fill="white" /> : <Circle size={49} fill="white" className="text-white" />}
         </button>
         <button type="button" onClick={toggleRecording} aria-label={recording ? "Parar vídeo" : "Gravar vídeo"} className={`rounded-full p-4 backdrop-blur ${recording ? "bg-red-600" : "bg-black/45"}`}>{recording ? <Square /> : <Camera />}</button>
-        <input ref={fileInputRef} type="file" accept="image/*,video/*" capture="environment" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) { setOpen(false); compose(file); } event.currentTarget.value = ""; }} />
+        <input ref={fileInputRef} type="file" accept="image/*,video/*" capture="environment" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) { setOpen(false); (storyMode ? composeStory : compose)(file); } event.currentTarget.value = ""; }} />
       </footer>
       {recording && <span className="absolute left-1/2 top-24 z-10 -translate-x-1/2 rounded-full bg-red-600 px-3 py-1 text-xs font-bold tracking-wider">● REC</span>}
     </div>
