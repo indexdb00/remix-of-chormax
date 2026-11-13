@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/auth")({
@@ -55,26 +56,17 @@ function AuthPage() {
     if (busy) return;
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth`,
-          queryParams: {
-            access_type: "offline",
-            prompt: "select_account",
-          },
-        },
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/auth",
       });
-
-      if (error) {
-        console.error("[Google OAuth] Não foi possível iniciar a autenticação:", error);
-        toast.error(error.message || "Não foi possível entrar com Google. Tente novamente.");
+      if (result.error) {
+        console.error("[Google OAuth]", result.error);
+        toast.error("Não foi possível entrar com Google. Tente novamente.");
         setBusy(false);
       }
-      // Em caso de sucesso, o Supabase redireciona o navegador para o Google.
     } catch (error) {
       console.error("[Google OAuth] Erro inesperado:", error);
-      toast.error("Falha ao conectar com o Google. Verifique sua conexão e tente novamente.");
+      toast.error("Falha ao conectar com o Google. Tente novamente.");
       setBusy(false);
     }
   }
