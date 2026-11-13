@@ -110,11 +110,9 @@ function Explorar() {
   ] as const;
 
   const shortcuts = [
-    { label: "Criar publicação", action: () => compose() },
     { label: "Projetos", action: () => set({ tab: "produtos" }) },
     { label: "Desenvolvedores", action: () => set({ tab: "posts" }) },
     { label: "Reels", action: () => set({ tab: "reels" }) },
-    { label: "Publicações", action: () => set({ tab: "posts" }) },
     { label: "Comunidade", action: () => set({ tab: "tudo" }) },
   ];
 
@@ -193,8 +191,10 @@ function Explorar() {
                   <span className="absolute right-2 top-2 text-white drop-shadow">
                     <span className="rounded-full border border-white/25 bg-black/60 px-2 py-1 text-[8px] font-semibold uppercase tracking-wider text-white/90">{tile.kind === "product" ? "Projeto" : tile.video ? "Reel" : "Post"}</span>
                   </span>
-                  <span className="absolute inset-x-2 bottom-2 line-clamp-2 text-[10px] font-medium leading-4 text-white drop-shadow sm:text-xs">{tile.title}</span>
-                  {tile.kind === "product" && <span className="absolute bottom-2 right-2 rounded-full border border-white/50 bg-black/70 px-2 py-1 text-[9px] font-semibold text-white backdrop-blur">{formatPrice(tile.price)}</span>}
+                  <span className="absolute inset-x-2 bottom-2 flex items-end justify-between gap-1">
+                    <span className="line-clamp-2 min-w-0 flex-1 text-[10px] font-medium leading-4 text-white drop-shadow sm:text-xs">{tile.title}</span>
+                    {tile.kind === "product" && <span className="shrink-0 rounded-full border border-white/35 bg-black/75 px-1.5 py-1 text-[8px] font-semibold text-white backdrop-blur sm:px-2 sm:text-[9px]">{formatPrice(tile.price)}</span>}
+                  </span>
                 </>
               );
               return tile.kind === "product" ? (
