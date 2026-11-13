@@ -95,22 +95,31 @@ function AuthPage() {
   return (
     <main className="auth-expo min-h-screen overflow-hidden bg-[#08090d] font-sans text-white">
       <style>{`
-        .auth-expo { background-image: radial-gradient(ellipse at 50% 0%, rgba(145,155,174,.17), transparent 48%), radial-gradient(ellipse at 100% 55%, rgba(89,103,130,.12), transparent 38%); }
-        .auth-stage { position:relative; isolation:isolate; }
-        .auth-stage:before { content:""; position:absolute; inset:7% 10%; z-index:-1; background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(120,130,150,.015) 48%,rgba(255,255,255,.07)); filter:blur(42px); border-radius:50%; }
-        .chrome-orb { background:linear-gradient(135deg,#fff 0%,#9da5b1 17%,#343b48 32%,#e9edf3 48%,#737e8d 62%,#f8fafc 77%,#555e6c 100%); background-size:240% 240%; animation:chromeFlow 9s ease-in-out infinite; box-shadow:inset -12px -14px 24px rgba(0,0,0,.45),inset 8px 8px 18px rgba(255,255,255,.5),0 22px 65px rgba(0,0,0,.55); }
-        @keyframes chromeFlow { 0%,100%{background-position:0% 20%;transform:rotate(-8deg)} 50%{background-position:100% 80%;transform:rotate(8deg)} }
-        .auth-glass { background:linear-gradient(135deg,rgba(255,255,255,.105),rgba(255,255,255,.035)); border:1px solid rgba(255,255,255,.17); box-shadow:0 24px 80px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.16); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); }
-        .auth-field { background:rgba(5,7,11,.42); border:1px solid rgba(255,255,255,.13); color:#fff; transition:border-color .2s,background .2s,box-shadow .2s; }
-        .auth-field:focus { border-color:rgba(226,232,240,.7); background:rgba(5,7,11,.62); box-shadow:0 0 0 3px rgba(203,213,225,.09); }
+
+        .auth-expo { height:100svh; background-image:radial-gradient(ellipse at 48% 10%,rgba(177,190,210,.16),transparent 42%),radial-gradient(ellipse at 95% 75%,rgba(89,103,130,.13),transparent 38%); }
+        .auth-layout { height:calc(100svh - 64px); min-height:496px; max-height:920px; }
+        .auth-stage { position:relative; isolation:isolate; flex:0 0 clamp(174px,27svh,252px); }
+        .auth-stage:before { content:""; position:absolute; inset:7% 10%; z-index:-1; background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(120,130,150,.015) 48%,rgba(255,255,255,.08)); filter:blur(42px); border-radius:50%; }
+        .voxel-scene { position:relative; width:clamp(116px,19vw,190px); height:clamp(116px,19vw,190px); flex:none; perspective:700px; filter:drop-shadow(0 18px 28px rgba(0,0,0,.48)); }
+        .voxel-cube { position:absolute; width:clamp(25px,4.1vw,42px); height:clamp(25px,4.1vw,42px); border-radius:5px; transform:rotateX(55deg) rotateZ(45deg); background:linear-gradient(145deg,#fff 0%,#bfc6d0 18%,#515b69 39%,#e9edf4 56%,#7b8797 73%,#f8fafc 88%,#566170 100%); background-size:220% 220%; box-shadow:inset 2px 2px 5px rgba(255,255,255,.8),inset -5px -6px 9px rgba(0,0,0,.48),0 8px 15px rgba(0,0,0,.32); animation:voxelShine 6s ease-in-out infinite; }
+        .voxel-cube:before,.voxel-cube:after { content:""; position:absolute; inset:0; border-radius:4px; }
+        .voxel-cube:before { transform:translate(7px,7px); background:linear-gradient(145deg,#7f8998,#222a35 70%,#aeb7c4); z-index:-1; filter:brightness(.8); }
+        .voxel-cube:after { inset:3px; border:1px solid rgba(255,255,255,.32); }
+        .voxel-cube:nth-child(3n) { animation-delay:-2s; } .voxel-cube:nth-child(4n) { animation-delay:-4s; }
+        @keyframes voxelShine { 0%,100%{background-position:0% 30%;filter:brightness(.88);transform:rotateX(55deg) rotateZ(45deg) translateY(0)} 50%{background-position:100% 70%;filter:brightness(1.2);transform:rotateX(55deg) rotateZ(45deg) translateY(-5px)} }
+        .auth-glass { background:linear-gradient(135deg,rgba(255,255,255,.115),rgba(255,255,255,.035)); border:1px solid rgba(255,255,255,.19); box-shadow:0 20px 65px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.18); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); }
+        .auth-field { background:rgba(5,7,11,.42); border:1px solid rgba(255,255,255,.15); color:#fff; transition:border-color .2s,background .2s,box-shadow .2s; }
+        .auth-field:focus { border-color:rgba(226,232,240,.78); background:rgba(5,7,11,.62); box-shadow:0 0 0 3px rgba(203,213,225,.09); }
         .auth-field::placeholder { color:rgba(226,232,240,.43); }
         .auth-slide-in { animation:authSlide .55s cubic-bezier(.2,.7,.2,1) both; }
         @keyframes authSlide { from{opacity:0;transform:translateY(13px) scale(.985)} to{opacity:1;transform:translateY(0) scale(1)} }
+        @media(max-height:720px){.auth-layout{min-height:0;padding-top:4px;padding-bottom:4px;gap:6px}.auth-stage{flex-basis:clamp(142px,23svh,180px)}.auth-glass{padding:12px 18px!important}.auth-glass-head{margin-bottom:8px!important}.auth-divider{margin-top:9px!important;margin-bottom:9px!important}.auth-form{gap:7px!important}.auth-label{margin-bottom:3px!important}.auth-input{padding-top:9px!important;padding-bottom:9px!important}.auth-switch{margin-top:9px!important;padding-top:8px!important}.auth-footer{display:none!important}}
+        @media(max-width:640px){.auth-stage{padding-left:10px;padding-right:10px}.voxel-scene{width:100px;height:100px}.voxel-cube{width:25px;height:25px}.auth-stage-copy h1{font-size:clamp(24px,7vw,34px)}.auth-stage-copy p{margin-top:7px;font-size:11px;line-height:1.45}.auth-stage-copy .auth-tag{margin-top:7px}.auth-glass{padding:15px!important}.auth-glass h2{font-size:19px}.auth-form{gap:8px!important}.auth-input{padding-top:10px!important;padding-bottom:10px!important}}
         @media(prefers-reduced-motion:reduce){.chrome-orb,.auth-slide-in{animation:none!important}}
       `}</style>
       <SiteHeader />
-      <section className="mx-auto flex w-full max-w-6xl flex-col items-center px-5 pb-14 pt-8 sm:pt-12">
-        <div className="auth-stage flex min-h-[310px] w-full max-w-3xl flex-col items-center justify-center overflow-hidden rounded-[30px] px-5 py-9 text-center sm:min-h-[350px]">
+      <section className="auth-layout mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-2 px-4 py-2 sm:px-6">
+        <div className="auth-stage flex w-full max-w-4xl items-center justify-center gap-3 overflow-hidden rounded-[28px] px-4 py-3 sm:gap-8 sm:px-8">
           <div className="pointer-events-none absolute left-[12%] top-[18%] h-24 w-24 rounded-full border border-white/10" />
           <div className="pointer-events-none absolute bottom-[12%] right-[13%] h-16 w-16 rotate-45 border border-white/10" />
           <div className="chrome-orb mb-6 h-14 w-14 rounded-[17px] sm:h-[68px] sm:w-[68px]" />
@@ -120,11 +129,11 @@ function AuthPage() {
             </span>
             <h1 className="whitespace-pre-line font-display text-3xl font-extrabold leading-[1.12] tracking-tight sm:text-5xl">{slide.title}</h1>
             <p className="mt-4 max-w-lg text-sm leading-6 text-slate-300 sm:text-base">{slide.copy}</p>
-            <div className="mt-5 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[.16em] text-slate-400">
+            <div className="auth-tag mt-4 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[.16em] text-slate-400">
               <SlideIcon size={14} /> {slide.tag}
             </div>
           </div>
-          <div className="relative z-10 mt-7 flex items-center gap-4">
+          <div className="absolute bottom-3 right-5 z-10 flex items-center gap-3 sm:bottom-4 sm:right-8">
             <button type="button" aria-label="Slide anterior" onClick={() => setActiveSlide((activeSlide + slides.length - 1) % slides.length)} className="rounded-full border border-white/15 p-2 text-slate-300 transition hover:bg-white/10"><ChevronLeft size={15}/></button>
             <div className="flex items-center gap-2" aria-label={`Slide ${activeSlide + 1} de ${slides.length}`}>
               {slides.map((_, index) => <button key={index} type="button" aria-label={`Ir para slide ${index + 1}`} onClick={() => setActiveSlide(index)} className={`h-1.5 rounded-full transition-all ${index === activeSlide ? "w-7 bg-white" : "w-1.5 bg-white/30 hover:bg-white/60"}`} />)}
@@ -133,8 +142,8 @@ function AuthPage() {
           </div>
         </div>
 
-        <div className="auth-glass mt-2 w-full max-w-md rounded-[28px] p-5 sm:p-7">
-          <div className="mb-5 flex items-center justify-between">
+        <div className="auth-glass w-full max-w-md shrink-0 rounded-[25px] p-4 sm:p-5">
+          <div className="auth-glass-head mb-3 flex items-center justify-between">
             <div>
               <p className="font-mono text-[10px] tracking-[.2em] text-slate-400">CHROMAX / {mode === "in" ? "ACESSO" : "REGISTRO"}</p>
               <h2 className="mt-1 font-display text-2xl font-bold">{mode === "in" ? "Bem-vindo de volta." : "Entre para a rede."}</h2>
@@ -145,12 +154,12 @@ function AuthPage() {
           <button onClick={google} disabled={busy} className="flex w-full items-center justify-center gap-[10px] rounded-xl border border-white/20 bg-white/[.07] px-3 py-3 text-sm font-medium text-white transition hover:bg-white/[.13] disabled:cursor-not-allowed disabled:opacity-50">
             <G /> {busy ? "Conectando..." : "Continuar com Google"}
           </button>
-          <div className="my-5 flex items-center gap-3 font-mono text-[10px] tracking-[.18em] text-slate-500"><span className="h-px flex-1 bg-white/15" />OU COM E-MAIL<span className="h-px flex-1 bg-white/15" /></div>
+          <div className="auth-divider my-3 flex items-center gap-3 font-mono text-[10px] tracking-[.18em] text-slate-500"><span className="h-px flex-1 bg-white/15" />OU COM E-MAIL<span className="h-px flex-1 bg-white/15" /></div>
 
-          <form onSubmit={submit} className="space-y-3">
+          <form onSubmit={submit} className="auth-form space-y-2">
             <label className="block">
-              <span className="mb-1.5 block font-mono text-[10px] tracking-[.14em] text-slate-400">E-MAIL</span>
-              <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" className="auth-field w-full rounded-xl px-4 py-3.5 text-sm outline-none" />
+              <span className="auth-label mb-1 block font-mono text-[10px] tracking-[.14em] text-slate-400">E-MAIL</span>
+              <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" className="auth-field auth-input w-full rounded-xl px-4 py-3 text-sm outline-none" />
             </label>
             <label className="block">
               <span className="mb-1.5 block font-mono text-[10px] tracking-[.14em] text-slate-400">SENHA</span>
@@ -163,13 +172,13 @@ function AuthPage() {
             </button>
           </form>
 
-          <div className="mt-5 border-t border-white/10 pt-4 text-center">
+          <div className="auth-switch mt-3 border-t border-white/10 pt-3 text-center">
             <button onClick={() => setMode(mode === "in" ? "up" : "in")} className="font-mono text-[10px] uppercase tracking-[.12em] text-slate-400 transition hover:text-white">
               {mode === "in" ? "Não tem conta? Criar agora" : "Já tem conta? Entrar"}
             </button>
           </div>
         </div>
-        <p className="mt-5 text-center font-mono text-[9px] tracking-[.2em] text-slate-600">CREATE • CONNECT • TRADE • CHROMAX</p>
+        <p className="auth-footer mt-2 text-center font-mono text-[9px] tracking-[.2em] text-slate-600">CREATE • CONNECT • TRADE • CHROMAX</p>
       </section>
     </main>
   );
