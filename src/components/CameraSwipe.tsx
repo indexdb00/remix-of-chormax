@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CameraOff, Circle, FlipHorizontal, X, ImagePlus, Square } from "lucide-react";
+import { Camera, CameraOff, Circle, FlipHorizontal, X, ImagePlus, Square } from "lucide-react";
 import { toast } from "sonner";
 import { useCommunity } from "./CommunityProvider";
 
