@@ -66,7 +66,11 @@ function Perfil() {
     queryKey: ["followers-count", user.id],
     queryFn: async () => (await supabase.from("profile_follows").select("id", { count: "exact", head: true }).eq("following_id", user.id)).count ?? 0,
   });
-  const { data: subscriberCount = 0 } = useQuery({\n    queryKey: ["creator-subscriber-count", user.id],\n    queryFn: async () => (await supabase.from("creator_subscriptions").select("id", { count: "exact", head: true }).eq("creator_id", user.id).eq("status", "active")).count ?? 0,\n  });\n  const { data: following = 0 } = useQuery({
+  const { data: subscriberCount = 0 } = useQuery({
+    queryKey: ["creator-subscriber-count", user.id],
+    queryFn: async () => (await supabase.from("creator_subscriptions").select("id", { count: "exact", head: true }).eq("creator_id", user.id).eq("status", "active")).count ?? 0,
+  });
+  const { data: following = 0 } = useQuery({
     queryKey: ["following-count", user.id],
     queryFn: async () => (await supabase.from("profile_follows").select("id", { count: "exact", head: true }).eq("follower_id", user.id)).count ?? 0,
   });
@@ -174,8 +178,8 @@ function Perfil() {
 
 
         <section className="mt-5 overflow-hidden sm:mt-6">
-          <div className="grid w-full grid-cols-4 items-center justify-items-stretch">
-            {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
+          <div className={"grid w-full items-center justify-items-stretch " + (subscriberCount > 0 ? "grid-cols-4" : "grid-cols-3")}>
+            {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["produtos", Grid3x3, "Seller"], ...(subscriberCount > 0 ? [["assinantes", Star, "Assinantes"] as const] : [])] as const).map(([k, I, l]) => (
               <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1 border-0 bg-transparent px-1 py-3 text-[10px] transition sm:flex-row sm:gap-2 sm:py-3.5 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
                 <I size={16} /> {l}
                 {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-white" />}
@@ -185,7 +189,7 @@ function Perfil() {
         </section>
 
         <div className="mt-3 overflow-hidden sm:mt-4">
-          {tab === "assinantes" && <Empty text="Seus assinantes aparecerão aqui quando as assinaturas estiverem disponíveis." />}
+          {tab === "assinantes" && subscriberCount > 0 && <Empty text={subscriberCount + " assinante(s) ativo(s)."} />}
 
           {tab === "produtos" && (
             products.length ? (
