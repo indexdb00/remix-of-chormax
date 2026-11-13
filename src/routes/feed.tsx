@@ -3,10 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { useState } from "react";
 import { z } from "zod";
-import {
-  Search, Package, Clapperboard, Grid3X3, Image as ImageIcon, Play,
-  Plus, SlidersHorizontal, Sparkles, Code2, Users, Layers3, X,
-} from "lucide-react";
+import { Search, Package, Play, Plus, SlidersHorizontal, X } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useCommunity } from "@/components/CommunityProvider";
 import { productsQuery, formatPrice } from "@/lib/products";
@@ -106,19 +103,19 @@ function Explorar() {
     .sort((a, b) => oldestFirst ? a.t.localeCompare(b.t) : b.t.localeCompare(a.t));
 
   const tabs = [
-    { id: "tudo", label: "Para você", Icon: Sparkles },
-    { id: "posts", label: "Posts", Icon: Grid3X3 },
-    { id: "reels", label: "Reels", Icon: Clapperboard },
-    { id: "produtos", label: "Projetos", Icon: Package },
+    { id: "tudo", label: "Para você" },
+    { id: "posts", label: "Posts" },
+    { id: "reels", label: "Reels" },
+    { id: "produtos", label: "Projetos" },
   ] as const;
 
   const shortcuts = [
-    { label: "Criar", Icon: Plus, action: () => compose() },
-    { label: "Projetos", Icon: Layers3, action: () => set({ tab: "produtos" }) },
-    { label: "Dev", Icon: Code2, action: () => set({ tab: "posts" }) },
-    { label: "Reels", Icon: Clapperboard, action: () => set({ tab: "reels" }) },
-    { label: "Posts", Icon: ImageIcon, action: () => set({ tab: "posts" }) },
-    { label: "Comunidade", Icon: Users, action: () => set({ tab: "tudo" }) },
+    { label: "Criar publicação", action: () => compose() },
+    { label: "Projetos", action: () => set({ tab: "produtos" }) },
+    { label: "Desenvolvedores", action: () => set({ tab: "posts" }) },
+    { label: "Reels", action: () => set({ tab: "reels" }) },
+    { label: "Publicações", action: () => set({ tab: "posts" }) },
+    { label: "Comunidade", action: () => set({ tab: "tudo" }) },
   ];
 
   return (
@@ -150,22 +147,19 @@ function Explorar() {
           )}
         </div>
 
-        <div className="scrollbar-none -mx-3 mt-6 flex gap-5 overflow-x-auto px-3 pb-2 sm:mx-0 sm:gap-7 sm:px-1" aria-label="Atalhos de descoberta">
-          {shortcuts.map(({ label, Icon, action }) => (
-            <button key={label} type="button" onClick={action} className="group flex min-w-[66px] shrink-0 flex-col items-center gap-2">
-              <span className="grid h-[66px] w-[66px] place-items-center rounded-full border border-white/65 bg-gradient-to-br from-white/15 via-white/[0.04] to-black p-[2px] transition group-hover:border-white group-hover:shadow-[0_0_18px_rgba(255,255,255,.18)]">
-                <span className="grid h-full w-full place-items-center rounded-full bg-[#090909] text-white"><Icon size={25} strokeWidth={1.65} /></span>
-              </span>
-              <span className="text-xs text-white/85">{label}</span>
+        <nav className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-white/10 py-3" aria-label="Atalhos de descoberta">
+          {shortcuts.map(({ label, action }) => (
+            <button key={label} type="button" onClick={action} className="text-[11px] font-medium text-white/55 transition hover:text-white focus-visible:text-white focus-visible:outline-none sm:text-xs">
+              {label}
             </button>
           ))}
-        </div>
+        </nav>
 
         <div className="mt-5 grid grid-cols-4 border-y border-white/15" role="tablist" aria-label="Tipo de conteúdo">
-          {tabs.map(({ id, label, Icon }) => (
+          {tabs.map(({ id, label }) => (
             <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => set({ tab: id })}
-              className={`flex min-h-12 items-center justify-center gap-2 border-b-2 px-1 py-3 text-[11px] font-semibold transition sm:text-sm ${tab === id ? "border-white text-white" : "border-transparent text-white/45 hover:text-white/80"}`}>
-              <Icon size={15} /> <span>{label}</span>
+              className={`flex min-h-11 items-center justify-center border-b-2 px-1 py-3 text-[11px] font-semibold transition sm:text-sm ${tab === id ? "border-white text-white" : "border-transparent text-white/45 hover:text-white/80"}`}>
+              {label}
             </button>
           ))}
         </div>
@@ -197,7 +191,7 @@ function Explorar() {
                   {media}
                   <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/10 opacity-70 transition group-hover:opacity-100" />
                   <span className="absolute right-2 top-2 text-white drop-shadow">
-                    {tile.kind === "product" ? <Package size={17} /> : tile.video ? <Play size={17} fill="white" /> : <ImageIcon size={17} />}
+                    <span className="rounded-full border border-white/25 bg-black/60 px-2 py-1 text-[8px] font-semibold uppercase tracking-wider text-white/90">{tile.kind === "product" ? "Projeto" : tile.video ? "Reel" : "Post"}</span>
                   </span>
                   <span className="absolute inset-x-2 bottom-2 line-clamp-2 text-[10px] font-medium leading-4 text-white drop-shadow sm:text-xs">{tile.title}</span>
                   {tile.kind === "product" && <span className="absolute bottom-2 right-2 rounded-full border border-white/50 bg-black/70 px-2 py-1 text-[9px] font-semibold text-white backdrop-blur">{formatPrice(tile.price)}</span>}
@@ -212,9 +206,7 @@ function Explorar() {
           </div>
         ) : (
           <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-            <span className="mb-4 grid h-14 w-14 place-items-center rounded-full border border-white/20 bg-white/[0.04] text-white/70">
-              {tab === "reels" ? <Clapperboard size={23} /> : tab === "posts" ? <Grid3X3 size={23} /> : <Search size={23} />}
-            </span>
+            <span className="mb-3 text-[10px] uppercase tracking-[.22em] text-white/35">ChromaX</span>
             <h2 className="text-sm font-semibold text-white">{tab === "reels" ? "Ainda não há Reels" : "Nada encontrado"}</h2>
             <p className="mt-2 max-w-sm text-xs leading-6 text-white/50">
               {tab === "reels" ? "Os vídeos publicados pela comunidade vão aparecer aqui." : "Tente outra pesquisa ou volte mais tarde para descobrir novos conteúdos."}
