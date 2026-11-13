@@ -43,9 +43,13 @@ function Perfil() {
     queryKey: ["my-posts", user.id],
     queryFn: async () => (await supabase.from("feed_posts").select("*").eq("author_id", user.id).order("created_at", { ascending: false })).data ?? [],
   });
-  const { data: friends = 0 } = useQuery({
-    queryKey: ["friend-count", user.id],
-    queryFn: async () => (await supabase.from("friendships").select("id", { count: "exact", head: true }).eq("status", "accepted").or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)).count ?? 0,
+  const { data: followers = 0 } = useQuery({
+    queryKey: ["followers-count", user.id],
+    queryFn: async () => (await supabase.from("profile_follows").select("id", { count: "exact", head: true }).eq("following_id", user.id)).count ?? 0,
+  });
+  const { data: following = 0 } = useQuery({
+    queryKey: ["following-count", user.id],
+    queryFn: async () => (await supabase.from("profile_follows").select("id", { count: "exact", head: true }).eq("follower_id", user.id)).count ?? 0,
   });
 
   const { data: activity = { reposts: [], ups: [] } } = useQuery({
