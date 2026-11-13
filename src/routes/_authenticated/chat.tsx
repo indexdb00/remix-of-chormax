@@ -130,10 +130,6 @@ function ChatPage() {
       <section className="mx-auto max-w-6xl px-0 py-0 sm:px-4 sm:py-5">
         <div className="grid h-[calc(100dvh-150px)] min-h-[520px] overflow-hidden border-y border-white/10 bg-[#0d0d11] sm:h-[min(780px,calc(100dvh-170px))] sm:rounded-2xl sm:border md:grid-cols-[350px_1fr]">
           <aside className={`min-h-0 border-border md:border-r ${selected ? "hidden md:flex md:flex-col" : "flex flex-col"}`}>
-            <div className="flex items-center justify-between px-5 pb-4 pt-5">
-              <h1 className="text-xl font-semibold tracking-tight">Mensagens</h1>
-              <button type="button" aria-label="Mais opções" className="rounded-full p-2 text-white/65 hover:bg-white/10 hover:text-white"><MoreHorizontal size={21}/></button>
-            </div>
             <div className="px-4 pb-3">
               <label className="flex items-center gap-2 rounded-xl bg-white/[.07] px-3 py-2.5 text-white/45">
                 <Search size={16}/><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Pesquisar" aria-label="Pesquisar conversas" className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40"/>
@@ -143,7 +139,6 @@ function ChatPage() {
               <button onClick={() => { setTab("friends"); setActive(null); }} className={`border-b-2 pb-3 text-xs font-semibold ${tab === "friends" ? "border-white text-white" : "border-transparent text-white/40"}`}>Principal</button>
               <button onClick={() => { setTab("market"); setActive(null); }} className={`border-b-2 pb-3 text-xs font-semibold ${tab === "market" ? "border-white text-white" : "border-transparent text-white/40"}`}>Compras e vendas</button>
             </div>
-            <p className="px-5 pb-2 pt-4 text-[11px] font-semibold text-white/45">Mensagens</p>
             {chatsQuery.isLoading ? <p className="p-5 text-xs text-muted-foreground">Carregando conversas…</p> : chatsQuery.isError ? <div className="px-5 py-10 text-center"><p className="text-xs text-white/60">Não foi possível carregar suas conversas.</p><button type="button" onClick={() => chatsQuery.refetch()} className="mt-3 text-xs font-semibold text-white underline underline-offset-4">Tentar novamente</button></div> : filteredChats.length ? filteredChats.map((chat) => {
               const otherId = chat.buyer_id === user.id ? chat.seller_id : chat.buyer_id;
               const person = people.find((p) => p.id === otherId);
