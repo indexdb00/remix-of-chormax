@@ -135,7 +135,18 @@ export function CameraSwipe() {
     }
   };
 
-  if (!open) return null;
+  if (!open) return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      aria-label="Abrir câmera ChromaX"
+      title="Abrir câmera"
+      className="fixed bottom-24 right-4 z-[80] grid h-14 w-14 place-items-center rounded-full border border-white/25 bg-black/75 text-white shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-transform hover:scale-105 active:scale-95"
+    >
+      <Camera size={23} />
+      <span className="sr-only">Abrir câmera</span>
+    </button>
+  );
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-black text-white" role="dialog" aria-modal="true" aria-label="Câmera ChromaX">
       <video ref={videoRef} autoPlay muted playsInline className={`absolute inset-0 h-full w-full object-cover ${facing === "user" ? "-scale-x-100" : ""}`} />
