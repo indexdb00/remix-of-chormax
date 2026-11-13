@@ -3,7 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { useState } from "react";
 import { z } from "zod";
-import { Search, Package, Plus, SlidersHorizontal, X } from "lucide-react";
+import { Search, Package, SlidersHorizontal, X, Play, Image as ImageIcon } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useCommunity } from "@/components/CommunityProvider";
 import { productsQuery, formatPrice } from "@/lib/products";
@@ -21,7 +21,6 @@ const mediaPostsQuery = queryOptions({
       .from("feed_posts")
       .select("id,body,image_url,created_at")
       .eq("archived", false)
-      .not("image_url", "is", null)
       .order("created_at", { ascending: false })
       .limit(80);
     if (error) throw error;
@@ -57,7 +56,7 @@ export const Route = createFileRoute("/feed")({
 
 type Tile =
   | { kind: "product"; id: string; img: string | undefined; title: string; slug: string; price: number; t: string; video: false }
-  | { kind: "post"; id: string; img: string; title: string; t: string; video: boolean };
+  | { kind: "post"; id: string; img: string | undefined; title: string; t: string; video: boolean };
 
 const isVideo = (src: string | undefined) =>
   !!src && /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(src);
@@ -77,7 +76,7 @@ function Explorar() {
   const postTiles: Tile[] = posts.map((post) => ({
     kind: "post",
     id: post.id,
-    img: post.image_url!,
+    img: post.image_url ?? undefined,
     title: post.body || "Publicação da comunidade",
     t: post.created_at,
     video: isVideo(post.image_url),
@@ -109,13 +108,6 @@ function Explorar() {
     { id: "produtos", label: "Projetos" },
   ] as const;
 
-  const shortcuts = [
-    { label: "Projetos", action: () => set({ tab: "produtos" }) },
-    { label: "Desenvolvedores", action: () => set({ tab: "posts" }) },
-    { label: "Reels", action: () => set({ tab: "reels" }) },
-    { label: "Comunidade", action: () => set({ tab: "tudo" }) },
-  ];
-
   return (
     <main className="min-h-screen bg-[#050505] pb-32 text-white">
       <SiteHeader />
@@ -145,26 +137,9 @@ function Explorar() {
           )}
         </div>
 
-        <nav className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-white/10 py-3" aria-label="Atalhos de descoberta">
-          {shortcuts.map(({ label, action }) => (
-            <button key={label} type="button" onClick={action} className="text-[11px] font-medium text-white/55 transition hover:text-white focus-visible:text-white focus-visible:outline-none sm:text-xs">
-              {label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="mt-5 grid grid-cols-4 border-y border-white/15" role="tablist" aria-label="Tipo de conteúdo">
-          {tabs.map(({ id, label }) => (
-            <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => set({ tab: id })}
-              className={`flex min-h-11 items-center justify-center border-b-2 px-1 py-3 text-[11px] font-semibold transition sm:text-sm ${tab === id ? "border-white text-white" : "border-transparent text-white/45 hover:text-white/80"}`}>
-              {label}
-            </button>
-          ))}
-        </div>
-
         <div className="mb-3 mt-4 flex items-center justify-between">
           <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-white/45">
-            {tab === "reels" ? "Reels da comunidade" : tab === "posts" ? "Publicações" : tab === "produtos" ? "Projetos digitais" : "Descobertas para você"}
+            {"Descubra a comunidade"}
           </p>
           <span className="text-[10px] text-white/40">{tiles.length} {tiles.length === 1 ? "item" : "itens"}</span>
         </div>
@@ -174,12 +149,20 @@ function Explorar() {
             {tiles.map((tile) => {
               const media = tile.img ? (
                 tile.video ? (
-                  <video src={tile.img} muted loop playsInline autoPlay={tab === "reels"} preload="metadata"
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <span className="absolute inset-0">
+                    <video src={tile.img} muted loop playsInline autoPlay preload="metadata"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                    <span className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white"><Play size={13} fill="currentColor" /></span>
+                  </span>
                 ) : (
                   <img src={tile.img} alt={tile.title} loading="lazy"
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 )
+              ) : tile.kind === "post" ? (
+                <span className="flex h-full flex-col justify-between bg-gradient-to-br from-[#292929] via-[#111] to-[#050505] p-3 sm:p-4">
+                  <span className="flex items-center gap-1.5 text-white/45"><ImageIcon size={13} /><span className="text-[8px] uppercase tracking-[.18em]">chromaX · post</span></span>
+                  <span className="line-clamp-6 break-words text-xs font-semibold leading-relaxed text-white sm:text-sm">{tile.title}</span>
+                </span>
               ) : (
                 <span className="flex h-full items-center justify-center bg-[#151515]"><Package size={28} className="text-white/35" /></span>
               );
@@ -207,11 +190,11 @@ function Explorar() {
         ) : (
           <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
             <span className="mb-3 text-[10px] uppercase tracking-[.22em] text-white/35">ChromaX</span>
-            <h2 className="text-sm font-semibold text-white">{tab === "reels" ? "Ainda não há Reels" : "Nada encontrado"}</h2>
+            <h2 className="text-sm font-semibold text-white">{"Nada por aqui ainda"}</h2>
             <p className="mt-2 max-w-sm text-xs leading-6 text-white/50">
-              {tab === "reels" ? "Os vídeos publicados pela comunidade vão aparecer aqui." : "Tente outra pesquisa ou volte mais tarde para descobrir novos conteúdos."}
+              {"Fotos, vídeos, publicações e projetos da comunidade vão aparecer nesta grade."}
             </p>
-            {(tab !== "tudo" || q) && <button type="button" onClick={() => set({ tab: "tudo", q: "" })} className="mt-5 rounded-full border border-white/50 px-5 py-2 text-xs text-white transition hover:bg-white hover:text-black">Ver tudo</button>}
+            {q && <button type="button" onClick={() => set({ q: "" })} className="mt-5 rounded-full border border-white/50 px-5 py-2 text-xs text-white transition hover:bg-white hover:text-black">Limpar pesquisa</button>}
           </div>
         )}
       </section>
