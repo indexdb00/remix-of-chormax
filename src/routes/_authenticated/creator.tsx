@@ -18,6 +18,7 @@ const cleanName = (s: string) => s.trim().replace(/[^\p{L}\p{N} ._-]/gu, "").rep
 type FolderItem = { id: string; name: string; parentId: string | null; createdAt: string };
 type AssetItem = { id: string; name: string; path: string; folderId: string | null; size: number; mime: string; createdAt: string };
 type Project = { id: string; name: string; createdAt: string; folders: FolderItem[]; files: AssetItem[] };
+type CreatorKind = "dev" | "gamer" | "mentoria";
 
 function Creator() {
   const { user } = Route.useRouteContext();
@@ -31,7 +32,8 @@ function Creator() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [section, setSection] = useState<"workspace" | "publish" | "subscribers">("workspace");
-  const [creatorType, setCreatorType] = useState<"dev" | "gamer" | "mentoria" | null>(null);
+  const [creatorTypes, setCreatorTypes] = useState<CreatorKind[]>([]);
+  const [creatorType, setCreatorType] = useState<CreatorKind | null>(null);
   const [setupOpen, setSetupOpen] = useState(false);
   const [setupLoading, setSetupLoading] = useState(true);
   const [game, setGame] = useState("");
@@ -75,23 +77,33 @@ function Creator() {
   useEffect(() => { void loadWorkspace(); }, [user.id]);
   useEffect(() => {
     let alive = true;
-    supabase.from("creator_profiles").select("creator_type,game,offering").eq("user_id", user.id).maybeSingle().then(({ data, error }) => {
+    supabase.from("creator_profiles").select("creator_type,creator_types,game,offering").eq("user_id", user.id).maybeSingle().then(({ data, error }) => {
       if (!alive) return;
       if (error) toast.error("Não foi possível carregar seu perfil Creator", { description: error.message });
-      if (data) { setCreatorType(data.creator_type as "dev" | "gamer" | "mentoria"); setGame(data.game ?? ""); setOffering(data.offering ?? ""); }
+      if (data) { const selected = (data.creator_types?.length ? data.creator_types : [data.creator_type]).filter((value): value is CreatorKind => ["dev", "gamer", "mentoria"].includes(value)); setCreatorTypes(selected); setCreatorType(selected[0] ?? null); setGame(data.game ?? ""); setOffering(data.offering ?? ""); }
       else setSetupOpen(true);
       setSetupLoading(false);
     });
     return () => { alive = false; };
   }, [user.id]);
-  async function saveCreatorSetup(type: "dev" | "gamer" | "mentoria") {
-    if (type === "gamer" && (!game.trim() || !offering.trim())) { toast.error("Informe o jogo e o que você vai oferecer."); return; }
-    if (type === "mentoria" && !offering.trim()) { toast.error("Informe o tipo de mentoria."); return; }
+  async function saveCreatorSetup() {
+    if (!creatorTypes.length) { toast.error("Selecione pelo menos uma área."); return; }
+    if (creatorTypes.includes("gamer") && !game.trim()) { toast.error("Informe qual jogo você oferece."); return; }
+    if ((creatorTypes.includes("gamer") || creatorTypes.includes("mentoria")) && !offering.trim()) { toast.error("Descreva o que você vai oferecer."); return; }
     setSetupSaving(true);
-    const { error } = await supabase.from("creator_profiles").upsert({ user_id: user.id, creator_type: type, game: type === "gamer" ? game.trim() : null, offering: type === "dev" ? null : offering.trim() }, { onConflict: "user_id" });
+    const { error } = await supabase.from("creator_profiles").upsert({
+      user_id: user.id,
+      creator_type: creatorTypes[0],
+      creator_types: creatorTypes,
+      game: creatorTypes.includes("gamer") ? game.trim() : null,
+      offering: creatorTypes.some((type) => type === "gamer" || type === "mentoria") ? offering.trim() : null,
+    }, { onConflict: "user_id" });
     setSetupSaving(false);
     if (error) { toast.error("Não foi possível salvar sua escolha", { description: error.message }); return; }
-    setCreatorType(type); setSetupOpen(false); setSection("workspace"); toast.success("Creator configurado");
+    setCreatorType(creatorTypes[0]);
+    setSetupOpen(false);
+    setSection(creatorTypes.includes("dev") ? "workspace" : "publish");
+    toast.success("Creator configurado");
   }
   const { data: subscriberRows = [] } = useQuery({ queryKey: ["creator-subscribers", user.id], queryFn: async () => {
     const { data, error } = await supabase.from("creator_subscriptions").select("id,subscriber_id,created_at,profiles!creator_subscriptions_subscriber_id_fkey(display_name,username,logo_url)").eq("creator_id", user.id).eq("status", "active").order("created_at", { ascending: false });
@@ -229,14 +241,14 @@ function Creator() {
       <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         {setupLoading ? <div className="py-20 text-center text-sm text-muted-foreground">Carregando Creator...</div> : <>
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div><p className="font-mono text-[10px] tracking-[.24em] text-muted-foreground">CHROMAX / CREATOR</p><h1 className="mt-2 text-3xl font-bold tracking-tight">{creatorType === "dev" ? "Seu espaço de criação." : creatorType === "gamer" ? "Seu espaço gamer." : "Sua área de mentoria."}</h1></div>
+          <div><p className="font-mono text-[10px] tracking-[.24em] text-muted-foreground">CHROMAX / CREATOR</p><h1 className="mt-2 text-3xl font-bold tracking-tight">{creatorTypes.includes("dev") ? "Seu espaço de criação." : creatorTypes.includes("gamer") ? "Seu espaço gamer." : "Sua área de mentoria."}</h1></div>
           <div className="flex flex-wrap gap-2">
             {creatorType === "dev" && <><button onClick={() => setSection("workspace")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "workspace" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><HardDrive className="mr-2 inline" size={14}/>Projetos</button><button onClick={() => setSection("publish")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "publish" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Package className="mr-2 inline" size={14}/>Marketplace</button><button onClick={() => setSection("subscribers")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "subscribers" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Star className="mr-2 inline" size={14}/>Assinantes</button></>}
             <button onClick={() => setSetupOpen(true)} className="rounded-xl border border-border px-3 py-2.5 text-xs">Editar perfil</button>
           </div>
         </div>
         {creatorType === "gamer" && <div className="mt-8 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-card p-5"><Gamepad2 size={22}/><p className="mt-3 text-xs text-muted-foreground">Jogo</p><h2 className="mt-1 text-lg font-semibold">{game || "Não definido"}</h2></div><div className="rounded-2xl bg-card p-5"><Star size={22}/><p className="mt-3 text-xs text-muted-foreground">O que oferece</p><p className="mt-1 text-sm">{offering || "Adicione sua oferta"}</p></div></div>}
-        {creatorType === "mentoria" && <div className="mt-8 rounded-2xl bg-card p-5"><GraduationCap size={22}/><p className="mt-3 text-xs text-muted-foreground">Sua mentoria</p><p className="mt-1 text-sm">{offering || "Configure sua mentoria"}</p></div>}
+        {creatorTypes.includes("mentoria") && <div className="mt-8 rounded-2xl bg-card p-5"><GraduationCap size={22}/><p className="mt-3 text-xs text-muted-foreground">Sua mentoria</p><p className="mt-1 text-sm">{offering || "Configure sua mentoria"}</p></div>}
 
         {creatorType === "dev" && section === "workspace" && (
           <div className="mt-8">
@@ -272,7 +284,30 @@ function Creator() {
       </>}
       </section>
 
-      {setupOpen && <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/75 p-4 backdrop-blur-xl" role="dialog" aria-modal="true"><section className="w-full max-w-md rounded-3xl bg-[#151515] p-5 text-white shadow-2xl sm:p-7"><p className="font-mono text-[10px] tracking-[.22em] text-white/35">CHROMAX / CREATOR</p><h2 className="mt-2 text-xl font-semibold">O que você quer criar?</h2><p className="mt-1 text-xs text-white/45">Escolha seu perfil para personalizar as ferramentas.</p><div className="mt-5 grid grid-cols-3 gap-2">{([{id:"dev",label:"Dev",Icon:Code2},{id:"gamer",label:"Gamer",Icon:Gamepad2},{id:"mentoria",label:"Mentoria",Icon:GraduationCap}] as const).map(({id,label,Icon}) => <button key={id} type="button" onClick={() => setCreatorType(id)} className={"flex flex-col items-center gap-2 rounded-2xl p-4 text-xs " + (creatorType === id ? "bg-white text-black" : "bg-white/[.06] text-white/70")}><Icon size={22}/>{label}</button>)}</div>{creatorType === "gamer" && <div className="mt-4 space-y-3"><label className="block text-[11px] text-white/55">Qual jogo?<input value={game} onChange={(e) => setGame(e.target.value)} placeholder="Ex.: Valorant, Fortnite" className="mt-1 w-full rounded-xl bg-white/[.07] px-3 py-3 text-sm text-white outline-none"/></label><label className="block text-[11px] text-white/55">O que vai oferecer?<textarea value={offering} onChange={(e) => setOffering(e.target.value)} rows={2} placeholder="Partidas, coaching, comunidade..." className="mt-1 w-full resize-none rounded-xl bg-white/[.07] px-3 py-3 text-sm text-white outline-none"/></label></div>}{creatorType === "mentoria" && <label className="mt-4 block text-[11px] text-white/55">Qual mentoria oferece?<textarea value={offering} onChange={(e) => setOffering(e.target.value)} rows={2} placeholder="Programação, carreira, design..." className="mt-1 w-full resize-none rounded-xl bg-white/[.07] px-3 py-3 text-sm text-white outline-none"/></label>}<div className="mt-5 flex gap-2">{creatorType && <button type="button" onClick={() => saveCreatorSetup(creatorType)} disabled={setupSaving} className="flex-1 rounded-xl bg-white py-3 text-sm font-semibold text-black disabled:opacity-50">{setupSaving ? "Salvando..." : "Continuar"}</button>}{creatorType && <button type="button" onClick={() => setSetupOpen(false)} className="rounded-xl bg-white/[.07] px-4 py-3 text-xs text-white/65">Fechar</button>}</div></section></div>}
+      {setupOpen && <div className="fixed inset-0 z-[90] flex items-center justify-center bg-background/75 p-4 backdrop-blur-md" role="dialog" aria-modal="true" aria-label="Configurar Creator">
+        <section className="w-full max-w-xl overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-2xl">
+          <div className="border-b border-border px-5 py-5 sm:px-7">
+            <div className="flex items-center justify-between"><p className="font-mono text-[10px] tracking-[.22em] text-muted-foreground">CHROMAX / CREATOR</p><button type="button" onClick={() => setSetupOpen(false)} aria-label="Fechar" className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary hover:text-foreground"><X size={17}/></button></div>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight">Como você quer usar o Creator?</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Escolha uma ou mais áreas. Você pode combinar suas atividades.</p>
+          </div>
+          <div className="space-y-5 px-5 py-5 sm:px-7 sm:py-6">
+            <div className="grid gap-2 sm:grid-cols-3">
+              {([{id:"dev",label:"Desenvolvedor",desc:"Projetos e marketplace",Icon:Code2},{id:"gamer",label:"Gamer",desc:"Jogos e ofertas",Icon:Gamepad2},{id:"mentoria",label:"Mentoria",desc:"Ensinar e orientar",Icon:GraduationCap}] as const).map(({id,label,desc,Icon}) => {
+                const selected = creatorTypes.includes(id);
+                return <button key={id} type="button" aria-pressed={selected} onClick={() => setCreatorTypes((current) => selected ? current.filter((item) => item !== id) : [...current, id])} className={"relative flex min-h-28 flex-col items-start rounded-2xl border p-4 text-left transition " + (selected ? "border-foreground bg-foreground/[.06]" : "border-border bg-background hover:bg-secondary/50")}>
+                  <span className={"grid h-9 w-9 place-items-center rounded-xl " + (selected ? "bg-foreground text-background" : "bg-secondary text-muted-foreground")}><Icon size={18}/></span>
+                  <span className="mt-3 text-xs font-semibold">{label}</span><span className="mt-1 text-[10px] text-muted-foreground">{desc}</span>
+                  {selected && <Check size={15} className="absolute right-3 top-3"/>}
+                </button>;
+              })}
+            </div>
+            {creatorTypes.includes("gamer") && <div><label className={label}>Qual jogo você trabalha?</label><input value={game} onChange={(e) => setGame(e.target.value)} placeholder="Ex.: Valorant, Fortnite, CS2" className={input}/></div>}
+            {(creatorTypes.includes("gamer") || creatorTypes.includes("mentoria")) && <div><label className={label}>{creatorTypes.includes("gamer") && creatorTypes.includes("mentoria") ? "O que você oferece em jogos e mentorias?" : creatorTypes.includes("gamer") ? "O que você oferece para jogadores?" : "Qual mentoria você oferece?"}</label><textarea value={offering} onChange={(e) => setOffering(e.target.value)} rows={3} placeholder="Descreva serviços, aulas, coaching ou comunidade..." className={input + " resize-none"}/></div>}
+            <div className="flex items-center justify-between gap-3 border-t border-border pt-4"><p className="text-[11px] text-muted-foreground">{creatorTypes.length} área(s) selecionada(s)</p><button type="button" onClick={saveCreatorSetup} disabled={setupSaving || !creatorTypes.length} className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition disabled:opacity-40">{setupSaving ? "Salvando..." : "Salvar e continuar"} <ArrowUpRight className="ml-1 inline" size={15}/></button></div>
+          </div>
+        </section>
+      </div>}
       {modal && <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm" onClick={() => setModal(null)}><form onSubmit={modal === "project" ? createProject : createFolder} onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl"><div className="flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-background">{modal === "project" ? <Boxes size={19}/> : <FolderPlus size={19}/>}</span><button type="button" onClick={() => setModal(null)} aria-label="Fechar" className="rounded-lg p-2 text-muted-foreground"><X size={17}/></button></div><h2 className="mt-4 text-lg font-semibold">{modal === "project" ? "Criar projeto" : "Criar pasta"}</h2><p className="mt-1 text-xs text-muted-foreground">{modal === "project" ? "Dê um nome ao novo espaço de trabalho." : "A pasta será criada dentro do local atual."}</p><input autoFocus value={modalName} onChange={(e) => setModalName(e.target.value)} maxLength={64} placeholder={modal === "project" ? "Ex.: Meu próximo SaaS" : "Nome da pasta"} className="mt-5 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"/><button disabled={saving || !modalName.trim()} className="mt-3 w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">{saving ? "Salvando..." : "Continuar"}</button></form></div>}
     </main>
   );
