@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowUpRight, Boxes, Check, ChevronRight, Download, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, HardDrive, ImagePlus, Package, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Boxes, Check, ChevronRight, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, HardDrive, ImagePlus, Package, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -24,7 +24,7 @@ function Creator() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const storage = supabase.storage.from("media");
-  const manifestPath = user.id + "/creator-workspace/index.json";
+  const manifestPath = user.id + "/creator-workspace";
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
@@ -55,11 +55,12 @@ function Creator() {
   async function loadWorkspace() {
     setLoading(true);
     try {
-      const { data, error } = await storage.download(manifestPath);
-      if (error) {
-        if (error.message.toLowerCase().includes("not found") || error.message.includes("404")) { setProjects([]); return; }
-        throw error;
-      }
+      const { data: manifests, error: listError } = await storage.list(manifestPath, { limit: 100, sortBy: { column: "created_at", order: "desc" } });
+      if (listError) throw listError;
+      const latest = (manifests ?? []).filter((item) => item.name.endsWith(".json")).sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))[0];
+      if (!latest) { setProjects([]); return; }
+      const { data, error } = await storage.download(manifestPath + "/" + latest.name);
+      if (error) throw error;
       const parsed = JSON.parse(await data.text()) as { projects?: Project[] };
       setProjects(Array.isArray(parsed.projects) ? parsed.projects : []);
     } catch (error) { toast.error("Não foi possível carregar seus projetos", { description: (error as Error).message }); }
@@ -68,7 +69,8 @@ function Creator() {
   useEffect(() => { void loadWorkspace(); }, [user.id]);
 
   async function persist(next: Project[]) {
-    const { error } = await storage.upload(manifestPath, new Blob([JSON.stringify({ projects: next })], { type: "application/json" }), { upsert: true, contentType: "application/json", cacheControl: "0" });
+    const snapshot = manifestPath + "/index-" + Date.now() + "-" + crypto.randomUUID() + ".json";
+    const { error } = await storage.upload(snapshot, new Blob([JSON.stringify({ projects: next })], { type: "application/json" }), { upsert: false, contentType: "application/json", cacheControl: "0" });
     if (error) throw error;
     setProjects(next);
   }
@@ -121,7 +123,7 @@ function Creator() {
     const { data, error } = await storage.download(asset.path);
     if (error) { toast.error("Não foi possível baixar o arquivo", { description: error.message }); return; }
     const url = URL.createObjectURL(data);
-    const anchor = document.createElement("a"); anchor.href = url; anchor.download = asset.name; anchor.click(); URL.revokeObjectURL(url);
+    const anchor = document.createElement("a"); anchor.href = url; anchor.download = asset.name; anchor.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   async function deleteAsset(asset: AssetItem) {
