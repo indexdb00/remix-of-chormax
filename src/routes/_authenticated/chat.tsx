@@ -130,9 +130,10 @@ function ChatPage() {
       <section className="mx-auto max-w-6xl px-0 py-0 sm:px-4 sm:py-5">
         <div className="grid h-[calc(100dvh-150px)] min-h-[520px] overflow-hidden border-y border-white/10 bg-[#0d0d11] sm:h-[min(780px,calc(100dvh-170px))] sm:rounded-2xl sm:border md:grid-cols-[350px_1fr]">
           <aside className={`min-h-0 border-border md:border-r ${selected ? "hidden md:flex md:flex-col" : "flex flex-col"}`}>
-            <div className="px-4 pb-3">
-              <label className="flex items-center gap-2 rounded-xl bg-white/[.07] px-3 py-2.5 text-white/45">
-                <Search size={16}/><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Pesquisar" aria-label="Pesquisar conversas" className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40"/>
+            <div className="px-5 pb-4 pt-4">
+              <label className="flex h-10 items-center gap-2.5 rounded-full bg-white/[.06] px-4 text-white/45 transition-colors focus-within:bg-white/[.09]">
+                <Search size={15} className="shrink-0"/>
+                <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Pesquisar" aria-label="Pesquisar conversas" className="h-full min-w-0 w-full bg-transparent text-[13px] text-white outline-none placeholder:text-white/40"/>
               </label>
             </div>
             <div className="flex gap-6 border-b border-white/10 px-5">
