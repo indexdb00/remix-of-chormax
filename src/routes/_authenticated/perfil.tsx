@@ -158,9 +158,9 @@ function Perfil() {
                 ><Repeat2 size={17} /></button>
               </div>
               <button type="button" onClick={() => setActivityOpen(true)} aria-label="Expandir mapa de atividade comercial" className="mt-2 flex w-full items-center justify-between gap-3 px-2.5 py-2 text-left transition hover:bg-white/[0.04]">
-                <span className="min-w-0"><span className="block text-[10px] font-medium text-white/55">Atividade</span><span className="mt-0.5 block text-[9px] text-white/30">Últimas 12 semanas</span></span>
+                
                 <span className="grid shrink-0 grid-flow-col grid-rows-3 gap-[3px]" aria-hidden="true">{heatmapDays.slice(-21).map((day) => <span key={day} className={"h-[6px] w-[6px] rounded-[2px] " + (balanceView === "sales" ? "bg-emerald-400/20" : "bg-sky-400/20")} />)}</span>
-                <span className="text-[10px] text-white/45">Ver</span>
+                
               </button>
               <div className="mt-2 min-h-0">
                 <p className="text-xs text-white/40">{balanceView === "sales" ? "Total em vendas" : "Total em compras"}</p>
@@ -228,9 +228,9 @@ function Perfil() {
 
       {activityOpen && <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/65 p-4 backdrop-blur-xl" role="dialog" aria-modal="true" aria-label="Mapa de atividade comercial" onClick={() => setActivityOpen(false)}>
         <section className="w-full max-w-md rounded-2xl bg-[#151515] p-4 text-white shadow-2xl sm:p-5" onClick={(event) => event.stopPropagation()}>
-          <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold">Atividade comercial</p><p className="mt-1 text-[10px] text-white/40">{balanceView === "sales" ? "Vendas · verde" : "Compras · azul"} · últimas 12 semanas</p></div><button type="button" onClick={() => setActivityOpen(false)} aria-label="Fechar atividade" className="grid h-8 w-8 place-items-center rounded-full bg-white/[0.07] text-white/70"><X size={16} /></button></div>
+          <div className="flex items-center justify-end gap-3"><button type="button" onClick={() => setActivityOpen(false)} aria-label="Fechar atividade" className="grid h-8 w-8 place-items-center rounded-full bg-white/[0.07] text-white/70"><X size={16} /></button></div>
           <div className="mt-5 flex justify-center"><div className="grid grid-flow-col grid-rows-7 gap-1">{heatmapDays.map((day) => <span key={day} title="Sem transação registrada" className={"h-[10px] w-[10px] rounded-[2px] " + (balanceView === "sales" ? "bg-emerald-400/15" : "bg-sky-400/15")} />)}</div></div>
-          <div className="mt-5 text-center"><p className="text-xs font-medium text-white/75">Seu histórico aparecerá aqui</p><p className="mx-auto mt-1 max-w-xs text-[10px] leading-5 text-white/40">O checkout atual ainda não registra as datas individuais de compras e vendas. O mapa será preenchido quando esse histórico estiver disponível.</p></div>
+          
         </section>
       </div>}
       {editing && profile && <EditSheet userId={user.id} profile={profile} onClose={() => setEditing(false)} />}
