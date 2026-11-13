@@ -1,8 +1,8 @@
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowUpRight, Globe2, Users, Plus, MessageSquare, Send } from "lucide-react";
+import { ArrowUpRight, Globe2, Users, Plus, MessageSquare, Send, ImagePlus, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "./SiteHeader";
 import { useCommunity } from "./CommunityProvider";
@@ -13,6 +13,7 @@ import { HomeSocialPreview } from "./HomeSocialPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isValidPost } from "@/lib/community-rules";
+import { uploadMedia } from "@/lib/media";
 
 function Posts({ scope, userId }: { scope: "global" | "friends" | "all"; userId: string | undefined }) {
   const { data } = useSuspenseQuery(postsQuery(scope, userId));
@@ -23,11 +24,14 @@ function Posts({ scope, userId }: { scope: "global" | "friends" | "all"; userId:
 function InlineQuickPost({ userId }: { userId: string }) {
   const qc = useQueryClient();
   const [body, setBody] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const canPublish = isValidPost(body) || !!file;
 
   async function publish() {
     const content = body.trim();
-    if (!isValidPost(content) || busy) return;
+    if (!canPublish || busy) return;
     setBusy(true);
     try {
       const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -35,17 +39,20 @@ function InlineQuickPost({ userId }: { userId: string }) {
       if (!authData.user || authData.user.id !== userId) {
         throw new Error("Sua sessão expirou. Entre novamente para publicar.");
       }
+      const imageUrl = file ? await uploadMedia(authData.user.id, file) : null;
       const { error } = await supabase.from("feed_posts").insert({
         author_id: authData.user.id,
         body: content,
         kind: "geral",
-        image_url: null,
+        image_url: imageUrl,
       });
       if (error) throw error;
       setBody("");
+      setFile(null);
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["posts"] }),
         qc.invalidateQueries({ queryKey: ["home-story-previews"] }),
+        qc.invalidateQueries({ queryKey: ["explore-posts"] }),
       ]);
       toast.success("Publicação compartilhada");
     } catch (error) {
@@ -57,7 +64,7 @@ function InlineQuickPost({ userId }: { userId: string }) {
   }
 
   return (
-    <form onSubmit={(event) => { event.preventDefault(); void publish(); }} className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2.5 sm:px-7">
+    <form onSubmit={(event) => { event.preventDefault(); void publish(); }} className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2.5 sm:px-7">
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-foreground">
         <Plus size={16} />
       </div>
@@ -71,10 +78,35 @@ function InlineQuickPost({ userId }: { userId: string }) {
         disabled={busy}
         className="h-10 min-w-0 flex-1 rounded-full border border-white/[.09] bg-white/[.035] px-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/75 focus:border-white/25 focus:bg-white/[.06]"
       />
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.csv,.json,.js,.ts,.tsx,.py"
+        className="hidden"
+        aria-label="Selecionar foto, vídeo ou arquivo"
+        onChange={(event) => {
+          const selected = event.currentTarget.files?.[0];
+          if (selected && selected.size > 25 * 1024 * 1024) {
+            toast.error("O arquivo deve ter até 25 MB.");
+          } else if (selected) {
+            setFile(selected);
+          }
+          event.currentTarget.value = "";
+        }}
+      />
+      <Button type="button" size="icon" variant="ghost" disabled={busy} onClick={() => fileInput.current?.click()} aria-label="Anexar foto, vídeo ou arquivo" title="Anexar foto, vídeo ou arquivo" className="h-9 w-9 shrink-0 rounded-full">
+        <ImagePlus size={17} />
+      </Button>
       <span className="hidden text-[10px] tabular-nums text-muted-foreground sm:block">{body.length}/500</span>
-      <Button type="submit" size="icon" disabled={busy || !isValidPost(body)} aria-label="Publicar post" title="Publicar post" className="h-9 w-9 shrink-0 rounded-full">
+      <Button type="submit" size="icon" disabled={busy || !canPublish} aria-label="Publicar post" title="Publicar post" className="h-9 w-9 shrink-0 rounded-full">
         {busy ? <span className="text-[10px]">…</span> : <Send size={15} />}
       </Button>
+      {file && <div className="flex w-full min-w-0 items-center gap-2 rounded-lg border border-white/10 bg-white/[.04] px-3 py-2 text-xs">
+        <FileText size={14} className="shrink-0 text-white/60" />
+        <span className="min-w-0 flex-1 truncate">{file.name}</span>
+        <span className="shrink-0 text-white/40">{(file.size / 1024 / 1024).toFixed(1)} MB</span>
+        <button type="button" onClick={() => setFile(null)} disabled={busy} aria-label="Remover anexo" className="rounded-full p-1 text-white/60 hover:bg-white/10 hover:text-white"><X size={14} /></button>
+      </div>}
     </form>
   );
 }
