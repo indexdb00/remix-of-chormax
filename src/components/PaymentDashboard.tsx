@@ -28,7 +28,7 @@ export function PaymentDashboard({ user }: { user: User }) {
       setLoading(true);
       const [profileResult, productsResult] = await Promise.all([
         supabase.from("profiles").select("display_name,username,total_sold_cents,total_bought_cents,logo_url").eq("id", user.id).maybeSingle(),
-        supabase.from("products").select("id,slug,name,category,price_cents,images,sales,created_at").eq("creator_id", user.id).order("created_at", { ascending: false }).limit(8),
+        supabase.from("products").select("id,slug,name,category,price_cents,images,sales,created_at").eq("creator_id", user.id).order("created_at", { ascending: false }),
       ]);
       if (!active) return;
       setProfile(profileResult.data as Profile | null);
