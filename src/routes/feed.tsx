@@ -5,7 +5,6 @@ import { useState } from "react";
 import { z } from "zod";
 import { Search, Package, SlidersHorizontal, X, Play, Image as ImageIcon } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { useCommunity } from "@/components/CommunityProvider";
 import { productsQuery, formatPrice } from "@/lib/products";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -65,7 +64,6 @@ function Explorar() {
   const { data: posts } = useSuspenseQuery(mediaPostsQuery);
   const { q } = Route.useSearch();
   const navigate = useNavigate({ from: "/feed" });
-  const { compose } = useCommunity();
   const [showFilters, setShowFilters] = useState(false);
   const [oldestFirst, setOldestFirst] = useState(false);
   const set = (patch: Partial<z.infer<typeof schema>>) =>
@@ -91,12 +89,7 @@ function Explorar() {
     video: false,
   }));
 
-  let tiles: Tile[] = [];
-  if (tab === "tudo") tiles = [...productTiles, ...postTiles];
-  if (tab === "posts") tiles = postTiles.filter((tile) => !tile.video);
-  if (tab === "reels") tiles = postTiles.filter((tile) => tile.video);
-  if (tab === "produtos") tiles = productTiles;
-  tiles = tiles
+  const tiles: Tile[] = [...productTiles, ...postTiles]
     .filter((tile) => tile.title.toLocaleLowerCase("pt-BR").includes(term))
     .sort((a, b) => oldestFirst ? a.t.localeCompare(b.t) : b.t.localeCompare(a.t));
 
