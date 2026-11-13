@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Archive, ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, Undo2, X } from "lucide-react";
+import { ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, X, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -29,7 +29,7 @@ const DAY = 86400000;
 function Perfil() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups" | "arquivados">("posts");
+  const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups">("posts");
   const [editing, setEditing] = useState(false);
 
   const { data: profile } = useQuery({
@@ -71,7 +71,6 @@ function Perfil() {
   });
   const isCreator = products.length > 0;
   const active = posts.filter((p) => !p.archived);
-  const archived = posts.filter((p) => p.archived);
   const refreshPosts = () => qc.invalidateQueries({ queryKey: ["my-posts", user.id] }).then(() => qc.invalidateQueries({ queryKey: ["posts"] }));
 
   async function setArchived(id: string, v: boolean) {
@@ -108,13 +107,13 @@ function Perfil() {
               {name}
               {isCreator && <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent"><BadgeCheck size={12} /> Creator</span>}
             </h1>
-            <p className="text-sm text-muted-foreground">@{profile?.username || "sem_usuario"}</p>
+            <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"><span>@{profile?.username || "sem_usuario"}</span><Pencil size={12} /></button>
             {profile?.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           </div>
 
           <div className="mt-5 grid grid-cols-3 border-y border-border py-3 text-center">
             {[["Posts", active.length], ["Ups recebidos", upsReceived], ["Amigos", friends]].map(([l, v]) => (
-              <div key={l as string}><p className="text-base font-bold">{v}</p><p className="text-xs text-muted-foreground">{l}</p></div>
+              <div key={l as string}><p className="text-base font-bold">{v}</p><p className="flex items-center justify-center gap-1 text-xs text-muted-foreground">{l === "Assinantes" && <Star size={11} />}{l}</p></div>
             ))}
           </div>
           {profile?.show_totals !== false && <div className="mt-3 grid grid-cols-2 gap-2">
@@ -124,7 +123,7 @@ function Perfil() {
         </div>
 
         <div className="mt-5 grid grid-cols-5 border-b border-border">
-          {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"], ["arquivados", Archive, "Arquivo"]] as const).map(([k, I, l]) => (
+          {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"]] as const).map(([k, I, l]) => (
             <button key={k} onClick={() => setTab(k)} className={`flex flex-col items-center justify-center gap-1 py-3 text-[11px] sm:flex-row sm:text-xs ${tab === k ? "border-b-2 border-foreground font-semibold" : "text-muted-foreground"}`}><I size={15} /> {l}</button>
           ))}
         </div>
