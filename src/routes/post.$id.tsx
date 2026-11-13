@@ -38,7 +38,7 @@ function PostPage() {
     <main className="min-h-screen bg-background pb-32 text-foreground">
       <SiteHeader />
       <section className="mx-auto max-w-2xl">
-        <Link to="/explorar" className="flex items-center gap-2 px-5 py-4 text-sm text-muted-foreground"><ArrowLeft size={16} /> Explorar</Link>
+        <Link to="/feed" className="flex items-center gap-2 px-5 py-4 text-sm text-muted-foreground"><ArrowLeft size={16} /> Projetos</Link>
         {data ? <PostCard post={data} /> : <p className="p-10 text-center text-sm text-muted-foreground">Publicação não encontrada.</p>}
       </section>
     </main>

@@ -20,9 +20,9 @@ export const Route = createFileRoute("/auth")({
 });
 
 const slides = [
-  { eyebrow: "NETWORK DEV", title: "Conecte-se ao\nuniverso dev.", copy: "Encontre pessoas, troque ideias e construa conexões que fazem seus projetos avançarem.", icon: Network, tag: "Comunidade em movimento" },
-  { eyebrow: "SEUS PROJETOS, EM DESTAQUE", title: "Mostre o que\nvocê está criando.", copy: "Publique projetos digitais, compartilhe atualizações e descubra o trabalho de outros criadores.", icon: Layers3, tag: "Feed • Explorar • Publicações" },
-  { eyebrow: "MARKETPLACE DIGITAL", title: "Transforme ideias\nem oportunidades.", copy: "Apresente produtos e ativos digitais, descubra soluções e encontre novas possibilidades.", icon: Code2, tag: "Criação • Descoberta • Negócios" },
+  { eyebrow: "COMUNIDADE DE APRENDIZAGEM", title: "Aprenda junto com\nquem constrói.", copy: "Troque experiências, compartilhe dúvidas e evolua com pessoas que também estão aprendendo.", icon: Network, tag: "Conexões • Conversas • Colaboração" },
+  { eyebrow: "SEUS PROJETOS, EM DESTAQUE", title: "Mostre o que\nvocê está criando.", copy: "Publique projetos, compartilhe seu processo e descubra o trabalho de outros estudantes.", icon: Layers3, tag: "Projetos • Portfólio • Publicações" },
+  { eyebrow: "CHROMAX ACADEMY", title: "Transforme ideias\nem conhecimento.", copy: "Aprenda inteligência artificial, desenvolvimento, design e cibersegurança com trilhas orientadas à prática.", icon: Code2, tag: "Cursos • Trilhas • Projetos" },
 ];
 
 function AuthPage() {
