@@ -182,10 +182,10 @@ type P = { display_name: string | null; username: string | null; bio: string | n
 
 function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; onClose: () => void }) {
   const qc = useQueryClient();
-  const [f, setF] = useState({ display_name: "", username: "", bio: "" });
+  const [f, setF] = useState({ username: "" });
   const [busy, setBusy] = useState<string | null>(null);
   const logo = useRef<HTMLInputElement>(null);
-  useEffect(() => setF({ display_name: profile.display_name ?? "", username: profile.username ?? "", bio: profile.bio ?? "" }), [profile]);
+  useEffect(() => setF({ username: profile.username ?? "" }), [profile]);
 
   const next = profile.name_changed_at ? new Date(profile.name_changed_at).getTime() + 15 * DAY : 0;
   const locked = next > Date.now();
@@ -205,8 +205,7 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
 
   async function save() {
     setBusy("save");
-    const patch: { username: string | null; bio: string; display_name?: string } = { username: f.username.trim().toLowerCase() || null, bio: f.bio.trim() };
-    if (f.display_name.trim() !== (profile.display_name ?? "")) patch.display_name = f.display_name.trim();
+    const patch: { username: string | null } = { username: f.username.trim().toLowerCase() || null };
     const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
     setBusy(null);
     if (error) toast.error(error.message.includes("NAME_COOLDOWN") ? "Nome só pode mudar a cada 15 dias" : error.code === "23505" ? "Esse usuário já existe" : "Erro ao salvar");
@@ -217,7 +216,7 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 backdrop-blur-sm sm:items-center" onClick={onClose}>
       <div onClick={(e) => e.stopPropagation()} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-border bg-card p-5 sm:rounded-2xl">
-        <div className="flex items-center justify-between"><h2 className="font-bold">Editar perfil</h2><button onClick={onClose} aria-label="Fechar"><X size={18} /></button></div>
+        <div className="flex items-center justify-between"><h2 className="font-bold">Editar usuário e foto</h2><button onClick={onClose} aria-label="Fechar"><X size={18} /></button></div>
 
         <button onClick={() => logo.current?.click()} className="relative -mt-8 ml-4 block h-20 w-20 overflow-hidden rounded-full border-4 border-card bg-secondary">
           {profile.logo_url && <img src={profile.logo_url} alt="" className="h-full w-full object-cover" />}
@@ -225,18 +224,15 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
         </button>
         <input ref={logo} type="file" accept="image/*" hidden onChange={(e) => upload("logo_url", e.target.files?.[0])} />
 
-        <label className="mt-4 block text-xs text-muted-foreground">Nome
-          <input className={input} value={f.display_name} disabled={locked} maxLength={60} onChange={(e) => setF({ ...f, display_name: e.target.value })} />
-          <span className="mt-1 block text-[11px]">{locked ? `Você poderá mudar o nome em ${new Date(next).toLocaleDateString("pt-BR")}.` : "O nome pode ser alterado a cada 15 dias."}</span>
-        </label>
-        <label className="mt-3 block text-xs text-muted-foreground">Usuário
-          <input className={input} value={f.username} maxLength={30} onChange={(e) => setF({ ...f, username: e.target.value.replace(/[^a-zA-Z0-9_.]/g, "") })} />
-        </label>
-        <label className="mt-3 block text-xs text-muted-foreground">Bio
-          <textarea className={input} rows={3} value={f.bio} maxLength={280} onChange={(e) => setF({ ...f, bio: e.target.value })} />
+        <label className="mt-4 block text-xs text-muted-foreground">Nome de usuário
+          <div className="mt-1 flex items-center rounded-lg border border-border bg-background px-3 focus-within:border-foreground">
+            <span className="text-sm text-muted-foreground">@</span>
+            <input className="w-full bg-transparent px-2 py-2.5 text-sm outline-none" value={f.username} maxLength={30} onChange={(e) => setF({ username: e.target.value.replace(/[^a-zA-Z0-9_.]/g, "") })} />
+          </div>
+          <span className="mt-1 block text-[11px]">Use letras, números, ponto ou sublinhado.</span>
         </label>
         <button onClick={save} disabled={busy !== null} className="mt-5 w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy === "save" ? "Salvando..." : "Salvar"}</button>
-        <p className="mt-3 text-center text-[11px] text-muted-foreground">Seus posts arquivados ficam em Salvos.</p>
+        
       </div>
     </div>
   );
