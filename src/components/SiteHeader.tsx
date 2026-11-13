@@ -95,7 +95,7 @@ export function SiteHeader() {
         </div>
         <Link to="/" className="font-display text-xl font-extrabold tracking-tight text-chrome sm:text-2xl">chromaX</Link>
         <nav className="flex justify-end gap-1 sm:gap-3" aria-label="Ações rápidas">
-          {user && <Button variant="ghost" size="icon" className="rounded-full text-zinc-200 hover:bg-white/10 hover:text-white" aria-label="Abrir câmera" title="Abrir câmera" onClick={() => window.dispatchEvent(new Event("chromax:open-camera"))}><Camera/></Button>}
+          <Button variant="ghost" size="icon" className="rounded-full text-zinc-200 hover:bg-white/10 hover:text-white" aria-label="Abrir câmera" title="Abrir câmera" onClick={() => window.dispatchEvent(new Event("chromax:open-camera"))}><Camera/></Button>
           {user && <Button variant="ghost" size="icon" className="rounded-full text-zinc-200 hover:bg-white/10 hover:text-white" aria-label="Criar post" title="Criar post" onClick={compose}><Plus/></Button>}
           {user && <Button asChild variant="ghost" size="icon" className="rounded-full text-zinc-200 hover:bg-white/10 hover:text-white"><Link to="/salvos" aria-label="Salvos" title="Salvos"><Bookmark/></Link></Button>}
         </nav>
