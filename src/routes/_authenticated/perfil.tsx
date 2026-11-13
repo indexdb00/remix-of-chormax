@@ -70,7 +70,7 @@ function Perfil() {
     queryFn: async () => (await supabase.from("profile_follows").select("id", { count: "exact", head: true }).eq("follower_id", user.id)).count ?? 0,
   });
 
-  const { data: activity = { reposts: [], ups: [] } } = useQuery({
+  const { data: activity = { reposts: [], ups: [], repostDates: [] as string[], upDates: [] as string[] } } = useQuery({
     queryKey: ["profile-activity", user.id],
     queryFn: async () => {
       const [r, u] = await Promise.all([
@@ -78,7 +78,12 @@ function Perfil() {
         supabase.from("post_ups").select("post_id,created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
       ]);
       const load = async (ids: string[]) => ids.length ? ((await supabase.from("feed_posts").select(POST_SELECT).in("id", ids)).data ?? []) as unknown as CommunityPost[] : [];
-      return { reposts: await load((r.data ?? []).map((x) => x.post_id)), ups: await load((u.data ?? []).map((x) => x.post_id)) };
+      return {
+        reposts: await load((r.data ?? []).map((x) => x.post_id)),
+        ups: await load((u.data ?? []).map((x) => x.post_id)),
+        repostDates: (r.data ?? []).map((x) => x.created_at),
+        upDates: (u.data ?? []).map((x) => x.created_at),
+      };
     },
   });
 
@@ -96,8 +101,8 @@ function Perfil() {
   weekStart.setDate(weekStart.getDate() - 6);
   weekStart.setHours(0, 0, 0, 0);
   const weekPosts = active.filter((post) => new Date(post.created_at) >= weekStart).length;
-  const weekReposts = activity.reposts.filter((post) => new Date(post.created_at) >= weekStart).length;
-  const weekUps = activity.ups.filter((post) => new Date(post.created_at) >= weekStart).length;
+  const weekReposts = activity.repostDates.filter((createdAt) => new Date(createdAt) >= weekStart).length;
+  const weekUps = activity.upDates.filter((createdAt) => new Date(createdAt) >= weekStart).length;
   const weeklyPoints = weekPosts * 20 + weekReposts * 10 + weekUps * 5;
   const missions = [
     { label: "Compartilhe uma publicação", detail: "Mostre o que você está criando", progress: Math.min(weekPosts, 1), target: 1, points: 20 },
