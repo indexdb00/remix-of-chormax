@@ -127,7 +127,7 @@ function Perfil() {
                 </div>
                 <div className="flex shrink-0 gap-2">
                   <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.06] px-3 py-2.5 text-xs font-medium text-white transition hover:bg-white/10"><Package size={14} /> <span className="hidden sm:inline">Creator</span></Link>
-                  <Link to="/configuracoes" aria-label="Configurações" className="rounded-xl border border-white/10 bg-white/[0.05] p-2.5 text-white/75 transition hover:bg-white/10"><Settings size={16} /></Link>
+                  <Link to="/configuracoes" aria-label="Configurações" className="rounded-xl bg-white/[0.06] p-2.5 text-white/75 transition hover:bg-white/10"><Settings size={16} /></Link>
                 </div>
               </div>
               {profile?.bio && <p className="mt-5 max-w-xl whitespace-pre-wrap text-sm leading-6 text-white/55">{profile.bio}</p>}
@@ -163,7 +163,7 @@ function Perfil() {
             {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
               <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
                 <I size={16} /> {l}
-                {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-violet-300" />}
+                {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-white" />}
               </button>
             ))}
           </div>
