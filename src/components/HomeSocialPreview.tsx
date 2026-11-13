@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Camera, CirclePlus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -45,7 +45,12 @@ export function HomeSocialPreview() {
 
   return (
     <section className="sticky top-[68px] z-30 border-b border-white/10 bg-[#0d0d11]/98 px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,.3)] backdrop-blur-2xl sm:px-6" aria-label="Notas e stories">
-      <div className="mx-auto max-w-6xl">\n        <div className="mb-2 flex items-center justify-end gap-1.5">\n          <button type="button" onClick={() => setMode("both")} aria-pressed={mode === "both"} className={`rounded-full px-2.5 py-1 text-[10px] transition ${mode === "both" ? "bg-white/15 text-white" : "text-white/45 hover:text-white"}`}>Tudo</button>\n          <button type="button" onClick={() => setMode("notes")} aria-pressed={mode === "notes"} className={`rounded-full px-2.5 py-1 text-[10px] transition ${mode === "notes" ? "bg-white/15 text-white" : "text-white/45 hover:text-white"}`}>Notas</button>\n          <button type="button" onClick={() => setMode("stories")} aria-pressed={mode === "stories"} className={`rounded-full px-2.5 py-1 text-[10px] transition ${mode === "stories" ? "bg-white/15 text-white" : "text-white/45 hover:text-white"}`}>Stories</button>\n        </div>
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-2 flex items-center justify-end gap-1.5">
+          <button type="button" onClick={() => setMode("both")} aria-pressed={mode === "both"} className={`rounded-full px-2.5 py-1 text-[10px] transition ${mode === "both" ? "bg-white/15 text-white" : "text-white/45 hover:text-white"}`}>Tudo</button>
+          <button type="button" onClick={() => setMode("notes")} aria-pressed={mode === "notes"} className={`rounded-full px-2.5 py-1 text-[10px] transition ${mode === "notes" ? "bg-white/15 text-white" : "text-white/45 hover:text-white"}`}>Notas</button>
+          <button type="button" onClick={() => setMode("stories")} aria-pressed={mode === "stories"} className={`rounded-full px-2.5 py-1 text-[10px] transition ${mode === "stories" ? "bg-white/15 text-white" : "text-white/45 hover:text-white"}`}>Stories</button>
+        </div>
         {showNotes && (
           <div className="animate-in fade-in duration-200">
             <div className="mb-2 flex items-center justify-between">
