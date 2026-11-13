@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   q: fallback(z.string(), "").default(""),
-  tab: fallback(z.enum(["tudo", "posts", "reels", "produtos"]), "tudo").default("tudo"),
 });
 
 const mediaPostsQuery = queryOptions({
@@ -64,7 +63,7 @@ const isVideo = (src: string | undefined) =>
 function Explorar() {
   const { data: products } = useSuspenseQuery(productsQuery);
   const { data: posts } = useSuspenseQuery(mediaPostsQuery);
-  const { q, tab } = Route.useSearch();
+  const { q } = Route.useSearch();
   const navigate = useNavigate({ from: "/feed" });
   const { compose } = useCommunity();
   const [showFilters, setShowFilters] = useState(false);
@@ -100,13 +99,6 @@ function Explorar() {
   tiles = tiles
     .filter((tile) => tile.title.toLocaleLowerCase("pt-BR").includes(term))
     .sort((a, b) => oldestFirst ? a.t.localeCompare(b.t) : b.t.localeCompare(a.t));
-
-  const tabs = [
-    { id: "tudo", label: "Para você" },
-    { id: "posts", label: "Posts" },
-    { id: "reels", label: "Reels" },
-    { id: "produtos", label: "Projetos" },
-  ] as const;
 
   return (
     <main className="min-h-screen bg-[#050505] pb-32 text-white">
