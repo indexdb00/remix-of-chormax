@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, X, Star, ShoppingBag, TrendingUp, Wallet } from "lucide-react";
+import { ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, X, Star, ShoppingBag, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -119,7 +119,7 @@ function Perfil() {
                     <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-[#ded7ff] text-[#17131f] shadow-lg"><Pencil size={13} /></button>
                   </div>
                   <div className="min-w-0">
-                    <p className="font-mono text-[9px] tracking-[.24em] text-violet-200/60">CHROMAX / IDENTITY</p>
+                    
                     <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-white sm:text-2xl">{name}</h1>
                     <button onClick={() => setEditing(true)} className="mt-1 inline-flex items-center gap-1.5 text-sm text-white/50 transition hover:text-white"><span>@{profile?.username || "sem_usuario"}</span><Pencil size={11} /></button>
                     {isCreator && <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-violet-300/20 bg-violet-300/10 px-2.5 py-1 text-[10px] font-semibold text-violet-100"><BadgeCheck size={12} /> Creator</span>}
@@ -140,15 +140,17 @@ function Perfil() {
 
             {profile?.show_totals !== false && <div className="rounded-[24px] border border-white/[0.09] bg-[#1b1b22]/90 p-4 sm:p-5">
               <div className="flex items-center justify-between gap-3">
-                <div><p className="font-mono text-[9px] tracking-[.2em] text-white/35">CHROMAX / MARKET</p><h2 className="mt-1 text-sm font-medium text-white/80">Resumo financeiro</h2></div>
-                <span className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-violet-200"><Wallet size={17} /></span>
-              </div>
-              <div className="mt-5 flex rounded-xl border border-white/[0.08] bg-black/25 p-1">
-                <button onClick={() => setBalanceView("sales")} className={"flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all " + (balanceView === "sales" ? "bg-[#d9d0ff] text-[#17131f] shadow-[0_3px_16px_rgba(167,139,250,.2)]" : "text-white/45 hover:text-white")}><TrendingUp size={14} /> Vendas</button>
-                <button onClick={() => setBalanceView("purchases")} className={"flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all " + (balanceView === "purchases" ? "bg-[#d9d0ff] text-[#17131f] shadow-[0_3px_16px_rgba(167,139,250,.2)]" : "text-white/45 hover:text-white")}><ShoppingBag size={14} /> Compras</button>
+                <div><p className="text-xs font-medium text-white/55">{balanceView === "sales" ? "Vendas" : "Compras"}</p></div>
+                <button
+                  type="button"
+                  onClick={() => setBalanceView((current) => current === "sales" ? "purchases" : "sales")}
+                  aria-label={balanceView === "sales" ? "Mostrar saldo de compras" : "Mostrar saldo de vendas"}
+                  title={balanceView === "sales" ? "Mostrar compras" : "Mostrar vendas"}
+                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-violet-200 transition hover:rotate-180 hover:border-violet-200/40 hover:bg-violet-300/10"
+                ><Repeat2 size={17} /></button>
               </div>
               <div className="mt-5 min-h-[112px]">
-                <p className="text-xs text-white/40">{balanceView === "sales" ? "Total acumulado em vendas" : "Total acumulado em compras"}</p>
+                <p className="text-xs text-white/40">{balanceView === "sales" ? "Total em vendas" : "Total em compras"}</p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-white tabular-nums sm:text-4xl">{brl(balanceView === "sales" ? profile?.total_sold_cents ?? 0 : profile?.total_bought_cents ?? 0)}</p>
                 <p className="mt-3 text-[10px] text-white/30">Valores registrados na sua conta ChromaX</p>
               </div>
