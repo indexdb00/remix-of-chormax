@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, X, Star } from "lucide-react";
+import { ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, X, Star, ShoppingBag, TrendingUp, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -30,6 +30,7 @@ function Perfil() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
   const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups" | "assinantes">("posts");
+  const [balanceView, setBalanceView] = useState<"sales" | "purchases">("sales");
   const [editing, setEditing] = useState(false);
   const [usernameDraft, setUsernameDraft] = useState("");
   const [usernameBusy, setUsernameBusy] = useState(false);
@@ -104,85 +105,108 @@ function Perfil() {
   return (
     <main className="min-h-screen bg-background pb-32 text-foreground">
       <SiteHeader />
-      <div className="mx-auto max-w-3xl">
-        <div className="px-4 pt-6 sm:px-6">
-          <div className="flex items-end justify-between gap-3">
-            <div className="relative h-24 w-24 sm:h-28 sm:w-28">
-              <div className="h-full w-full overflow-hidden rounded-full border-4 border-background bg-card">
-                {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold">{name[0]?.toUpperCase()}</span>}
+      <div className="mx-auto max-w-6xl px-4 pt-5 sm:px-6 sm:pt-8">
+        <section className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#141419] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-8">
+          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-violet-500/[0.09] blur-3xl" />
+          <div className="relative grid gap-7 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
+            <div>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-4 sm:gap-5">
+                  <div className="relative h-20 w-20 shrink-0 rounded-[25px] border border-white/15 bg-gradient-to-br from-violet-300/30 via-zinc-700 to-[#17171d] p-1 shadow-[0_10px_35px_rgba(139,92,246,.16)] sm:h-24 sm:w-24">
+                    <div className="h-full w-full overflow-hidden rounded-[21px] bg-[#24242c]">
+                      {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold text-white">{name[0]?.toUpperCase()}</span>}
+                    </div>
+                    <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-[#ded7ff] text-[#17131f] shadow-lg"><Pencil size={13} /></button>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-mono text-[9px] tracking-[.24em] text-violet-200/60">CHROMAX / IDENTITY</p>
+                    <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-white sm:text-2xl">{name}</h1>
+                    <button onClick={() => setEditing(true)} className="mt-1 inline-flex items-center gap-1.5 text-sm text-white/50 transition hover:text-white"><span>@{profile?.username || "sem_usuario"}</span><Pencil size={11} /></button>
+                    {isCreator && <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-violet-300/20 bg-violet-300/10 px-2.5 py-1 text-[10px] font-semibold text-violet-100"><BadgeCheck size={12} /> Creator</span>}
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-xs font-medium text-white transition hover:bg-white/10"><Package size={14} /> <span className="hidden sm:inline">Creator</span></Link>
+                  <Link to="/configuracoes" aria-label="Configurações" className="rounded-xl border border-white/10 bg-white/[0.05] p-2.5 text-white/75 transition hover:bg-white/10"><Settings size={16} /></Link>
+                </div>
               </div>
-              <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border border-white/30 bg-zinc-200 text-black shadow-lg"><Pencil size={13} /></button>
+              {profile?.bio && <p className="mt-5 max-w-xl whitespace-pre-wrap text-sm leading-6 text-white/55">{profile.bio}</p>}
+              <div className="mt-6 grid grid-cols-4 gap-2 border-t border-white/[0.08] pt-5 text-center">
+                {[["Posts", active.length], ["Seguidores", followers], ["Seguindo", following], ["Ups", upsReceived]].map(([l, v]) => (
+                  <div key={l as string}><p className="text-lg font-semibold tabular-nums text-white">{v}</p><p className="mt-1 text-[10px] text-white/40 sm:text-xs">{l}</p></div>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-2 pb-1">
-              <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium"><Package size={14} /> Creator</Link>
-              <Link to="/configuracoes" aria-label="Configurações" className="rounded-lg border border-border bg-card p-2"><Settings size={16} /></Link>
-            </div>
-          </div>
 
-          <div className="mt-3">
-            <h1 className="flex items-center gap-1.5 text-lg font-bold">
-              {name}
-              {isCreator && <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent"><BadgeCheck size={12} /> Creator</span>}
-            </h1>
-            <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"><span>@{profile?.username || "sem_usuario"}</span><Pencil size={12} /></button>
-            {profile?.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
+            {profile?.show_totals !== false && <div className="rounded-[24px] border border-white/[0.09] bg-[#1b1b22]/90 p-4 sm:p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div><p className="font-mono text-[9px] tracking-[.2em] text-white/35">CHROMAX / MARKET</p><h2 className="mt-1 text-sm font-medium text-white/80">Resumo financeiro</h2></div>
+                <span className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-violet-200"><Wallet size={17} /></span>
+              </div>
+              <div className="mt-5 flex rounded-xl border border-white/[0.08] bg-black/25 p-1">
+                <button onClick={() => setBalanceView("sales")} className={"flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all " + (balanceView === "sales" ? "bg-[#d9d0ff] text-[#17131f] shadow-[0_3px_16px_rgba(167,139,250,.2)]" : "text-white/45 hover:text-white")}><TrendingUp size={14} /> Vendas</button>
+                <button onClick={() => setBalanceView("purchases")} className={"flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all " + (balanceView === "purchases" ? "bg-[#d9d0ff] text-[#17131f] shadow-[0_3px_16px_rgba(167,139,250,.2)]" : "text-white/45 hover:text-white")}><ShoppingBag size={14} /> Compras</button>
+              </div>
+              <div className="mt-5 min-h-[112px]">
+                <p className="text-xs text-white/40">{balanceView === "sales" ? "Total acumulado em vendas" : "Total acumulado em compras"}</p>
+                <p className="mt-2 text-3xl font-semibold tracking-tight text-white tabular-nums sm:text-4xl">{brl(balanceView === "sales" ? profile?.total_sold_cents ?? 0 : profile?.total_bought_cents ?? 0)}</p>
+                <p className="mt-3 text-[10px] text-white/30">Valores registrados na sua conta ChromaX</p>
+              </div>
+            </div>}
           </div>
+        </section>
 
-          <div className="mt-5 grid grid-cols-4 border-y border-border py-3 text-center">
-            {[["Posts", active.length], ["Seguidores", followers], ["Seguindo", following], ["Ups recebidos", upsReceived]].map(([l, v]) => (
-              <div key={l as string}><p className="text-base font-bold">{v}</p><p className="text-xs text-muted-foreground">{l}</p></div>
+        <section className="mt-6 overflow-hidden rounded-[24px] border border-border bg-card/70">
+          <div className="grid grid-cols-5">
+            {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
+              <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
+                <I size={16} /> {l}
+                {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-violet-300" />}
+              </button>
             ))}
           </div>
-          {profile?.show_totals !== false && <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-xl border border-border bg-card p-3"><p className="text-[11px] text-muted-foreground">Total comprado</p><p className="font-bold">{brl(profile?.total_bought_cents ?? 0)}</p></div>
-            <div className="rounded-xl border border-border bg-card p-3"><p className="text-[11px] text-muted-foreground">Total vendido</p><p className="font-bold">{brl(profile?.total_sold_cents ?? 0)}</p></div>
-          </div>}
+        </section>
+
+        <div className="mt-4 overflow-hidden rounded-[24px] border border-border bg-card/40">
+          {tab === "assinantes" && <Empty text="Seus assinantes aparecerão aqui quando as assinaturas estiverem disponíveis." />}
+
+          {tab === "produtos" && (
+            products.length ? (
+              <div className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-3 sm:gap-3 sm:p-3">
+                {products.map((p) => (
+                  <Link key={p.id} to="/produto/$slug" params={{ slug: p.slug }} className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-card">
+                    {p.images[0] ? <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center"><Package className="text-muted-foreground" /></span>}
+                    <span className="absolute inset-x-2 bottom-2 rounded-lg border border-white/10 bg-black/65 px-2.5 py-2 text-xs font-semibold text-white backdrop-blur">{brl(p.price_cents)}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : <Empty text="Nenhum produto ainda." cta />
+          )}
+
+          {(tab === "reposts" || tab === "ups") && (
+            activity[tab].length ? <div>{activity[tab].map((p) => <PostCard key={p.id} post={p} repostedBy={tab === "reposts" ? "Você" : undefined} />)}</div>
+              : <Empty text={tab === "reposts" ? "Você ainda não repostou nada." : "Você ainda não deu Up em nenhum post."} />
+          )}
+
+          {tab === "posts" && (
+            active.length ? (
+              <ul>
+                {active.map((p) => (
+                  <li key={p.id} className="flex gap-3 border-b border-border px-4 py-4 last:border-0">
+                    {p.image_url && <img src={p.image_url} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />}
+                    <div className="min-w-0 flex-1">
+                      <p className="whitespace-pre-wrap break-words text-sm">{p.body}</p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">{new Date(p.created_at).toLocaleDateString("pt-BR")}</p>
+                    </div>
+                    <div className="flex shrink-0 flex-col gap-2">
+                      <button onClick={() => remove(p.id)} aria-label="Apagar" className="text-muted-foreground hover:text-destructive"><Trash2 size={16} /></button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : <Empty text="Nenhum post ainda." />
+          )}
         </div>
-
-        <div className="mt-5 grid grid-cols-5 border-b border-border">
-          {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={`flex flex-col items-center justify-center gap-1 py-3 text-[11px] sm:flex-row sm:text-xs ${tab === k ? "border-b-2 border-foreground font-semibold" : "text-muted-foreground"}`}><I size={15} /> {l}</button>
-          ))}
-        </div>
-
-        {tab === "assinantes" && <Empty text="Seus assinantes aparecerão aqui quando as assinaturas estiverem disponíveis." />}
-
-        {tab === "produtos" && (
-          products.length ? (
-            <div className="grid grid-cols-3 gap-0.5">
-              {products.map((p) => (
-                <Link key={p.id} to="/produto/$slug" params={{ slug: p.slug }} className="relative aspect-square overflow-hidden bg-card">
-                  {p.images[0] ? <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center"><Package className="text-muted-foreground" /></span>}
-                  <span className="absolute bottom-1 left-1 rounded bg-background/75 px-1.5 text-[10px] font-semibold">{brl(p.price_cents)}</span>
-                </Link>
-              ))}
-            </div>
-          ) : <Empty text="Nenhum produto ainda." cta />
-        )}
-
-        {(tab === "reposts" || tab === "ups") && (
-          activity[tab].length ? <div>{activity[tab].map((p) => <PostCard key={p.id} post={p} repostedBy={tab === "reposts" ? "Você" : undefined} />)}</div>
-            : <Empty text={tab === "reposts" ? "Você ainda não repostou nada." : "Você ainda não deu Up em nenhum post."} />
-        )}
-
-        {tab === "posts" && (
-          active.length ? (
-            <ul>
-              {active.map((p) => (
-                <li key={p.id} className="flex gap-3 border-b border-border px-4 py-4">
-                  {p.image_url && <img src={p.image_url} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover" />}
-                  <div className="min-w-0 flex-1">
-                    <p className="whitespace-pre-wrap break-words text-sm">{p.body}</p>
-                    <p className="mt-1 text-[11px] text-muted-foreground">{new Date(p.created_at).toLocaleDateString("pt-BR")}</p>
-                  </div>
-                  <div className="flex shrink-0 flex-col gap-2">
-                    <button onClick={() => remove(p.id)} aria-label="Apagar" className="text-muted-foreground hover:text-destructive"><Trash2 size={16} /></button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : <Empty text="Nenhum post ainda." />
-        )}
       </div>
 
       {editing && profile && <EditSheet userId={user.id} profile={profile} onClose={() => setEditing(false)} />}
