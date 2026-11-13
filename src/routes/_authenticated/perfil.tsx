@@ -71,12 +71,7 @@ function Perfil() {
   });
   const isCreator = products.length > 0;
   const active = posts.filter((p) => !p.archived);
-  const refreshPosts = () => qc.invalidateQueries({ queryKey: ["my-posts", user.id] }).then(() => qc.invalidateQueries({ queryKey: ["posts"] }));
 
-  async function setArchived(id: string, v: boolean) {
-    const { error } = await supabase.from("feed_posts").update({ archived: v }).eq("id", id);
-    if (error) toast.error("Erro"); else { toast.success(v ? "Arquivado" : "Restaurado"); refreshPosts(); }
-  }
   async function remove(id: string) {
     if (!confirm("Apagar este post?")) return;
     await supabase.from("saved_items").delete().eq("post_id", id);
@@ -92,11 +87,13 @@ function Perfil() {
       <div className="mx-auto max-w-3xl">
         <div className="px-4 pt-6 sm:px-6">
           <div className="flex items-end justify-between gap-3">
-            <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-background bg-card sm:h-28 sm:w-28">
-              {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold">{name[0]?.toUpperCase()}</span>}
+            <div className="relative h-24 w-24 sm:h-28 sm:w-28">
+              <div className="h-full w-full overflow-hidden rounded-full border-4 border-background bg-card">
+                {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold">{name[0]?.toUpperCase()}</span>}
+              </div>
+              <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border border-white/30 bg-zinc-200 text-black shadow-lg"><Pencil size={13} /></button>
             </div>
             <div className="flex gap-2 pb-1">
-              <button onClick={() => setEditing(true)} className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-gradient-to-b from-white/[0.14] to-white/[0.04] px-4 py-2.5 text-xs font-semibold text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,.16)] transition hover:border-white/40 hover:from-white/[0.2]"><Pencil size={14} /> Editar perfil</button>
               <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium"><Package size={14} /> Creator</Link>
               <Link to="/configuracoes" aria-label="Configurações" className="rounded-lg border border-border bg-card p-2"><Settings size={16} /></Link>
             </div>
@@ -111,8 +108,8 @@ function Perfil() {
             {profile?.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           </div>
 
-          <div className="mt-5 grid grid-cols-3 border-y border-border py-3 text-center">
-            {[["Posts", active.length], ["Ups recebidos", upsReceived], ["Amigos", friends]].map(([l, v]) => (
+          <div className="mt-5 grid grid-cols-4 border-y border-border py-3 text-center">
+            {[["Posts", active.length], ["Ups recebidos", upsReceived], ["Amigos", friends], ["Assinantes", "—"]].map(([l, v]) => (
               <div key={l as string}><p className="text-base font-bold">{v}</p><p className="flex items-center justify-center gap-1 text-xs text-muted-foreground">{l === "Assinantes" && <Star size={11} />}{l}</p></div>
             ))}
           </div>
@@ -122,7 +119,7 @@ function Perfil() {
           </div>}
         </div>
 
-        <div className="mt-5 grid grid-cols-5 border-b border-border">
+        <div className="mt-5 grid grid-cols-4 border-b border-border">
           {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"]] as const).map(([k, I, l]) => (
             <button key={k} onClick={() => setTab(k)} className={`flex flex-col items-center justify-center gap-1 py-3 text-[11px] sm:flex-row sm:text-xs ${tab === k ? "border-b-2 border-foreground font-semibold" : "text-muted-foreground"}`}><I size={15} /> {l}</button>
           ))}
@@ -146,10 +143,10 @@ function Perfil() {
             : <Empty text={tab === "reposts" ? "Você ainda não repostou nada." : "Você ainda não deu Up em nenhum post."} />
         )}
 
-        {(tab === "posts" || tab === "arquivados") && (
-          (tab === "posts" ? active : archived).length ? (
+        {tab === "posts" && (
+          active.length ? (
             <ul>
-              {(tab === "posts" ? active : archived).map((p) => (
+              {active.map((p) => (
                 <li key={p.id} className="flex gap-3 border-b border-border px-4 py-4">
                   {p.image_url && <img src={p.image_url} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover" />}
                   <div className="min-w-0 flex-1">
@@ -157,13 +154,12 @@ function Perfil() {
                     <p className="mt-1 text-[11px] text-muted-foreground">{new Date(p.created_at).toLocaleDateString("pt-BR")}</p>
                   </div>
                   <div className="flex shrink-0 flex-col gap-2">
-                    <button onClick={() => setArchived(p.id, !p.archived)} aria-label={p.archived ? "Restaurar" : "Arquivar"} className="text-muted-foreground hover:text-foreground">{p.archived ? <Undo2 size={16} /> : <Archive size={16} />}</button>
                     <button onClick={() => remove(p.id)} aria-label="Apagar" className="text-muted-foreground hover:text-destructive"><Trash2 size={16} /></button>
                   </div>
                 </li>
               ))}
             </ul>
-          ) : <Empty text={tab === "posts" ? "Nenhum post ainda." : "Nada arquivado."} />
+          ) : <Empty text="Nenhum post ainda." />
         )}
       </div>
 
@@ -239,7 +235,7 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
           <textarea className={input} rows={3} value={f.bio} maxLength={280} onChange={(e) => setF({ ...f, bio: e.target.value })} />
         </label>
         <button onClick={save} disabled={busy !== null} className="mt-5 w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy === "save" ? "Salvando..." : "Salvar"}</button>
-        <p className="mt-3 text-center text-[11px] text-muted-foreground">Para apagar ou arquivar posts, use as abas Posts e Arquivo do perfil.</p>
+        <p className="mt-3 text-center text-[11px] text-muted-foreground">Seus posts arquivados ficam em Salvos.</p>
       </div>
     </div>
   );
