@@ -111,8 +111,8 @@ function Perfil() {
             {profile?.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
           </div>
 
-          <div className="mt-5 grid grid-cols-3 border-y border-border py-3 text-center">
-            {[["Posts", active.length], ["Ups recebidos", upsReceived], ["Amigos", friends]].map(([l, v]) => (
+          <div className="mt-5 grid grid-cols-4 border-y border-border py-3 text-center">
+            {[["Posts", active.length], ["Seguidores", followers], ["Seguindo", following], ["Ups recebidos", upsReceived]].map(([l, v]) => (
               <div key={l as string}><p className="text-base font-bold">{v}</p><p className="text-xs text-muted-foreground">{l}</p></div>
             ))}
           </div>
