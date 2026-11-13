@@ -190,6 +190,21 @@ export type Database = {
         Update: { id?: string; author_id?: string; media_url?: string; media_type?: string; created_at?: string; expires_at?: string }
         Relationships: [{ foreignKeyName: "stories_author_id_fkey"; columns: ["author_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }]
       }
+      creator_profiles: {
+        Row: { user_id: string; creator_type: string; game: string | null; offering: string | null; updated_at: string }
+        Insert: { user_id: string; creator_type: string; game?: string | null; offering?: string | null; updated_at?: string }
+        Update: { user_id?: string; creator_type?: string; game?: string | null; offering?: string | null; updated_at?: string }
+        Relationships: [{ foreignKeyName: "creator_profiles_user_id_fkey"; columns: ["user_id"]; isOneToOne: true; referencedRelation: "profiles"; referencedColumns: ["id"] }]
+      }
+      creator_subscriptions: {
+        Row: { id: string; creator_id: string; subscriber_id: string; status: string; created_at: string }
+        Insert: { id?: string; creator_id: string; subscriber_id: string; status?: string; created_at?: string }
+        Update: { id?: string; creator_id?: string; subscriber_id?: string; status?: string; created_at?: string }
+        Relationships: [
+          { foreignKeyName: "creator_subscriptions_creator_id_fkey"; columns: ["creator_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
+          { foreignKeyName: "creator_subscriptions_subscriber_id_fkey"; columns: ["subscriber_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }
+        ]
+      }
       friendships: {
         Row: {
           addressee_id: string
