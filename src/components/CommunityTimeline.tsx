@@ -30,8 +30,13 @@ function InlineQuickPost({ userId }: { userId: string }) {
     if (!isValidPost(content) || busy) return;
     setBusy(true);
     try {
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!authData.user || authData.user.id !== userId) {
+        throw new Error("Sua sessão expirou. Entre novamente para publicar.");
+      }
       const { error } = await supabase.from("feed_posts").insert({
-        author_id: userId,
+        author_id: authData.user.id,
         body: content,
         kind: "geral",
         image_url: null,
