@@ -34,9 +34,9 @@ function AuthPage() {
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => data.session && navigate({ to: "/perfil", replace: true }));
+    supabase.auth.getSession().then(({ data }) => data.session && navigate({ to: "/", replace: true }));
     const { data } = supabase.auth.onAuthStateChange((e, s) => {
-      if (e === "SIGNED_IN" && s) navigate({ to: "/perfil", replace: true });
+      if (e === "SIGNED_IN" && s) navigate({ to: "/", replace: true });
     });
     return () => data.subscription.unsubscribe();
   }, [navigate]);
