@@ -36,11 +36,11 @@ export function HomeSocialPreview() {
   }).slice(0, 10);
 
   return (
-    <section className="border-b border-white/10 bg-[#0d0d11] px-4 py-4 sm:px-6" aria-label="Notas e stories">
-      <div className="mx-auto max-w-6xl space-y-4">
+    <section className="sticky top-[68px] z-20 border-b border-white/15 bg-[#0d0d11]/95 px-4 py-3 shadow-[0_12px_28px_rgba(0,0,0,.35)] backdrop-blur-2xl sm:px-6" aria-label="Notas e stories">
+      <div className="mx-auto max-w-6xl grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xs font-semibold tracking-wide text-white/85">Notas</h2>
+            <h2 className="text-[11px] font-semibold tracking-wide text-white/85">Notas</h2>
             <span className="text-[10px] text-white/35">Perfis da comunidade</span>
           </div>
           <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1">
@@ -59,10 +59,10 @@ export function HomeSocialPreview() {
         </div>
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xs font-semibold tracking-wide text-white/85">Stories</h2>
+            <h2 className="text-[11px] font-semibold tracking-wide text-white/85">Stories</h2>
             <span className="text-[10px] text-white/35">Publicações com mídia</span>
           </div>
-          <div className="scrollbar-none flex gap-4 overflow-x-auto pb-1">
+          <div className="scrollbar-none flex gap-3 overflow-x-auto pb-1">
             {user && <button type="button" onClick={() => window.dispatchEvent(new Event("chromax:open-camera"))} className="flex w-[68px] shrink-0 flex-col items-center gap-1.5">
               <span className="grid h-[62px] w-[62px] place-items-center rounded-full border border-dashed border-white/50 bg-white/[.04] text-white/75"><Camera size={22}/></span>
               <span className="max-w-full truncate text-[10px] text-white/65">Seu story</span>
