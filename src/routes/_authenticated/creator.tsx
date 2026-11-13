@@ -94,7 +94,7 @@ function Creator() {
     setCreatorType(type); setSetupOpen(false); setSection("workspace"); toast.success("Creator configurado");
   }
   const { data: subscriberRows = [] } = useQuery({ queryKey: ["creator-subscribers", user.id], queryFn: async () => {
-    const { data, error } = await supabase.from("creator_subscriptions").select("id,subscriber_id,created_at,profiles:subscriber_id(display_name,username,logo_url)").eq("creator_id", user.id).eq("status", "active").order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("creator_subscriptions").select("id,subscriber_id,created_at,profiles!creator_subscriptions_subscriber_id_fkey(display_name,username,logo_url)").eq("creator_id", user.id).eq("status", "active").order("created_at", { ascending: false });
     if (error) throw error; return data ?? [];
   } });
 
