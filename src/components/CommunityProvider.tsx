@@ -4,13 +4,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
-const CommunityContext = createContext<{ user: User | null; ready: boolean; compose: (file?: File) => void; draftFile: File | null; composing: boolean; closeCompose: () => void }>({ user: null, ready: false, compose: () => {}, draftFile: null, composing: false, closeCompose: () => {} });
+const CommunityContext = createContext<{ user: User | null; ready: boolean; compose: (file?: File) => void; composeStory: (file?: File) => void; composeMode: "post" | "story"; draftFile: File | null; composing: boolean; closeCompose: () => void }>({ user: null, ready: false, compose: () => {}, composeStory: () => {}, composeMode: "post", draftFile: null, composing: false, closeCompose: () => {} });
 export const useCommunity = () => useContext(CommunityContext);
 export function CommunityProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [composing, setComposing] = useState(false);
   const [draftFile, setDraftFile] = useState<File | null>(null);
+  const [composeMode, setComposeMode] = useState<"post" | "story">("post");
   const qc = useQueryClient();
   const router = useRouter();
   useEffect(() => {
@@ -23,5 +24,5 @@ export function CommunityProvider({ children }: { children: ReactNode }) {
     });
     return () => data.subscription.unsubscribe();
   }, [qc, router]);
-  return <CommunityContext.Provider value={{ user, ready, composing, draftFile, compose: (file) => { setDraftFile(file ?? null); setComposing(true); }, closeCompose: () => { setComposing(false); setDraftFile(null); } }}>{children}</CommunityContext.Provider>;
+  return <CommunityContext.Provider value={{ user, ready, composing, draftFile, composeMode, compose: (file) => { setComposeMode("post"); setDraftFile(file ?? null); setComposing(true); }, composeStory: (file) => { setComposeMode("story"); setDraftFile(file ?? null); setComposing(true); }, closeCompose: () => { setComposing(false); setDraftFile(null); setComposeMode("post"); } }}>{children}</CommunityContext.Provider>;
 }
