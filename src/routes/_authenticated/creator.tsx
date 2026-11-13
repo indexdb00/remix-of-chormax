@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowUpRight, Boxes, Check, ChevronRight, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, HardDrive, ImagePlus, Package, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Boxes, Check, ChevronRight, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, Gamepad2, GraduationCap, HardDrive, ImagePlus, Package, Plus, Search, Star, Trash2, Upload, X, Code2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -30,7 +30,13 @@ function Creator() {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [section, setSection] = useState<"workspace" | "publish">("workspace");
+  const [section, setSection] = useState<"workspace" | "publish" | "subscribers">("workspace");
+  const [creatorType, setCreatorType] = useState<"dev" | "gamer" | "mentoria" | null>(null);
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [setupLoading, setSetupLoading] = useState(true);
+  const [game, setGame] = useState("");
+  const [offering, setOffering] = useState("");
+  const [setupSaving, setSetupSaving] = useState(false);
   const [modal, setModal] = useState<"project" | "folder" | null>(null);
   const [modalName, setModalName] = useState("");
   const [search, setSearch] = useState("");
@@ -67,6 +73,30 @@ function Creator() {
     finally { setLoading(false); }
   }
   useEffect(() => { void loadWorkspace(); }, [user.id]);
+  useEffect(() => {
+    let alive = true;
+    supabase.from("creator_profiles").select("creator_type,game,offering").eq("user_id", user.id).maybeSingle().then(({ data, error }) => {
+      if (!alive) return;
+      if (error) toast.error("Não foi possível carregar seu perfil Creator", { description: error.message });
+      if (data) { setCreatorType(data.creator_type as "dev" | "gamer" | "mentoria"); setGame(data.game ?? ""); setOffering(data.offering ?? ""); }
+      else setSetupOpen(true);
+      setSetupLoading(false);
+    });
+    return () => { alive = false; };
+  }, [user.id]);
+  async function saveCreatorSetup(type: "dev" | "gamer" | "mentoria") {
+    if (type === "gamer" && (!game.trim() || !offering.trim())) { toast.error("Informe o jogo e o que você vai oferecer."); return; }
+    if (type === "mentoria" && !offering.trim()) { toast.error("Informe o tipo de mentoria."); return; }
+    setSetupSaving(true);
+    const { error } = await supabase.from("creator_profiles").upsert({ user_id: user.id, creator_type: type, game: type === "gamer" ? game.trim() : null, offering: type === "dev" ? null : offering.trim() }, { onConflict: "user_id" });
+    setSetupSaving(false);
+    if (error) { toast.error("Não foi possível salvar sua escolha", { description: error.message }); return; }
+    setCreatorType(type); setSetupOpen(false); setSection("workspace"); toast.success("Creator configurado");
+  }
+  const { data: subscriberRows = [] } = useQuery({ queryKey: ["creator-subscribers", user.id], queryFn: async () => {
+    const { data, error } = await supabase.from("creator_subscriptions").select("id,subscriber_id,created_at,profiles:subscriber_id(display_name,username,logo_url)").eq("creator_id", user.id).eq("status", "active").order("created_at", { ascending: false });
+    if (error) throw error; return data ?? [];
+  } });
 
   async function persist(next: Project[]) {
     const snapshot = manifestPath + "/index-" + Date.now() + "-" + crypto.randomUUID() + ".json";
@@ -197,15 +227,16 @@ function Creator() {
     <main className="min-h-screen bg-background pb-28 font-sans text-foreground">
       <SiteHeader />
       <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+        {setupLoading ? <div className="py-20 text-center text-sm text-muted-foreground">Carregando Creator...</div> : <>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div><p className="font-mono text-[10px] tracking-[.24em] text-muted-foreground">CHROMAX / CREATOR STUDIO</p><h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Seu espaço de criação.</h1><p className="mt-2 max-w-xl text-sm text-muted-foreground">Organize projetos, arquivos e entregáveis. Tudo em um único hub para desenvolver e publicar.</p></div>
           <div className="flex gap-2">
             <button onClick={() => setSection("workspace")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "workspace" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><HardDrive className="mr-2 inline" size={14}/>Workspace</button>
-            <button onClick={() => setSection("publish")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "publish" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Package className="mr-2 inline" size={14}/>Marketplace</button>
+            {creatorType === "dev" && <button onClick={() => setSection("publish")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "publish" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Package className="mr-2 inline" size={14}/>Marketplace</button>
           </div>
         </div>
 
-        {section === "workspace" && (
+        {creatorType === "dev" && section === "workspace" && (
           <div className="mt-8">
             {!activeProject ? <>
               <div className="mb-5 flex items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">Seus projetos</h2><p className="mt-1 text-xs text-muted-foreground">{projects.length} projeto(s) no workspace</p></div><button onClick={() => { setModal("project"); setModalName(""); }} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground"><Plus size={15}/>Novo projeto</button></div>
@@ -225,7 +256,7 @@ function Creator() {
           </div>
         )}
 
-        {section === "publish" && <div className="mt-8 grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
+        {creatorType === "dev" && section === "publish" && <div className="mt-8 grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
           <div className="h-fit rounded-3xl border border-border bg-card p-6"><p className="font-mono text-[10px] tracking-[.2em] text-muted-foreground">CHROMAX MARKETPLACE</p><h2 className="mt-3 text-2xl font-bold">Leve seu projeto ao mercado.</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">Publique plugins, templates, SaaS, ferramentas, códigos e outros ativos digitais. Seus arquivos privados do workspace continuam separados dos produtos anunciados.</p><div className="mt-6 space-y-3 text-xs text-muted-foreground"><p><Check className="mr-2 inline" size={14}/>Prévia com imagens</p><p><Check className="mr-2 inline" size={14}/>Entrega por texto ou arquivo</p><p><Check className="mr-2 inline" size={14}/>Venda automática ou negociação por chat</p></div></div>
           <form onSubmit={submitProduct} className="space-y-4 rounded-3xl border border-border bg-card p-5 sm:p-7"><div><p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Novo anúncio</p><h3 className="mt-1 text-xl font-semibold">Detalhes do produto</h3></div>
             <div><p className={label}>Fotos de prévia (mín. 3) — {images.length}</p><div className="mt-2 grid grid-cols-3 gap-2">{images.map((img, i) => <div key={img.name + i} className="relative aspect-square overflow-hidden rounded-xl border border-border"><img src={URL.createObjectURL(img)} alt="" className="h-full w-full object-cover"/><button type="button" aria-label="Remover imagem" onClick={() => setImages(images.filter((_, k) => k !== i))} className="absolute right-1 top-1 rounded-full bg-background p-1"><X size={12}/></button></div>)}{images.length < 8 && <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border text-xs text-muted-foreground"><ImagePlus size={20}/>Adicionar<input type="file" accept="image/*" multiple hidden onChange={(e) => setImages([...images, ...Array.from(e.target.files ?? [])].slice(0, 8))}/></label>}</div></div>
