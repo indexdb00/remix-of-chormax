@@ -227,9 +227,12 @@ function Perfil() {
       </div>
 
       {activityOpen && <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/65 p-4 backdrop-blur-xl" role="dialog" aria-modal="true" aria-label="Mapa de atividade comercial" onClick={() => setActivityOpen(false)}>
-        <section className="w-full max-w-md rounded-2xl bg-[#151515] p-4 text-white shadow-2xl sm:p-5" onClick={(event) => event.stopPropagation()}>
-          <div className="flex items-center justify-end gap-3"><button type="button" onClick={() => setActivityOpen(false)} aria-label="Fechar atividade" className="grid h-8 w-8 place-items-center rounded-full bg-white/[0.07] text-white/70"><X size={16} /></button></div>
-          <div className="mt-5 flex justify-center"><div className="grid grid-flow-col grid-rows-7 gap-1">{heatmapDays.map((day) => <span key={day} title="Sem transação registrada" className={"h-[10px] w-[10px] rounded-[2px] " + (balanceView === "sales" ? "bg-emerald-400/15" : "bg-sky-400/15")} />)}</div></div>
+        <section className="w-full max-w-xl rounded-2xl bg-[#151515] p-5 text-white shadow-2xl sm:p-7" onClick={(event) => event.stopPropagation()}>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold">{balanceView === "sales" ? "Vendas" : "Compras"}</p>
+            <button type="button" onClick={() => setActivityOpen(false)} aria-label="Fechar atividade" className="grid h-8 w-8 place-items-center text-white/70 transition hover:text-white"><X size={18} /></button>
+          </div>
+          <div className="mt-7 flex justify-center"><div className="grid grid-flow-col grid-rows-7 gap-[5px] sm:gap-2">{heatmapDays.map((day) => <span key={day} className={"h-4 w-4 rounded-[3px] sm:h-5 sm:w-5 " + (balanceView === "sales" ? "bg-emerald-400/15" : "bg-sky-400/15")} />)}</div></div>
           
         </section>
       </div>}
