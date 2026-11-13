@@ -9,7 +9,8 @@ export const useCommunity = () => useContext(CommunityContext);
 export function CommunityProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
-  const [composing, setComposing] = useState(false);\n  const [draftFile, setDraftFile] = useState<File | null>(null);
+  const [composing, setComposing] = useState(false);
+  const [draftFile, setDraftFile] = useState<File | null>(null);
   const qc = useQueryClient();
   const router = useRouter();
   useEffect(() => {
