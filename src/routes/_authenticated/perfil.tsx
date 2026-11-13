@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
 import { PostCard } from "@/components/PostCard";
 import { POST_SELECT, type CommunityPost } from "@/lib/community";
+import { AcademyProfileLinks } from "@/components/AcademyProfileLinks";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -175,7 +176,7 @@ function Perfil() {
           </div>
         </section>
 
-
+        <AcademyProfileLinks />
 
         <section className="mt-5 overflow-hidden sm:mt-6">
           <div className={"grid w-full items-center justify-items-stretch " + (subscriberCount > 0 ? "grid-cols-4" : "grid-cols-3")}>
