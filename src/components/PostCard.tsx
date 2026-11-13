@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ArrowBigUp, Repeat2, Users, LifeBuoy, ShoppingBag } from "lucide-react";
+import { ArrowBigUp, Repeat2, Users, LifeBuoy, ShoppingBag, FileText } from "lucide-react";
 import { type CommunityPost } from "@/lib/community";
 import { supabase } from "@/integrations/supabase/client";
 import { SaveButton } from "./SaveButton";
@@ -59,7 +59,18 @@ export function PostCard({ post, repostedBy }: { post: CommunityPost; repostedBy
 
   return <article className="border-b border-border px-5 py-6 sm:px-7">
     {repostedBy && <p className="mb-3 flex items-center gap-1.5 pl-14 text-[11px] text-muted-foreground"><Repeat2 size={13} />{repostedBy} repostou</p>}
-    <div className="flex gap-3"><div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary font-semibold">{p?.logo_url ? <img src={p.logo_url} alt={name} className="h-full w-full object-cover" /> : name.slice(0, 1).toUpperCase()}</div><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-sm font-semibold">{name}</p><p className="text-xs text-muted-foreground">@{p?.username || "membro"} <span className="mx-1">·</span><Link to="/post/$id" params={{ id: post.id }} className="hover:underline"><time dateTime={post.created_at}>{new Date(post.created_at).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}</time></Link></p></div><SaveButton postId={post.id} /></div><p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7">{post.body}</p>{post.image_url && <img src={post.image_url} alt="Imagem da publicação" loading="lazy" className="mt-4 max-h-96 w-full rounded-lg border border-border object-contain" />}
+    <div className="flex gap-3"><div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary font-semibold">{p?.logo_url ? <img src={p.logo_url} alt={name} className="h-full w-full object-cover" /> : name.slice(0, 1).toUpperCase()}</div><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-sm font-semibold">{name}</p><p className="text-xs text-muted-foreground">@{p?.username || "membro"} <span className="mx-1">·</span><Link to="/post/$id" params={{ id: post.id }} className="hover:underline"><time dateTime={post.created_at}>{new Date(post.created_at).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}</time></Link></p></div><SaveButton postId={post.id} /></div><p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7">{post.body}</p>{post.image_url && (() => {
+        const url = post.image_url;
+        const cleanUrl = url.split("?")[0].toLowerCase();
+        const video = /\\.(mp4|webm|mov|m4v)$/.test(cleanUrl);
+        const image = /\\.(jpg|jpeg|png|gif|webp|avif|svg)$/.test(cleanUrl);
+        const filename = decodeURIComponent(cleanUrl.split("/").pop() || "arquivo");
+        return video
+          ? <video src={url} controls playsInline preload="metadata" className="mt-4 max-h-96 w-full rounded-lg border border-border bg-black object-contain" />
+          : image
+            ? <img src={url} alt="Imagem da publicação" loading="lazy" className="mt-4 max-h-96 w-full rounded-lg border border-border object-contain" />
+            : <a href={url} target="_blank" rel="noreferrer" download className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-secondary/50 p-4 text-sm transition hover:bg-secondary"><span className="grid h-10 w-10 place-items-center rounded-lg bg-background"><FileText size={18} /></span><span className="min-w-0 flex-1 truncate">{filename}</span><span className="shrink-0 text-xs text-muted-foreground">Abrir arquivo ↗</span></a>;
+      })() }
       <div className="mt-4 flex items-center gap-5 text-xs text-muted-foreground">
         <button disabled={pending !== null} onClick={() => toggle("up")} aria-pressed={up} aria-label="Dar up" className={`inline-flex items-center gap-1 rounded-full px-2 py-1 transition hover:bg-secondary disabled:cursor-wait disabled:opacity-50 ${up ? "text-accent" : ""}`}><ArrowBigUp size={18} className={up ? "fill-current" : ""} />{upN} Up</button>
         {!own && <button disabled={pending !== null} onClick={() => toggle("rep")} aria-pressed={rep} aria-label="Repostar" className={`inline-flex items-center gap-1 rounded-full px-2 py-1 transition hover:bg-secondary disabled:cursor-wait disabled:opacity-50 ${rep ? "text-accent" : ""}`}><Repeat2 size={16} />{repN}</button>}
