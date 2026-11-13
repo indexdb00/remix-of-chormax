@@ -113,14 +113,14 @@ function Perfil() {
   return (
     <main className="min-h-screen bg-background pb-32 text-foreground">
       <SiteHeader />
-      <div className="mx-auto max-w-3xl px-3 pt-2 sm:px-5 sm:pt-4">
-        <section className="relative overflow-hidden p-2 sm:p-3">
+      <div className="mx-auto max-w-3xl px-4 pt-3 sm:px-6 sm:pt-5">
+        <section className="relative overflow-hidden p-1 sm:p-2">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-white/[0.035] blur-3xl" />
-          <div className="relative grid gap-4 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
+          <div className="relative grid items-center gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(220px,.78fr)]">
             <div>
               <div className="flex items-start justify-between gap-4">
-                <div className="flex min-w-0 items-center gap-4 sm:gap-5">
-                  <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full bg-[#242424] sm:h-24 sm:w-24">
+                <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
+                  <div className="relative h-[76px] w-[76px] shrink-0 overflow-hidden rounded-full bg-[#242424] sm:h-20 sm:w-20">
                     <div className="h-full w-full overflow-hidden rounded-full bg-[#242424]">
                       {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold text-white">{name[0]?.toUpperCase()}</span>}
                     </div>
@@ -128,7 +128,7 @@ function Perfil() {
                   </div>
                   <div className="min-w-0">
                     
-                    <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-white sm:text-2xl">{name}</h1>
+                    <h1 className="truncate text-lg font-semibold tracking-tight text-white sm:text-xl">{name}</h1>
                     <button onClick={() => setEditing(true)} className="mt-1 inline-flex items-center gap-1.5 text-sm text-white/50 transition hover:text-white"><span>@{profile?.username || "sem_usuario"}</span><Pencil size={11} /></button>
                     {isCreator && <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white"><BadgeCheck size={12} /> Creator</span>}
                   </div>
@@ -139,14 +139,14 @@ function Perfil() {
                 </div>
               </div>
               {profile?.bio && <p className="mt-5 max-w-xl whitespace-pre-wrap text-sm leading-6 text-white/55">{profile.bio}</p>}
-              <div className="mt-3 grid grid-cols-4 gap-2 pt-2 text-center">
+              <div className="mt-4 grid grid-cols-4 gap-1.5 pt-1 text-center sm:gap-2">
                 {[["Posts", active.length], ["Seguidores", followers], ["Seguindo", following], ["Ups", upsReceived]].map(([l, v]) => (
-                  <div key={l as string}><p className="text-lg font-semibold tabular-nums text-white">{v}</p><p className="mt-1 text-[10px] text-white/40 sm:text-xs">{l}</p></div>
+                  <div key={l as string} className="min-w-0"><p className="text-base font-semibold tabular-nums text-white sm:text-lg">{v}</p><p className="mt-1 truncate text-[9px] text-white/40 sm:text-[10px]">{l}</p></div>
                 ))}
               </div>
             </div>
 
-            {profile?.show_totals !== false && <div className="p-2.5 sm:p-3">
+            {profile?.show_totals !== false && <div className="w-full max-w-sm justify-self-center p-2 sm:max-w-none sm:p-3">
               <div className="flex items-center justify-between gap-3">
                 <div><p className="text-xs font-medium text-white/55">{balanceView === "sales" ? "Vendas" : "Compras"}</p></div>
                 <button
@@ -173,10 +173,10 @@ function Perfil() {
 
 
 
-        <section className="mt-6 overflow-hidden">
+        <section className="mt-5 overflow-hidden sm:mt-6">
           <div className="grid w-full grid-cols-4 items-center justify-items-stretch">
             {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
-              <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 border-0 bg-transparent px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
+              <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1 border-0 bg-transparent px-1 py-3 text-[10px] transition sm:flex-row sm:gap-2 sm:py-3.5 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
                 <I size={16} /> {l}
                 {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-white" />}
               </button>
@@ -184,7 +184,7 @@ function Perfil() {
           </div>
         </section>
 
-        <div className="mt-4 overflow-hidden">
+        <div className="mt-3 overflow-hidden sm:mt-4">
           {tab === "assinantes" && <Empty text="Seus assinantes aparecerão aqui quando as assinaturas estiverem disponíveis." />}
 
           {tab === "produtos" && (
@@ -209,7 +209,7 @@ function Perfil() {
             active.length ? (
               <ul>
                 {active.map((p) => (
-                  <li key={p.id} className="flex gap-3  px-4 py-4 ">
+                  <li key={p.id} className="flex gap-3 px-3 py-3 sm:px-4 sm:py-4">
                     {p.image_url && <img src={p.image_url} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />}
                     <div className="min-w-0 flex-1">
                       <p className="whitespace-pre-wrap break-words text-sm">{p.body}</p>
