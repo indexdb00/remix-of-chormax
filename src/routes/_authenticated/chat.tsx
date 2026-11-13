@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MessageCircle, Send, ArrowLeft, ShoppingBag, Users, Circle } from "lucide-react";
 import { toast } from "sonner";
@@ -86,12 +86,6 @@ function ChatPage() {
   const people = peopleQuery.data ?? [];
   const products = productsQuery.data ?? [];
   const messages = messagesQuery.data ?? [];
-  const latest = useMemo(() => {
-    const map = new Map<string, MessageRow>();
-    for (const message of messages) map.set(message.chat_id, message);
-    return map;
-  }, [messages]);
-
   async function send(e: React.FormEvent) {
     e.preventDefault();
     const text = body.trim();
