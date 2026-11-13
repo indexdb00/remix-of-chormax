@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Activity, ArrowLeft, ArrowRight, ArrowUpRight, Boxes, Check, ChevronRight, Crown, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, Gamepad2, GraduationCap, HardDrive, ImagePlus, Package, Plus, Search, Star, Trash2, TrendingUp, Upload, Users, X, Code2 } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Boxes, Check, ChevronRight, Crown, File, FileArchive, FileCode2, FileText, Folder, FolderPlus, Gamepad2, GraduationCap, HardDrive, ImagePlus, Package, Plus, Search, Star, Trash2, TrendingUp, Upload, Users, X, Code2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -257,7 +257,7 @@ function Creator() {
             ].map(({label,value,Icon}) => <div key={label} className="min-w-0 rounded-xl border border-white/[0.07] bg-black/25 px-2 py-2.5 sm:px-3"><div className="flex items-center justify-center gap-1 text-zinc-400 sm:justify-between"><span className="truncate text-[9px] sm:text-[11px]">{label}</span><Icon size={13} className="shrink-0 text-violet-400"/></div><p className="mt-1 text-center text-lg font-semibold leading-none tracking-tight text-white sm:text-xl">{value}</p></div>)}
           </div>
         </div>
-        <div className="mt-3 flex items-center gap-2 overflow-x-auto rounded-2xl border border-white/[0.08] bg-[#111116]/95 p-1.5 backdrop-blur-xl sm:mt-4 sm:justify-start">
+        <div className="sticky top-[68px] z-20 -mx-3 mt-3 flex items-center gap-1.5 overflow-x-auto border-y border-white/[0.08] bg-[#09090d]/95 px-3 py-2 backdrop-blur-xl sm:top-[68px] sm:mx-0 sm:mt-4 sm:rounded-2xl sm:border sm:bg-[#111116]/95 sm:p-1.5">
           {creatorTypes.includes("dev") && <>
             <button onClick={() => { setSection("workspace"); setActiveProjectId(null); setActiveFolderId(null); }} aria-current={section === "workspace" ? "page" : undefined} className={"flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-3 text-xs font-semibold transition sm:px-4 " + (section === "workspace" ? "bg-violet-600 text-white shadow-md shadow-violet-950/30" : "text-zinc-400 hover:bg-white/[0.06]")}><HardDrive size={15}/>Workspace</button>
             <button onClick={() => setSection("publish")} aria-current={section === "publish" ? "page" : undefined} className={"flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-3 text-xs font-semibold transition sm:px-4 " + (section === "publish" ? "bg-violet-600 text-white shadow-md shadow-violet-950/30" : "text-zinc-400 hover:bg-white/[0.06]")}><Package size={15}/>Marketplace</button>
