@@ -154,7 +154,7 @@ function Perfil() {
                   onClick={() => setBalanceView((current) => current === "sales" ? "purchases" : "sales")}
                   aria-label={balanceView === "sales" ? "Mostrar saldo de compras" : "Mostrar saldo de vendas"}
                   title={balanceView === "sales" ? "Mostrar compras" : "Mostrar vendas"}
-                  className="grid h-8 w-8 place-items-center rounded-full bg-white/[0.07] text-white/70 transition hover:rotate-180 hover:border-white/20 hover:bg-white/10"
+                  className="grid h-8 w-8 place-items-center rounded-full bg-white/[0.07] text-white/70 transition hover:rotate-180 hover:bg-white/10"
                 ><Repeat2 size={17} /></button>
               </div>
               <button type="button" onClick={() => setActivityOpen(true)} aria-label="Expandir mapa de atividade comercial" className="mt-2 flex w-full items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-2.5 py-2 text-left transition hover:bg-white/[0.06]">
@@ -234,7 +234,7 @@ function Perfil() {
         </section>
       </div>}
       {editing && profile && <EditSheet userId={user.id} profile={profile} onClose={() => setEditing(false)} />}
-      {profile !== undefined && !profile?.username && <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"><section className="w-full max-w-md rounded-3xl border border-white/15 bg-[#17171c] p-6 text-white shadow-2xl sm:p-8"><p className="font-mono text-[10px] tracking-[.22em] text-slate-400">CHROMAX / IDENTIDADE</p><h2 className="mt-3 text-2xl font-bold">Escolha seu @.</h2><p className="mt-2 text-sm leading-6 text-slate-400">Esse será seu nome único na comunidade. As pessoas poderão encontrar e mencionar você por ele.</p><label className="mt-6 block text-xs font-medium text-slate-300">Nome de usuário<div className="mt-2 flex items-center rounded-xl border border-white/15 bg-black/30 px-4 focus-within:border-white/50"><span className="text-slate-500">@</span><input autoFocus value={usernameDraft} maxLength={30} onChange={(e) => setUsernameDraft(e.target.value.replace(/[^a-zA-Z0-9_.]/g, "").toLowerCase())} placeholder="seu_usuario" className="w-full bg-transparent px-2 py-3 text-sm text-white outline-none"/></div></label><p className="mt-2 text-[11px] text-slate-500">Mínimo de 3 caracteres. Use letras, números, ponto ou sublinhado.</p><button onClick={saveFirstUsername} disabled={usernameBusy} className="mt-6 w-full rounded-xl bg-white py-3.5 text-sm font-semibold text-black disabled:opacity-50">{usernameBusy ? "Salvando..." : "Confirmar meu @ "}</button></section></div>}
+      {profile !== undefined && !profile?.username && <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"><section className="w-full max-w-md rounded-3xl bg-[#17171c] p-6 text-white shadow-2xl sm:p-8"><p className="font-mono text-[10px] tracking-[.22em] text-slate-400">CHROMAX / IDENTIDADE</p><h2 className="mt-3 text-2xl font-bold">Escolha seu @.</h2><p className="mt-2 text-sm leading-6 text-slate-400">Esse será seu nome único na comunidade. As pessoas poderão encontrar e mencionar você por ele.</p><label className="mt-6 block text-xs font-medium text-slate-300">Nome de usuário<div className="mt-2 flex items-center rounded-xl bg-black/30 px-4 focus-within:border-white/50"><span className="text-slate-500">@</span><input autoFocus value={usernameDraft} maxLength={30} onChange={(e) => setUsernameDraft(e.target.value.replace(/[^a-zA-Z0-9_.]/g, "").toLowerCase())} placeholder="seu_usuario" className="w-full bg-transparent px-2 py-3 text-sm text-white outline-none"/></div></label><p className="mt-2 text-[11px] text-slate-500">Mínimo de 3 caracteres. Use letras, números, ponto ou sublinhado.</p><button onClick={saveFirstUsername} disabled={usernameBusy} className="mt-6 w-full rounded-xl bg-white py-3.5 text-sm font-semibold text-black disabled:opacity-50">{usernameBusy ? "Salvando..." : "Confirmar meu @ "}</button></section></div>}
     </main>
   );
 }
@@ -290,7 +290,7 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
       <div onClick={(e) => e.stopPropagation()} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl  bg-card p-5 sm:rounded-2xl">
         <div className="flex items-center justify-between"><h2 className="font-bold">Editar usuário e foto</h2><button onClick={onClose} aria-label="Fechar"><X size={18} /></button></div>
 
-        <button onClick={() => logo.current?.click()} className="relative -mt-8 ml-4 block h-20 w-20 overflow-hidden rounded-full border-4 border-card bg-secondary">
+        <button onClick={() => logo.current?.click()} className="relative -mt-8 ml-4 block h-20 w-20 overflow-hidden rounded-full bg-secondary">
           {profile.logo_url && <img src={profile.logo_url} alt="" className="h-full w-full object-cover" />}
           <span className="absolute inset-0 flex items-center justify-center bg-background/40"><Camera size={14} /></span>
         </button>
