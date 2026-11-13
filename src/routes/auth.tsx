@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Layers3, Network, Sparkles } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Code2, Layers3, Network } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -75,7 +75,7 @@ function AuthPage() {
       <style>{`
 
         .auth-expo { height:100svh; background-image:radial-gradient(ellipse at 48% 10%,rgba(177,190,210,.16),transparent 42%),radial-gradient(ellipse at 95% 75%,rgba(89,103,130,.13),transparent 38%); }
-        .auth-layout { height:calc(100svh - 64px); min-height:496px; max-height:920px; }
+        .auth-layout { box-sizing:border-box; height:calc(100svh - 68px); min-height:0; max-height:none; transform:translateY(-5px); }
         .auth-stage { position:relative; isolation:isolate; flex:0 0 clamp(174px,27svh,252px); }
         .auth-stage:before { content:""; position:absolute; inset:7% 10%; z-index:-1; background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(120,130,150,.015) 48%,rgba(255,255,255,.08)); filter:blur(42px); border-radius:50%; }
         .voxel-scene { position:relative; width:clamp(116px,19vw,190px); height:clamp(116px,19vw,190px); flex:none; perspective:700px; filter:drop-shadow(0 18px 28px rgba(0,0,0,.48)); }
@@ -92,18 +92,18 @@ function AuthPage() {
         .auth-slide-in { animation:authSlide .55s cubic-bezier(.2,.7,.2,1) both; }
         @keyframes authSlide { from{opacity:0;transform:translateY(13px) scale(.985)} to{opacity:1;transform:translateY(0) scale(1)} }
         @media(max-height:720px){.auth-layout{min-height:0;padding-top:4px;padding-bottom:4px;gap:6px}.auth-stage{flex-basis:clamp(142px,23svh,180px)}.auth-glass{padding:12px 18px!important}.auth-glass-head{margin-bottom:8px!important}.auth-divider{margin-top:9px!important;margin-bottom:9px!important}.auth-form{gap:7px!important}.auth-label{margin-bottom:3px!important}.auth-input{padding-top:9px!important;padding-bottom:9px!important}.auth-switch{margin-top:9px!important;padding-top:8px!important}.auth-footer{display:none!important}}
-        @media(max-width:640px){.auth-layout{height:calc(100svh - 56px);min-height:0;justify-content:center;gap:5px;padding:4px 12px}.auth-stage{flex:0 0 clamp(112px,19svh,150px);padding:5px 8px 17px;gap:10px;border-radius:20px}.voxel-scene{width:76px;height:76px}.voxel-cube{width:21px;height:21px}.auth-stage-copy{max-width:calc(100% - 82px)}.auth-stage-copy>span{margin-bottom:5px;padding:4px 7px;font-size:8px;letter-spacing:.14em}.auth-stage-copy h1{font-size:clamp(20px,6vw,28px);line-height:1.05}.auth-stage-copy p{margin-top:5px;font-size:10px;line-height:1.3}.auth-stage-copy .auth-tag{margin-top:5px;font-size:8px}.auth-stage>div[aria-label^="Slide"]{bottom:4px;right:9px;gap:7px}.auth-stage>button{padding:5px}.auth-glass{padding:11px 13px!important;border-radius:19px}.auth-glass-head{margin-bottom:7px!important}.auth-glass h2{font-size:17px}.auth-glass-head>div:last-child{padding:8px}.auth-form{gap:6px!important}.auth-label{font-size:9px!important}.auth-input{padding:8px 11px!important;font-size:12px!important;border-radius:9px!important}.auth-form>button{margin-top:1px;padding:10px 12px;font-size:10px}.auth-switch{margin-top:7px!important;padding-top:7px!important}.auth-divider{display:none!important}.auth-footer{display:none!important}}\n        @media(max-height:760px) and (max-width:640px){.auth-layout{gap:4px}.auth-stage{flex-basis:clamp(100px,16svh,124px)}.voxel-scene{width:66px;height:66px}.voxel-cube{width:18px;height:18px}.auth-stage-copy h1{font-size:clamp(18px,5.6vw,24px)}.auth-stage-copy p{font-size:9px;line-height:1.22}.auth-glass{padding:9px 12px!important}.auth-glass-head{margin-bottom:5px!important}.auth-form{gap:5px!important}.auth-input{padding-top:7px!important;padding-bottom:7px!important}.auth-switch{margin-top:5px!important;padding-top:5px!important}}
+        @media(max-width:640px){.auth-layout{height:calc(100svh - 68px);min-height:0;justify-content:center;gap:5px;padding:0 12px;transform:translateY(-7px)}.auth-stage{flex:0 0 clamp(112px,19svh,150px);padding:5px 8px 17px;gap:10px;border-radius:20px}.voxel-scene{width:76px;height:76px}.voxel-cube{width:21px;height:21px}.auth-stage-copy{max-width:calc(100% - 82px)}.auth-stage-copy>span{margin-bottom:5px;padding:4px 7px;font-size:8px;letter-spacing:.14em}.auth-stage-copy h1{font-size:clamp(20px,6vw,28px);line-height:1.05}.auth-stage-copy p{margin-top:5px;font-size:10px;line-height:1.3}.auth-stage-copy .auth-tag{margin-top:5px;font-size:8px}.auth-stage>div[aria-label^="Slide"]{bottom:4px;right:9px;gap:7px}.auth-stage>button{padding:5px}.auth-glass{padding:11px 13px!important;border-radius:19px}.auth-glass-head{margin-bottom:7px!important}.auth-glass h2{font-size:17px}.auth-glass-head>div:last-child{padding:8px}.auth-form{gap:6px!important}.auth-label{font-size:9px!important}.auth-input{padding:8px 11px!important;font-size:12px!important;border-radius:9px!important}.auth-form>button{margin-top:1px;padding:10px 12px;font-size:10px}.auth-switch{margin-top:7px!important;padding-top:7px!important}.auth-divider{display:none!important}.auth-footer{display:none!important}}\n        @media(max-height:760px) and (max-width:640px){.auth-layout{gap:4px}.auth-stage{flex-basis:clamp(100px,16svh,124px)}.voxel-scene{width:66px;height:66px}.voxel-cube{width:18px;height:18px}.auth-stage-copy h1{font-size:clamp(18px,5.6vw,24px)}.auth-stage-copy p{font-size:9px;line-height:1.22}.auth-glass{padding:9px 12px!important}.auth-glass-head{margin-bottom:5px!important}.auth-form{gap:5px!important}.auth-input{padding-top:7px!important;padding-bottom:7px!important}.auth-switch{margin-top:5px!important;padding-top:5px!important}}
         @media(prefers-reduced-motion:reduce){.chrome-orb,.auth-slide-in{animation:none!important}}
       `}</style>
       <SiteHeader />
       <section className="auth-layout mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-2 px-4 py-2 sm:px-6">
         <div className="auth-stage flex w-full max-w-4xl items-center justify-center gap-3 overflow-hidden rounded-[28px] px-4 py-3 sm:gap-8 sm:px-8">
-          <div className="pointer-events-none absolute left-[12%] top-[18%] h-24 w-24 rounded-full border border-white/10" />
-          <div className="pointer-events-none absolute bottom-[12%] right-[13%] h-16 w-16 rotate-45 border border-white/10" />
+          <div className="pointer-events-none absolute left-[12%] top-[18%] h-px w-20 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <div className="pointer-events-none absolute bottom-[16%] right-[13%] h-px w-16 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           <div className="voxel-scene" aria-hidden="true">{voxelPositions.map(([left, top], index) => <span key={index} className="voxel-cube" style={{ left: left + "%", top: top + "%", zIndex: index % 3 }} />)}</div>
           <div key={activeSlide} className="auth-stage-copy auth-slide-in relative z-10 flex max-w-xl flex-col items-start text-left">
             <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.055] px-3 py-1.5 font-mono text-[10px] tracking-[.22em] text-slate-300">
-              <Sparkles size={12} /> {slide.eyebrow}
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" /> {slide.eyebrow}
             </span>
             <h1 className="whitespace-pre-line font-display text-3xl font-extrabold leading-[1.12] tracking-tight sm:text-5xl">{slide.title}</h1>
             <p className="mt-4 max-w-lg text-sm leading-6 text-slate-300 sm:text-base">{slide.copy}</p>
