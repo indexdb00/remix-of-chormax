@@ -30,11 +30,27 @@ function Perfil() {
   const { user } = Route.useRouteContext();
   const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups" | "assinantes">("posts");
   const [editing, setEditing] = useState(false);
+  const [usernameDraft, setUsernameDraft] = useState("");
+  const [usernameBusy, setUsernameBusy] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user.id],
     queryFn: async () => (await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()).data,
   });
+  useEffect(() => {
+    if (profile && !profile.username) setUsernameDraft((profile.display_name || "").toLowerCase().replace(/[^a-z0-9_.]/g, "").slice(0, 24));
+  }, [profile]);
+
+  async function saveFirstUsername() {
+    const username = usernameDraft.trim().toLowerCase();
+    if (!/^[a-z0-9._]{3,30}$/.test(username)) { toast.error("Use de 3 a 30 caracteres: letras, números, ponto ou sublinhado."); return; }
+    setUsernameBusy(true);
+    const { error } = await supabase.from("profiles").update({ username }).eq("id", user.id);
+    setUsernameBusy(false);
+    if (error) toast.error(error.code === "23505" ? "Esse @ já está em uso. Escolha outro." : "Não foi possível salvar o @", { description: error.message });
+    else { toast.success("Seu @ está definido!"); await qc.invalidateQueries({ queryKey: ["profile", user.id] }); }
+  }
+
   const { data: products = [] } = useQuery({
     queryKey: ["my-products", user.id],
     queryFn: async () => (await supabase.from("products").select("id,name,slug,price_cents,images,sales").eq("creator_id", user.id).order("created_at", { ascending: false })).data ?? [],
@@ -79,7 +95,7 @@ function Perfil() {
     if (!confirm("Apagar este post?")) return;
     await supabase.from("saved_items").delete().eq("post_id", id);
     const { error } = await supabase.from("feed_posts").delete().eq("id", id);
-    if (error) toast.error("Erro"); else { toast.success("Post apagado"); refreshPosts(); }
+    if (error) toast.error("Erro"); else { toast.success("Post apagado"); qc.invalidateQueries({ queryKey: ["my-posts", user.id] }); }
   }
 
   const name = profile?.display_name || "Sem nome";
@@ -169,6 +185,7 @@ function Perfil() {
       </div>
 
       {editing && profile && <EditSheet userId={user.id} profile={profile} onClose={() => setEditing(false)} />}
+      {profile && !profile.username && <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"><section className="w-full max-w-md rounded-3xl border border-white/15 bg-[#17171c] p-6 text-white shadow-2xl sm:p-8"><p className="font-mono text-[10px] tracking-[.22em] text-slate-400">CHROMAX / IDENTIDADE</p><h2 className="mt-3 text-2xl font-bold">Escolha seu @.</h2><p className="mt-2 text-sm leading-6 text-slate-400">Esse será seu nome único na comunidade. As pessoas poderão encontrar e mencionar você por ele.</p><label className="mt-6 block text-xs font-medium text-slate-300">Nome de usuário<div className="mt-2 flex items-center rounded-xl border border-white/15 bg-black/30 px-4 focus-within:border-white/50"><span className="text-slate-500">@</span><input autoFocus value={usernameDraft} maxLength={30} onChange={(e) => setUsernameDraft(e.target.value.replace(/[^a-zA-Z0-9_.]/g, "").toLowerCase())} placeholder="seu_usuario" className="w-full bg-transparent px-2 py-3 text-sm text-white outline-none"/></div></label><p className="mt-2 text-[11px] text-slate-500">Mínimo de 3 caracteres. Use letras, números, ponto ou sublinhado.</p><button onClick={saveFirstUsername} disabled={usernameBusy} className="mt-6 w-full rounded-xl bg-white py-3.5 text-sm font-semibold text-black disabled:opacity-50">{usernameBusy ? "Salvando..." : "Confirmar meu @ "}</button></section></div>}
     </main>
   );
 }
@@ -186,10 +203,10 @@ type P = { display_name: string | null; username: string | null; bio: string | n
 
 function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; onClose: () => void }) {
   const qc = useQueryClient();
-  const [f, setF] = useState({ username: "" });
+  const [f, setF] = useState({ username: "", display_name: "", bio: "" });
   const [busy, setBusy] = useState<string | null>(null);
   const logo = useRef<HTMLInputElement>(null);
-  useEffect(() => setF({ username: profile.username ?? "" }), [profile]);
+  useEffect(() => setF({ username: profile.username ?? "", display_name: profile.display_name ?? "", bio: profile.bio ?? "" }), [profile]);
 
   const next = profile.name_changed_at ? new Date(profile.name_changed_at).getTime() + 15 * DAY : 0;
   const locked = next > Date.now();
@@ -209,7 +226,9 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
 
   async function save() {
     setBusy("save");
-    const patch: { username: string | null } = { username: f.username.trim().toLowerCase() || null };
+    const nextUsername = f.username.trim().toLowerCase() || null;
+    if (nextUsername !== profile.username && locked) { setBusy(null); toast.error("Você poderá alterar seu @ novamente em " + new Date(next).toLocaleDateString("pt-BR") + "."); return; }
+    const patch = { username: nextUsername, display_name: f.display_name.trim() || null, bio: f.bio.trim() || null };
     const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
     setBusy(null);
     if (error) toast.error(error.message.includes("NAME_COOLDOWN") ? "Nome só pode mudar a cada 15 dias" : error.code === "23505" ? "Esse usuário já existe" : "Erro ao salvar");
@@ -228,6 +247,8 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
         </button>
         <input ref={logo} type="file" accept="image/*" hidden onChange={(e) => upload("logo_url", e.target.files?.[0])} />
 
+        <label className="mt-4 block text-xs text-muted-foreground">Nome de exibição<input className={input} maxLength={60} value={f.display_name} onChange={(e) => setF({ ...f, display_name: e.target.value })} /></label>
+        <label className="mt-4 block text-xs text-muted-foreground">Bio<textarea className={input} rows={3} maxLength={180} value={f.bio} onChange={(e) => setF({ ...f, bio: e.target.value })} /></label>
         <label className="mt-4 block text-xs text-muted-foreground">Nome de usuário
           <div className="mt-1 flex items-center rounded-lg border border-border bg-background px-3 focus-within:border-foreground">
             <span className="text-sm text-muted-foreground">@</span>
