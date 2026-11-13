@@ -6,7 +6,7 @@ export const Route = createFileRoute("/feed")({
     { title: "Feed global — chromaX" },
     { name: "description", content: "Posts, pedidos de ajuda e pré-vendas de toda a comunidade chromaX." },
     { property: "og:title", content: "Feed global — chromaX" },
-    { property: "og:description", content: "Conheça quem cria e joga na comunidade digital chromaX." },
+    { property: "og:description", content: "Conheça desenvolvedores, criadores e projetos digitais da comunidade ChromaX." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
