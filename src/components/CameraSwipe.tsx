@@ -97,8 +97,8 @@ export function CameraSwipe() {
       recorder.ondataavailable = (event) => { if (event.data.size) chunksRef.current.push(event.data); };
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "video/webm" });
-        if (blob.size > 50 * 1024 * 1024) {
-          toast.error("O vídeo ultrapassa o limite de 50 MB.");
+        if (blob.size > 25 * 1024 * 1024) {
+          toast.error("O vídeo ultrapassa o limite de 25 MB.");
           return;
         }
         const extension = blob.type.includes("mp4") ? "mp4" : "webm";
@@ -122,7 +122,7 @@ export function CameraSwipe() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/70" />
       <header className="relative z-10 flex items-center justify-between p-5 pt-[max(20px,env(safe-area-inset-top))]">
         <button type="button" onClick={() => setOpen(false)} aria-label="Fechar câmera" className="rounded-full bg-black/35 p-3 backdrop-blur"><X /></button>
-        <span className="font-display text-sm font-bold tracking-wider text-chrome-metal">CHROMAX CAMERA</span>
+        <span className="text-xs font-semibold tracking-[.18em] text-white/80">CÂMERA</span>
         <button type="button" onClick={() => setFacing((value) => value === "user" ? "environment" : "user")} aria-label="Alternar câmera" className="rounded-full bg-black/35 p-3 backdrop-blur"><FlipHorizontal /></button>
       </header>
       {!supported && <div className="relative z-10 m-auto flex items-center gap-2"><CameraOff /> Câmera indisponível</div>}
