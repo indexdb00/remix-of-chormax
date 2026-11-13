@@ -22,7 +22,6 @@ export function PostComposer() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [busy, setBusy] = useState(false);
-  const cameraInput = useRef<HTMLInputElement>(null);
   const attachmentInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (composing && draftFile) setFile(draftFile); }, [composing, draftFile]);
@@ -84,14 +83,8 @@ export function PostComposer() {
             <Button variant="secondary" size="icon" aria-label="Remover anexo" onClick={() => setFile(null)}><X /></Button>
           </div>}
           <div className="flex flex-wrap items-center gap-2 pt-2">
-            <button type="button" onClick={() => cameraInput.current?.click()} aria-label="Abrir câmera" title="Câmera" className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.07] text-white transition hover:bg-white/15"><Camera size={18} /></button>
+            <button type="button" onClick={() => window.dispatchEvent(new Event("chromax:open-camera"))} aria-label="Abrir câmera ChromaX" title="Câmera" className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.07] text-white transition hover:bg-white/15"><Camera size={18} /></button>
             <button type="button" onClick={() => attachmentInput.current?.click()} aria-label="Anexar foto ou arquivo" title="Anexar foto ou arquivo" className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.07] text-white transition hover:bg-white/15">{file ? <FileUp size={18} /> : <Paperclip size={18} />}</button>
-            <input ref={cameraInput} aria-label="Capturar foto" type="file" accept="image/*" capture="environment" hidden onChange={(e) => {
-              const selected = e.target.files?.[0];
-              if (selected && selected.size > MAX_FILE_SIZE) toast.error("A imagem deve ter até 25 MB.");
-              else if (selected) setFile(selected);
-              e.currentTarget.value = "";
-            }} />
             <input ref={attachmentInput} aria-label="Anexar foto, vídeo ou arquivo" type="file" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.csv,.json,.js,.ts,.tsx,.py" hidden onChange={(e) => {
               const selected = e.target.files?.[0];
               if (selected && selected.size > MAX_FILE_SIZE) toast.error("O arquivo deve ter até 25 MB.");
