@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Send, Plus, UserRound, Search } from "lucide-react";
 import { useCommunity } from "./CommunityProvider";
 
@@ -12,6 +12,8 @@ const items = [
 
 export function BottomNav() {
   const { compose } = useCommunity();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  if (pathname.startsWith("/creator")) return null;
   return (
     <nav aria-label="Navegação principal" className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
       <ul className="glass-menu mx-auto grid max-w-md grid-cols-5 rounded-[22px] px-2 py-2">
