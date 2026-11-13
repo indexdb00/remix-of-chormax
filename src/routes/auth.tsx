@@ -90,6 +90,7 @@ function AuthPage() {
   }
 
   const slide = slides[activeSlide];
+  const voxelPositions = [[42,5],[62,18],[22,25],[43,39],[82,43],[4,49],[63,61],[24,72],[44,83],[83,85],[3,8],[103,28]];
   const SlideIcon = slide.icon;
 
   return (
@@ -122,8 +123,8 @@ function AuthPage() {
         <div className="auth-stage flex w-full max-w-4xl items-center justify-center gap-3 overflow-hidden rounded-[28px] px-4 py-3 sm:gap-8 sm:px-8">
           <div className="pointer-events-none absolute left-[12%] top-[18%] h-24 w-24 rounded-full border border-white/10" />
           <div className="pointer-events-none absolute bottom-[12%] right-[13%] h-16 w-16 rotate-45 border border-white/10" />
-          <div className="chrome-orb mb-6 h-14 w-14 rounded-[17px] sm:h-[68px] sm:w-[68px]" />
-          <div key={activeSlide} className="auth-slide-in relative z-10 flex max-w-2xl flex-col items-center">
+          <div className="voxel-scene" aria-hidden="true">{voxelPositions.map(([left, top], index) => <span key={index} className="voxel-cube" style={{ left: left + "%", top: top + "%", zIndex: index % 3 }} />)}</div>
+          <div key={activeSlide} className="auth-stage-copy auth-slide-in relative z-10 flex max-w-xl flex-col items-start text-left">
             <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.055] px-3 py-1.5 font-mono text-[10px] tracking-[.22em] text-slate-300">
               <Sparkles size={12} /> {slide.eyebrow}
             </span>
@@ -162,8 +163,8 @@ function AuthPage() {
               <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" className="auth-field auth-input w-full rounded-xl px-4 py-3 text-sm outline-none" />
             </label>
             <label className="block">
-              <span className="mb-1.5 block font-mono text-[10px] tracking-[.14em] text-slate-400">SENHA</span>
-              <input type="password" autoComplete={mode === "in" ? "current-password" : "new-password"} required minLength={mode === "up" ? 8 : 6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" className="auth-field w-full rounded-xl px-4 py-3.5 text-sm outline-none" />
+              <span className="auth-label mb-1 block font-mono text-[10px] tracking-[.14em] text-slate-400">SENHA</span>
+              <input type="password" autoComplete={mode === "in" ? "current-password" : "new-password"} required minLength={mode === "up" ? 8 : 6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" className="auth-field auth-input w-full rounded-xl px-4 py-3 text-sm outline-none" />
             </label>
             {mode === "up" && <p className="px-1 text-xs leading-5 text-slate-400">Use 8+ caracteres, com maiúscula, minúscula, número e símbolo.</p>}
             {mode === "in" && <div className="text-right"><Link to="/reset-password" className="font-mono text-[10px] tracking-wide text-slate-400 transition hover:text-white">Esqueceu sua senha?</Link></div>}
