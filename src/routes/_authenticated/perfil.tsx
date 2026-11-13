@@ -105,14 +105,14 @@ function Perfil() {
   return (
     <main className="min-h-screen bg-background pb-32 text-foreground">
       <SiteHeader />
-      <div className="mx-auto max-w-6xl px-4 pt-5 sm:px-6 sm:pt-8">
-        <section className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#141419] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-8">
-          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-violet-500/[0.09] blur-3xl" />
+      <div className="mx-auto max-w-4xl px-4 pt-3 sm:px-6 sm:pt-5">
+        <section className="relative overflow-hidden rounded-2xl bg-[#111111] p-4 sm:p-5">
+          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-white/[0.035] blur-3xl" />
           <div className="relative grid gap-7 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
             <div>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-4 sm:gap-5">
-                  <div className="relative h-20 w-20 shrink-0 rounded-[25px] border border-white/15 bg-gradient-to-br from-violet-300/30 via-zinc-700 to-[#17171d] p-1 shadow-[0_10px_35px_rgba(139,92,246,.16)] sm:h-24 sm:w-24">
+                  <div className="relative h-[68px] w-[68px] shrink-0 rounded-[20px] bg-gradient-to-br from-white/10 via-zinc-700 to-[#17171d] p-1 shadow-[0_10px_35px_rgba(139,92,246,.16)] sm:h-24 sm:w-24">
                     <div className="h-full w-full overflow-hidden rounded-[21px] bg-[#24242c]">
                       {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold text-white">{name[0]?.toUpperCase()}</span>}
                     </div>
@@ -122,7 +122,7 @@ function Perfil() {
                     
                     <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-white sm:text-2xl">{name}</h1>
                     <button onClick={() => setEditing(true)} className="mt-1 inline-flex items-center gap-1.5 text-sm text-white/50 transition hover:text-white"><span>@{profile?.username || "sem_usuario"}</span><Pencil size={11} /></button>
-                    {isCreator && <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-violet-300/20 bg-violet-300/10 px-2.5 py-1 text-[10px] font-semibold text-violet-100"><BadgeCheck size={12} /> Creator</span>}
+                    {isCreator && <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white"><BadgeCheck size={12} /> Creator</span>}
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-2">
@@ -131,14 +131,14 @@ function Perfil() {
                 </div>
               </div>
               {profile?.bio && <p className="mt-5 max-w-xl whitespace-pre-wrap text-sm leading-6 text-white/55">{profile.bio}</p>}
-              <div className="mt-6 grid grid-cols-4 gap-2 border-t border-white/[0.08] pt-5 text-center">
+              <div className="mt-4 grid grid-cols-4 gap-2 pt-3 text-center">
                 {[["Posts", active.length], ["Seguidores", followers], ["Seguindo", following], ["Ups", upsReceived]].map(([l, v]) => (
                   <div key={l as string}><p className="text-lg font-semibold tabular-nums text-white">{v}</p><p className="mt-1 text-[10px] text-white/40 sm:text-xs">{l}</p></div>
                 ))}
               </div>
             </div>
 
-            {profile?.show_totals !== false && <div className="rounded-[24px] border border-white/[0.09] bg-[#1b1b22]/90 p-4 sm:p-5">
+            {profile?.show_totals !== false && <div className="rounded-2xl bg-[#1b1b1b] p-3 sm:p-4">
               <div className="flex items-center justify-between gap-3">
                 <div><p className="text-xs font-medium text-white/55">{balanceView === "sales" ? "Vendas" : "Compras"}</p></div>
                 <button
@@ -146,21 +146,21 @@ function Perfil() {
                   onClick={() => setBalanceView((current) => current === "sales" ? "purchases" : "sales")}
                   aria-label={balanceView === "sales" ? "Mostrar saldo de compras" : "Mostrar saldo de vendas"}
                   title={balanceView === "sales" ? "Mostrar compras" : "Mostrar vendas"}
-                  className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-violet-200 transition hover:rotate-180 hover:border-violet-200/40 hover:bg-violet-300/10"
+                  className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.07] text-white/70 transition hover:rotate-180 hover:border-white/20 hover:bg-white/10"
                 ><Repeat2 size={17} /></button>
               </div>
-              <div className="mt-5 min-h-[112px]">
+              <div className="mt-3 min-h-0">
                 <p className="text-xs text-white/40">{balanceView === "sales" ? "Total em vendas" : "Total em compras"}</p>
-                <p className="mt-2 text-3xl font-semibold tracking-tight text-white tabular-nums sm:text-4xl">{brl(balanceView === "sales" ? profile?.total_sold_cents ?? 0 : profile?.total_bought_cents ?? 0)}</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-white tabular-nums sm:text-3xl">{brl(balanceView === "sales" ? profile?.total_sold_cents ?? 0 : profile?.total_bought_cents ?? 0)}</p>
                 <p className="mt-3 text-[10px] text-white/30">Valores registrados na sua conta ChromaX</p>
               </div>
             </div>}
           </div>
         </section>
 
-        <section className="mt-6 overflow-hidden rounded-[24px] border border-border bg-card/70">
+        <section className="mt-6 overflow-hidden rounded-2xl bg-[#111111]">
           <div className="grid grid-cols-5">
-            {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Produtos"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
+            {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
               <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
                 <I size={16} /> {l}
                 {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-violet-300" />}
@@ -169,7 +169,7 @@ function Perfil() {
           </div>
         </section>
 
-        <div className="mt-4 overflow-hidden rounded-[24px] border border-border bg-card/40">
+        <div className="mt-4 overflow-hidden rounded-2xl bg-[#101010]">
           {tab === "assinantes" && <Empty text="Seus assinantes aparecerão aqui quando as assinaturas estiverem disponíveis." />}
 
           {tab === "produtos" && (
