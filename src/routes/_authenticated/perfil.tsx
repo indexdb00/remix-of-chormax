@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowBigUp, BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, X, Star, ShoppingBag, TrendingUp } from "lucide-react";
+import { BadgeCheck, Repeat2, Camera, Grid3x3, MessageSquare, Package, Pencil, Settings, Trash2, X, Star, ShoppingBag, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { uploadMedia } from "@/lib/media";
@@ -116,22 +116,22 @@ function Perfil() {
                     <div className="h-full w-full overflow-hidden rounded-[21px] bg-[#24242c]">
                       {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold text-white">{name[0]?.toUpperCase()}</span>}
                     </div>
-                    <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-[#ded7ff] text-[#17131f] shadow-lg"><Pencil size={13} /></button>
+                    <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full bg-white text-black shadow-lg"><Pencil size={13} /></button>
                   </div>
                   <div className="min-w-0">
                     
                     <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-white sm:text-2xl">{name}</h1>
                     <button onClick={() => setEditing(true)} className="mt-1 inline-flex items-center gap-1.5 text-sm text-white/50 transition hover:text-white"><span>@{profile?.username || "sem_usuario"}</span><Pencil size={11} /></button>
-                    {isCreator && <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white"><BadgeCheck size={12} /> Creator</span>}
+                    {isCreator && <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white"><BadgeCheck size={12} /> Creator</span>}
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2.5 text-xs font-medium text-white transition hover:bg-white/10"><Package size={14} /> <span className="hidden sm:inline">Creator</span></Link>
+                  <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.06] px-3 py-2.5 text-xs font-medium text-white transition hover:bg-white/10"><Package size={14} /> <span className="hidden sm:inline">Creator</span></Link>
                   <Link to="/configuracoes" aria-label="Configurações" className="rounded-xl border border-white/10 bg-white/[0.05] p-2.5 text-white/75 transition hover:bg-white/10"><Settings size={16} /></Link>
                 </div>
               </div>
               {profile?.bio && <p className="mt-5 max-w-xl whitespace-pre-wrap text-sm leading-6 text-white/55">{profile.bio}</p>}
-              <div className="mt-4 grid grid-cols-4 gap-2 pt-3 text-center">
+              <div className="mt-3 grid grid-cols-4 gap-2 pt-2 text-center">
                 {[["Posts", active.length], ["Seguidores", followers], ["Seguindo", following], ["Ups", upsReceived]].map(([l, v]) => (
                   <div key={l as string}><p className="text-lg font-semibold tabular-nums text-white">{v}</p><p className="mt-1 text-[10px] text-white/40 sm:text-xs">{l}</p></div>
                 ))}
@@ -146,12 +146,12 @@ function Perfil() {
                   onClick={() => setBalanceView((current) => current === "sales" ? "purchases" : "sales")}
                   aria-label={balanceView === "sales" ? "Mostrar saldo de compras" : "Mostrar saldo de vendas"}
                   title={balanceView === "sales" ? "Mostrar compras" : "Mostrar vendas"}
-                  className="grid h-10 w-10 place-items-center rounded-full bg-white/[0.07] text-white/70 transition hover:rotate-180 hover:border-white/20 hover:bg-white/10"
+                  className="grid h-8 w-8 place-items-center rounded-full bg-white/[0.07] text-white/70 transition hover:rotate-180 hover:border-white/20 hover:bg-white/10"
                 ><Repeat2 size={17} /></button>
               </div>
-              <div className="mt-3 min-h-0">
+              <div className="mt-2 min-h-0">
                 <p className="text-xs text-white/40">{balanceView === "sales" ? "Total em vendas" : "Total em compras"}</p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight text-white tabular-nums sm:text-3xl">{brl(balanceView === "sales" ? profile?.total_sold_cents ?? 0 : profile?.total_bought_cents ?? 0)}</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-white tabular-nums sm:text-2xl">{brl(balanceView === "sales" ? profile?.total_sold_cents ?? 0 : profile?.total_bought_cents ?? 0)}</p>
                 <p className="mt-3 text-[10px] text-white/30">Valores registrados na sua conta ChromaX</p>
               </div>
             </div>}
@@ -160,7 +160,7 @@ function Perfil() {
 
         <section className="mt-6 overflow-hidden rounded-2xl bg-[#111111]">
           <div className="grid grid-cols-5">
-            {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["ups", ArrowBigUp, "Ups"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
+            {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
               <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
                 <I size={16} /> {l}
                 {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-violet-300" />}
@@ -176,7 +176,7 @@ function Perfil() {
             products.length ? (
               <div className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-3 sm:gap-3 sm:p-3">
                 {products.map((p) => (
-                  <Link key={p.id} to="/produto/$slug" params={{ slug: p.slug }} className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-card">
+                  <Link key={p.id} to="/produto/$slug" params={{ slug: p.slug }} className="group relative aspect-square overflow-hidden rounded-2xl bg-[#171717]">
                     {p.images[0] ? <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <span className="flex h-full items-center justify-center"><Package className="text-muted-foreground" /></span>}
                     <span className="absolute inset-x-2 bottom-2 rounded-lg border border-white/10 bg-black/65 px-2.5 py-2 text-xs font-semibold text-white backdrop-blur">{brl(p.price_cents)}</span>
                   </Link>
