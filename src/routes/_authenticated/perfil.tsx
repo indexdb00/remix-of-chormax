@@ -122,10 +122,10 @@ function Perfil() {
               <div key={l as string}><p className="text-base font-bold">{v}</p><p className="text-xs text-muted-foreground">{l}</p></div>
             ))}
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
+          {profile?.show_totals !== false && <div className="mt-3 grid grid-cols-2 gap-2">
             <div className="rounded-xl border border-border bg-card p-3"><p className="text-[11px] text-muted-foreground">Total comprado</p><p className="font-bold">{brl(profile?.total_bought_cents ?? 0)}</p></div>
             <div className="rounded-xl border border-border bg-card p-3"><p className="text-[11px] text-muted-foreground">Total vendido</p><p className="font-bold">{brl(profile?.total_sold_cents ?? 0)}</p></div>
-          </div>
+          </div>}
         </div>
 
         <div className="mt-5 grid grid-cols-5 border-b border-border">
