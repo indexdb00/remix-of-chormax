@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Plus, Bookmark, Check, X, User, Camera } from "lucide-react";
+import { Bell, Plus, Bookmark, Check, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCommunity } from "./CommunityProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,7 +95,6 @@ export function SiteHeader() {
         </div>
         <Link to="/" className="font-display text-xl font-extrabold tracking-tight text-chrome sm:text-2xl">chromaX</Link>
         <nav className="flex justify-end gap-1 sm:gap-3" aria-label="Ações rápidas">
-          <Button variant="ghost" size="icon" className="rounded-full text-zinc-200 hover:bg-white/10 hover:text-white" aria-label="Abrir câmera" title="Abrir câmera" onClick={() => window.location.assign("/camera")}><Camera/></Button>
           {user && <Button variant="ghost" size="icon" className="rounded-full text-zinc-200 hover:bg-white/10 hover:text-white" aria-label="Criar post" title="Criar post" onClick={compose}><Plus/></Button>}
           {user && <Button asChild variant="ghost" size="icon" className="rounded-full text-zinc-200 hover:bg-white/10 hover:text-white"><Link to="/salvos" aria-label="Salvos" title="Salvos"><Bookmark/></Link></Button>}
         </nav>
