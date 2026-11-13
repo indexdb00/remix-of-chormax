@@ -114,17 +114,17 @@ function Perfil() {
     <main className="min-h-screen bg-background pb-32 text-foreground">
       <SiteHeader />
       <div className="mx-auto max-w-3xl px-3 pt-2 sm:px-5 sm:pt-4">
-        <section className="relative overflow-hidden rounded-2xl bg-[#111111] p-4 sm:p-5">
+        <section className="relative overflow-hidden p-2 sm:p-3">
           <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-white/[0.035] blur-3xl" />
           <div className="relative grid gap-4 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
             <div>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-4 sm:gap-5">
-                  <div className="relative h-[68px] w-[68px] shrink-0 rounded-[20px] bg-gradient-to-br from-white/10 via-zinc-700 to-[#17171d] p-1 shadow-[0_10px_35px_rgba(139,92,246,.16)] sm:h-24 sm:w-24">
-                    <div className="h-full w-full overflow-hidden rounded-[21px] bg-[#24242c]">
+                  <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full bg-[#242424] sm:h-24 sm:w-24">
+                    <div className="h-full w-full overflow-hidden rounded-full bg-[#242424]">
                       {profile?.logo_url ? <img src={profile.logo_url} alt={name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-3xl font-bold text-white">{name[0]?.toUpperCase()}</span>}
                     </div>
-                    <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full bg-white text-black shadow-lg"><Pencil size={13} /></button>
+                    <button onClick={() => setEditing(true)} aria-label="Editar foto do perfil" className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full bg-white text-black"><Pencil size={13} /></button>
                   </div>
                   <div className="min-w-0">
                     
@@ -134,8 +134,8 @@ function Perfil() {
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <Link to="/creator" className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.06] px-3 py-2.5 text-xs font-medium text-white transition hover:bg-white/10"><Package size={14} /> <span className="hidden sm:inline">Creator</span></Link>
-                  <Link to="/configuracoes" aria-label="Configurações" className="rounded-xl bg-white/[0.06] p-2.5 text-white/75 transition hover:bg-white/10"><Settings size={16} /></Link>
+                  <Link to="/creator" className="inline-flex items-center gap-1.5 px-2 py-2 text-xs font-medium text-white/75 transition hover:text-white"><Package size={14} /> <span className="hidden sm:inline">Creator</span></Link>
+                  <Link to="/configuracoes" aria-label="Configurações" className="p-2.5 text-white/75 transition hover:text-white"><Settings size={16} /></Link>
                 </div>
               </div>
               {profile?.bio && <p className="mt-5 max-w-xl whitespace-pre-wrap text-sm leading-6 text-white/55">{profile.bio}</p>}
@@ -146,7 +146,7 @@ function Perfil() {
               </div>
             </div>
 
-            {profile?.show_totals !== false && <div className="rounded-2xl bg-[#171717] p-2.5 sm:p-3">
+            {profile?.show_totals !== false && <div className="p-2.5 sm:p-3">
               <div className="flex items-center justify-between gap-3">
                 <div><p className="text-xs font-medium text-white/55">{balanceView === "sales" ? "Vendas" : "Compras"}</p></div>
                 <button
@@ -154,10 +154,10 @@ function Perfil() {
                   onClick={() => setBalanceView((current) => current === "sales" ? "purchases" : "sales")}
                   aria-label={balanceView === "sales" ? "Mostrar saldo de compras" : "Mostrar saldo de vendas"}
                   title={balanceView === "sales" ? "Mostrar compras" : "Mostrar vendas"}
-                  className="grid h-8 w-8 place-items-center rounded-full bg-white/[0.07] text-white/70 transition hover:rotate-180 hover:bg-white/10"
+                  className="grid h-8 w-8 place-items-center text-white/70 transition hover:rotate-180 hover:text-white"
                 ><Repeat2 size={17} /></button>
               </div>
-              <button type="button" onClick={() => setActivityOpen(true)} aria-label="Expandir mapa de atividade comercial" className="mt-2 flex w-full items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-2.5 py-2 text-left transition hover:bg-white/[0.06]">
+              <button type="button" onClick={() => setActivityOpen(true)} aria-label="Expandir mapa de atividade comercial" className="mt-2 flex w-full items-center justify-between gap-3 px-2.5 py-2 text-left transition hover:bg-white/[0.04]">
                 <span className="min-w-0"><span className="block text-[10px] font-medium text-white/55">Atividade</span><span className="mt-0.5 block text-[9px] text-white/30">Últimas 12 semanas</span></span>
                 <span className="grid shrink-0 grid-flow-col grid-rows-3 gap-[3px]" aria-hidden="true">{heatmapDays.slice(-21).map((day) => <span key={day} className={"h-[6px] w-[6px] rounded-[2px] " + (balanceView === "sales" ? "bg-emerald-400/20" : "bg-sky-400/20")} />)}</span>
                 <span className="text-[10px] text-white/45">Ver</span>
@@ -173,10 +173,10 @@ function Perfil() {
 
 
 
-        <section className="mt-6 overflow-hidden rounded-2xl bg-[#111111]">
+        <section className="mt-6 overflow-hidden">
           <div className="grid grid-cols-5">
             {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
-              <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
+              <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 border-0 bg-transparent px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
                 <I size={16} /> {l}
                 {tab === k && <span className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-white" />}
               </button>
@@ -184,7 +184,7 @@ function Perfil() {
           </div>
         </section>
 
-        <div className="mt-4 overflow-hidden rounded-2xl bg-[#101010]">
+        <div className="mt-4 overflow-hidden">
           {tab === "assinantes" && <Empty text="Seus assinantes aparecerão aqui quando as assinaturas estiverem disponíveis." />}
 
           {tab === "produtos" && (
@@ -209,7 +209,7 @@ function Perfil() {
             active.length ? (
               <ul>
                 {active.map((p) => (
-                  <li key={p.id} className="flex gap-3  px-4 py-4 last:border-0">
+                  <li key={p.id} className="flex gap-3  px-4 py-4 ">
                     {p.image_url && <img src={p.image_url} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />}
                     <div className="min-w-0 flex-1">
                       <p className="whitespace-pre-wrap break-words text-sm">{p.body}</p>
@@ -299,7 +299,7 @@ function EditSheet({ userId, profile, onClose }: { userId: string; profile: P; o
         <label className="mt-4 block text-xs text-muted-foreground">Nome de exibição<input className={input} maxLength={60} value={f.display_name} onChange={(e) => setF({ ...f, display_name: e.target.value })} /></label>
         <label className="mt-4 block text-xs text-muted-foreground">Bio<textarea className={input} rows={3} maxLength={180} value={f.bio} onChange={(e) => setF({ ...f, bio: e.target.value })} /></label>
         <label className="mt-4 block text-xs text-muted-foreground">Nome de usuário
-          <div className="mt-1 flex items-center rounded-lg  bg-background px-3 focus-within:border-foreground">
+          <div className="mt-1 flex items-center rounded-lg bg-background px-3">
             <span className="text-sm text-muted-foreground">@</span>
             <input className="w-full bg-transparent px-2 py-2.5 text-sm outline-none" value={f.username} maxLength={30} onChange={(e) => setF({ username: e.target.value.replace(/[^a-zA-Z0-9_.]/g, "") })} />
           </div>
