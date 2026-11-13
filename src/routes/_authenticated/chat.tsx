@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle, Send, ArrowLeft, ShoppingBag, Users, Search, Info, MoreHorizontal, CheckCheck } from "lucide-react";
+import { MessageCircle, ArrowLeft, Search, Info, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,13 +37,6 @@ function ChatPage() {
   const chats = chatsQuery.data ?? [];
   const selected = chats.find((c) => c.id === active) ?? null;
   const visible = chats.filter((c) => tab === "market" ? !!c.product_id : !c.product_id);
-  const filteredChats = useMemo(() => visible.filter((chat) => {
-    const otherId = chat.buyer_id === user.id ? chat.seller_id : chat.buyer_id;
-    const person = peopleQuery.data?.find((p) => p.id === otherId);
-    const product = productsQuery.data?.find((p) => p.id === chat.product_id);
-    const term = search.trim().toLowerCase();
-    return !term || [person?.display_name, person?.username, product?.name].some((value) => value?.toLowerCase().includes(term));
-  }), [visible, peopleQuery.data, productsQuery.data, search]);
   const otherIds = [...new Set(chats.map((c) => c.buyer_id === user.id ? c.seller_id : c.buyer_id))];
   const peopleQuery = useQuery({
     queryKey: ["chat-people", otherIds],
@@ -64,6 +57,14 @@ function ChatPage() {
       return data ?? [];
     },
   });
+  const filteredChats = useMemo(() => visible.filter((chat) => {
+    const otherId = chat.buyer_id === user.id ? chat.seller_id : chat.buyer_id;
+    const person = peopleQuery.data?.find((p) => p.id === otherId);
+    const product = productsQuery.data?.find((p) => p.id === chat.product_id);
+    const term = search.trim().toLowerCase();
+    return !term || [person?.display_name, person?.username, product?.name].some((value) => value?.toLowerCase().includes(term));
+  }), [visible, peopleQuery.data, productsQuery.data, search]);
+
   const messagesQuery = useQuery({
     queryKey: ["chat-messages", active],
     enabled: !!active,
@@ -107,12 +108,18 @@ function ChatPage() {
     const { error } = await supabase.from("chat_messages").insert({
       chat_id: selected.id, sender_id: user.id, body: text, kind: "text",
     });
-    if (error) toast.error("Não foi possível enviar a mensagem", { description: error.message });
-    else {
+    if (error) {
+      toast.error("Não foi possível enviar a mensagem", { description: error.message });
+    } else {
       setBody("");
-      await supabase.from("chats").update({ last_message_at: new Date().toISOString() }).eq("id", selected.id);
-      qc.invalidateQueries({ queryKey: ["chat-messages", selected.id] });
-      qc.invalidateQueries({ queryKey: ["chats", user.id] });
+      const { error: updateError } = await supabase.from("chats")
+        .update({ last_message_at: new Date().toISOString() })
+        .eq("id", selected.id);
+      if (updateError) {
+        toast.error("Mensagem enviada, mas a conversa não foi atualizada.");
+      }
+      await qc.invalidateQueries({ queryKey: ["chat-messages", selected.id] });
+      await qc.invalidateQueries({ queryKey: ["chats", user.id] });
     }
     setSending(false);
   }
@@ -137,7 +144,7 @@ function ChatPage() {
               <button onClick={() => { setTab("market"); setActive(null); }} className={`border-b-2 pb-3 text-xs font-semibold ${tab === "market" ? "border-white text-white" : "border-transparent text-white/40"}`}>Compras e vendas</button>
             </div>
             <p className="px-5 pb-2 pt-4 text-[11px] font-semibold text-white/45">Mensagens</p>
-            {chatsQuery.isLoading ? <p className="p-5 text-xs text-muted-foreground">Carregando conversas…</p> : filteredChats.length ? filteredChats.map((chat) => {
+            {chatsQuery.isLoading ? <p className="p-5 text-xs text-muted-foreground">Carregando conversas…</p> : chatsQuery.isError ? <div className="px-5 py-10 text-center"><p className="text-xs text-white/60">Não foi possível carregar suas conversas.</p><button type="button" onClick={() => chatsQuery.refetch()} className="mt-3 text-xs font-semibold text-white underline underline-offset-4">Tentar novamente</button></div> : filteredChats.length ? filteredChats.map((chat) => {
               const otherId = chat.buyer_id === user.id ? chat.seller_id : chat.buyer_id;
               const person = people.find((p) => p.id === otherId);
               const product = products.find((p) => p.id === chat.product_id);
@@ -162,7 +169,7 @@ function ChatPage() {
                 <button type="button" aria-label="Informações da conversa" className="rounded-full p-2 text-white/65 hover:bg-white/10"><Info size={19}/></button>
               </header>
               <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-5 sm:px-6">
-                {messagesQuery.isLoading ? <p className="text-center text-xs text-white/40">Carregando mensagens…</p> : messages.length ? messages.map((message) => <div key={message.id} className={`flex max-w-[82%] flex-col rounded-[22px] px-4 py-2.5 text-sm shadow-sm ${message.sender_id === user.id ? "ml-auto rounded-br-md bg-gradient-to-br from-zinc-100 to-zinc-300 text-black" : "mr-auto rounded-bl-md border border-white/10 bg-[#202024] text-white"}`}><p className="whitespace-pre-wrap break-words leading-5">{message.body}</p><time className={`mt-1 text-[9px] ${message.sender_id === user.id ? "text-black/45" : "text-white/35"}`}>{new Date(message.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</time></div>) : <div className="m-auto max-w-xs text-center"><MessageCircle size={30} className="mx-auto text-white/30"/><p className="mt-3 text-sm font-medium">Envie uma mensagem</p><p className="mt-1 text-xs text-white/40">Sua conversa começa aqui.</p></div>}
+                {messagesQuery.isLoading ? <p className="text-center text-xs text-white/40">Carregando mensagens…</p> : messagesQuery.isError ? <div className="m-auto text-center"><p className="text-xs text-white/55">Não foi possível carregar as mensagens.</p><button type="button" onClick={() => messagesQuery.refetch()} className="mt-3 text-xs font-semibold text-white underline underline-offset-4">Tentar novamente</button></div> : messages.length ? messages.map((message) => <div key={message.id} className={`flex max-w-[82%] flex-col rounded-[22px] px-4 py-2.5 text-sm shadow-sm ${message.sender_id === user.id ? "ml-auto rounded-br-md bg-gradient-to-br from-zinc-100 to-zinc-300 text-black" : "mr-auto rounded-bl-md border border-white/10 bg-[#202024] text-white"}`}><p className="whitespace-pre-wrap break-words leading-5">{message.body}</p><time className={`mt-1 text-[9px] ${message.sender_id === user.id ? "text-black/45" : "text-white/35"}`}>{new Date(message.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</time></div>) : <div className="m-auto max-w-xs text-center"><MessageCircle size={30} className="mx-auto text-white/30"/><p className="mt-3 text-sm font-medium">Envie uma mensagem</p><p className="mt-1 text-xs text-white/40">Sua conversa começa aqui.</p></div>}
                 <div ref={messagesEndRef}/>
               </div>
               <form onSubmit={send} className="flex items-center gap-2 border-t border-white/10 px-3 py-3 sm:px-5">
