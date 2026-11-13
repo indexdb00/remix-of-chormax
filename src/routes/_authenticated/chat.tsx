@@ -10,7 +10,7 @@ type ChatRow = { id: string; buyer_id: string; seller_id: string; product_id: st
 type MessageRow = { id: string; chat_id: string; sender_id: string; body: string; kind: string; offer_cents: number | null; created_at: string; };
 
 export const Route = createFileRoute("/_authenticated/chat")({
-  head: () => ({ meta: [{ title: "Chat — chromaX" }, { name: "description", content: "Conversas e negociações no chromaX." }] }),
+  head: () => ({ meta: [{ title: "Conversas — ChromaX" }, { name: "description", content: "Conversas e conexões na comunidade ChromaX." }] }),
   component: ChatPage,
 });
 

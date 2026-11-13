@@ -58,8 +58,8 @@ function Config() {
         <Link to="/perfil" className="flex items-center gap-2 px-5 py-4 text-sm text-muted-foreground"><ArrowLeft size={16} /> Perfil</Link>
         <h1 className="px-5 pb-2 text-xl font-bold">Configurações</h1>
         <p className="px-5 pt-4 text-xs uppercase tracking-wider text-muted-foreground">Privacidade</p>
-        <Row k="is_private" title="Conta privada" desc="Só amigos veem seus posts e produtos no perfil." />
-        <Row k="show_totals" title="Mostrar valores no perfil" desc="Exibe quanto já comprou e vendeu para quem visita." />
+        <Row k="is_private" title="Conta privada" desc="Só amigos veem suas publicações no perfil." />
+        <Row k="show_totals" title="Mostrar estatísticas no perfil" desc="Controla a exibição dos totais comerciais no perfil." />
         <Row k="banner_public" title="Banner público" desc="Quando desligado, só você vê seu banner." />
         <p className="px-5 pt-6 text-xs uppercase tracking-wider text-muted-foreground">Notificações</p>
         <Row k="sound_chat" title="Som de mensagens" desc="Toca um aviso ao receber mensagens no chat." />

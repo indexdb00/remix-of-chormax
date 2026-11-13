@@ -21,8 +21,8 @@ const mediaPostsQuery = queryOptions({
 export const Route = createFileRoute("/feed")({
   validateSearch: zodValidator(schema),
   head: () => ({ meta: [
-    { title: "Explorar — chromaX" },
-    { name: "description", content: "Pesquise publicações, fotos e vídeos da comunidade ChromaX." },
+    { title: "Projetos da comunidade — ChromaX" },
+    { name: "description", content: "Descubra projetos, estudos e publicações da comunidade ChromaX." },
   ] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(mediaPostsQuery),
   component: Explorar,
@@ -41,7 +41,7 @@ function Explorar() {
   const term = q.trim().toLocaleLowerCase("pt-BR");
   const tiles = posts.map((post) => ({
     id: post.id, img: post.image_url ?? undefined,
-    title: post.body || "Publicação da comunidade", t: post.created_at,
+    title: post.body || "Projeto da comunidade", t: post.created_at,
     video: isVideo(post.image_url ?? undefined),
   })).filter((tile) => tile.title.toLocaleLowerCase("pt-BR").includes(term))
     .sort((a, b) => oldestFirst ? a.t.localeCompare(b.t) : b.t.localeCompare(a.t));
@@ -53,7 +53,7 @@ function Explorar() {
         <div className="relative">
           <label className="flex h-11 items-center gap-3 rounded-full bg-white/[0.06] px-4 transition focus-within:bg-white/[0.09]">
             <Search size={18} className="shrink-0 text-white/75" />
-            <input value={q} onChange={(event) => set({ q: event.target.value })} placeholder="Pesquisar publicações..." aria-label="Pesquisar publicações" className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40" />
+            <input value={q} onChange={(event) => set({ q: event.target.value })} placeholder="Pesquisar projetos e publicações..." aria-label="Pesquisar publicações" className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40" />
             {q && <button type="button" onClick={() => set({ q: "" })} aria-label="Limpar pesquisa" className="text-white/60 hover:text-white"><X size={17} /></button>}
             <button type="button" onClick={() => setShowFilters((value) => !value)} aria-label="Ordenar publicações" aria-expanded={showFilters} className="rounded-full p-1.5 text-white/70 transition hover:bg-white/10"><SlidersHorizontal size={18} /></button>
           </label>
@@ -63,7 +63,7 @@ function Explorar() {
           </div>}
         </div>
         <div className="mb-3 mt-4 flex items-center justify-between">
-          <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-white/45">Publicações</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-white/45">Projetos e publicações</p>
           <span className="text-[10px] text-white/40">{tiles.length} {tiles.length === 1 ? "post" : "posts"}</span>
         </div>
         {tiles.length ? <div className="grid grid-cols-3 gap-[2px] sm:gap-1.5">
@@ -75,13 +75,13 @@ function Explorar() {
             return <Link key={tile.id} to="/post/$id" params={{ id: tile.id }} aria-label={"Abrir publicação: " + tile.title} className="group relative block aspect-square overflow-hidden bg-[#111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
               {media}
               <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/10 opacity-70 transition group-hover:opacity-100" />
-              <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[8px] font-semibold uppercase tracking-wider text-white/90">{tile.video ? "Reel" : "Post"}</span>
+              <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[8px] font-semibold uppercase tracking-wider text-white/90">{tile.video ? "Vídeo" : "Projeto"}</span>
               <span className="absolute inset-x-2 bottom-2 line-clamp-2 text-[10px] font-medium leading-4 text-white drop-shadow sm:text-xs">{tile.title}</span>
             </Link>;
           })}
         </div> : <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
           <h2 className="text-sm font-semibold text-white">Nada por aqui ainda</h2>
-          <p className="mt-2 max-w-sm text-xs leading-6 text-white/50">As publicações da comunidade aparecerão aqui.</p>
+          <p className="mt-2 max-w-sm text-xs leading-6 text-white/50">Os projetos e as publicações da comunidade aparecerão aqui.</p>
           {q && <button type="button" onClick={() => set({ q: "" })} className="mt-5 rounded-full bg-white px-5 py-2 text-xs text-black">Limpar pesquisa</button>}
         </div>}
       </section>
