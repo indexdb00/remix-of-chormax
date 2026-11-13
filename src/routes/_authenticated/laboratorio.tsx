@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { academyCourses } from "@/lib/academy";
 
 export const Route = createFileRoute("/_authenticated/laboratorio")({
+  validateSearch: (search: Record<string, unknown>) => ({ course: typeof search.course === "string" ? search.course : undefined }),
   head: () => ({ meta: [{ title: "Meu Laboratório — ChromaX" }, { name: "description", content: "Transforme o que você aprende em projetos reais com orientação de IA." }] }),
   component: Laboratory,
 });
@@ -14,7 +15,8 @@ export const Route = createFileRoute("/_authenticated/laboratorio")({
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
 function Laboratory() {
-  const [courseSlug, setCourseSlug] = useState(academyCourses[0]?.slug ?? "");
+  const search = Route.useSearch();
+  const [courseSlug, setCourseSlug] = useState(search.course ?? academyCourses[0]?.slug ?? "");
   const [idea, setIdea] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sending, setSending] = useState(false);
