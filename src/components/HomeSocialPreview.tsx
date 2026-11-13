@@ -52,7 +52,7 @@ export function HomeSocialPreview() {
               <div key={profile.id} className="flex min-w-[190px] max-w-[220px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-3">
                 <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-white/20 bg-white/10 text-xs text-white">{profile.logo_url ? <img src={profile.logo_url} alt="" className="h-full w-full object-cover"/> : (profile.display_name || profile.username || "?").slice(0,1).toUpperCase()}</span>
                 <span className="min-w-0"><span className="block truncate text-[11px] font-semibold text-white">{profile.display_name || profile.username || "Membro"}</span><span className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-white/50">{profile.bio}</span></span>
-              </Link>
+              </div>
             ))}
             {!notes.isLoading && !notes.data?.length && <p className="py-3 text-[11px] text-white/40">As notas da comunidade aparecerão aqui.</p>}
           </div>
