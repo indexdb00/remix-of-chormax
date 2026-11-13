@@ -174,7 +174,7 @@ function Perfil() {
 
 
         <section className="mt-6 overflow-hidden">
-          <div className="grid grid-cols-5">
+          <div className="grid w-full grid-cols-4 items-center justify-items-stretch">
             {([["posts", MessageSquare, "Posts"], ["reposts", Repeat2, "Reposts"], ["produtos", Grid3x3, "Seller"], ["assinantes", Star, "Assinantes"]] as const).map(([k, I, l]) => (
               <button key={k} onClick={() => setTab(k)} className={"relative flex flex-col items-center justify-center gap-1.5 border-0 bg-transparent px-1 py-4 text-[10px] transition sm:flex-row sm:gap-2 sm:text-xs " + (tab === k ? "font-semibold text-foreground" : "text-muted-foreground hover:text-foreground")}>
                 <I size={16} /> {l}
