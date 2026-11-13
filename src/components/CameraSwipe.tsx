@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, CameraOff, Circle, FlipHorizontal, X, ImagePlus, Square } from "lucide-react";
+import { CameraOff, Circle, FlipHorizontal, X, ImagePlus, Square } from "lucide-react";
 import { toast } from "sonner";
 import { useCommunity } from "./CommunityProvider";
 
@@ -47,30 +47,10 @@ export function CameraSwipe() {
   }, [facing, stopCamera]);
 
   useEffect(() => {
-    let startX = 0;
-    let startY = 0;
-    const onStart = (event: TouchEvent) => {
-      if (open || event.touches.length !== 1) return;
-      const target = event.target as HTMLElement | null;
-      if (target?.closest("input, textarea, select, button, a, [role='dialog'], [data-no-camera-swipe]")) return;
-      startX = event.touches[0].clientX;
-      startY = event.touches[0].clientY;
-    };
-    const onEnd = (event: TouchEvent) => {
-      if (open || !startX || !event.changedTouches.length) return;
-      const dx = event.changedTouches[0].clientX - startX;
-      const dy = event.changedTouches[0].clientY - startY;
-      if (startX < 72 && dx > 95 && Math.abs(dy) < 70) setOpen(true);
-      startX = 0;
-      startY = 0;
-    };
-    window.addEventListener("touchstart", onStart, { passive: true });
-    window.addEventListener("touchend", onEnd, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", onStart);
-      window.removeEventListener("touchend", onEnd);
-    };
-  }, [open]);
+    const openCamera = () => setOpen(true);
+    window.addEventListener("chromax:open-camera", openCamera);
+    return () => window.removeEventListener("chromax:open-camera", openCamera);
+  }, []);
 
   useEffect(() => {
     if (open) void startCamera();
@@ -135,18 +115,7 @@ export function CameraSwipe() {
     }
   };
 
-  if (!open) return (
-    <button
-      type="button"
-      onClick={() => setOpen(true)}
-      aria-label="Abrir câmera ChromaX"
-      title="Abrir câmera"
-      className="fixed bottom-24 right-4 z-[80] grid h-14 w-14 place-items-center rounded-full border border-white/25 bg-black/75 text-white shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-transform hover:scale-105 active:scale-95"
-    >
-      <Camera size={23} />
-      <span className="sr-only">Abrir câmera</span>
-    </button>
-  );
+  if (!open) return null;
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-black text-white" role="dialog" aria-modal="true" aria-label="Câmera ChromaX">
       <video ref={videoRef} autoPlay muted playsInline className={`absolute inset-0 h-full w-full object-cover ${facing === "user" ? "-scale-x-100" : ""}`} />
