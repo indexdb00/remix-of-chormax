@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/creator")({
   component: Creator,
 });
 
-const CATS = ["Plugin", "Template", "Software", "Asset", "Conta de jogo", "Código"];
+const CATS = ["SaaS", "Plugin", "Template", "Software", "API / Integração", "Automação", "Código", "Asset digital"];
 
 function Creator() {
   const { user } = Route.useRouteContext();
