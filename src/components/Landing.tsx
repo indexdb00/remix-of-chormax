@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Blocks, Code2, CreditCard, Layers3, Package, Palette, Puzzle, Rocket, ShieldCheck, ShoppingBag, Sparkles, Wrench } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2, CreditCard, Layers3, Package, Palette, Puzzle, Rocket, ShieldCheck, ShoppingBag, Sparkles, Wrench } from "lucide-react";
 import voxel from "@/assets/voxel-chrome.jpg";
 
 const categories = [
