@@ -108,10 +108,6 @@ function ChatPage() {
     <main className="min-h-screen bg-background pb-28 text-foreground">
       <SiteHeader />
       <section className="mx-auto max-w-5xl px-3 py-5 sm:px-6">
-        <div className="mb-5 flex items-center justify-between">
-          <div><p className="text-[10px] uppercase tracking-[.24em] text-muted-foreground">Mensagens</p><h1 className="mt-1 font-display text-2xl font-extrabold">Chat</h1></div>
-          <span className="rounded-full border border-border bg-card px-3 py-1 text-[10px] text-muted-foreground">Tempo real</span>
-        </div>
         <div className="grid min-h-[68vh] overflow-hidden rounded-2xl border border-border bg-card/70 md:grid-cols-[300px_1fr]">
           <aside className={`border-border md:border-r ${selected ? "hidden md:block" : "block"}`}>
             <div className="grid grid-cols-2 gap-1 border-b border-border p-2">
