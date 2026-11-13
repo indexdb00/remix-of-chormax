@@ -191,9 +191,9 @@ export type Database = {
         Relationships: [{ foreignKeyName: "stories_author_id_fkey"; columns: ["author_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }]
       }
       creator_profiles: {
-        Row: { user_id: string; creator_type: string; game: string | null; offering: string | null; updated_at: string }
-        Insert: { user_id: string; creator_type: string; game?: string | null; offering?: string | null; updated_at?: string }
-        Update: { user_id?: string; creator_type?: string; game?: string | null; offering?: string | null; updated_at?: string }
+        Row: { user_id: string; creator_type: string; creator_types: string[]; game: string | null; offering: string | null; updated_at: string }
+        Insert: { user_id: string; creator_type: string; creator_types?: string[]; game?: string | null; offering?: string | null; updated_at?: string }
+        Update: { user_id?: string; creator_type?: string; creator_types?: string[]; game?: string | null; offering?: string | null; updated_at?: string }
         Relationships: [{ foreignKeyName: "creator_profiles_user_id_fkey"; columns: ["user_id"]; isOneToOne: true; referencedRelation: "profiles"; referencedColumns: ["id"] }]
       }
       creator_subscriptions: {
