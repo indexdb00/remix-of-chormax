@@ -28,6 +28,7 @@ const DAY = 86400000;
 
 function Perfil() {
   const { user } = Route.useRouteContext();
+  const qc = useQueryClient();
   const [tab, setTab] = useState<"produtos" | "posts" | "reposts" | "ups" | "assinantes">("posts");
   const [editing, setEditing] = useState(false);
   const [usernameDraft, setUsernameDraft] = useState("");
