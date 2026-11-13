@@ -71,7 +71,7 @@ function AuthPage() {
   const SlideIcon = slide.icon;
 
   return (
-    <main className="auth-expo min-h-screen overflow-hidden bg-[#08090d] font-sans text-white">
+    <main className="auth-expo h-svh min-h-0 overflow-hidden bg-[#08090d] font-sans text-white">
       <style>{`
 
         .auth-expo { height:100svh; background-image:radial-gradient(ellipse at 48% 10%,rgba(177,190,210,.16),transparent 42%),radial-gradient(ellipse at 95% 75%,rgba(89,103,130,.13),transparent 38%); }
