@@ -33,7 +33,6 @@ function Creator() {
   const [saving, setSaving] = useState(false);
   const [section, setSection] = useState<"workspace" | "publish" | "subscribers">("workspace");
   const [creatorTypes, setCreatorTypes] = useState<CreatorKind[]>([]);
-  const [creatorType, setCreatorType] = useState<CreatorKind | null>(null);
   const [setupOpen, setSetupOpen] = useState(false);
   const [setupLoading, setSetupLoading] = useState(true);
   const [game, setGame] = useState("");
@@ -100,7 +99,6 @@ function Creator() {
     }, { onConflict: "user_id" });
     setSetupSaving(false);
     if (error) { toast.error("Não foi possível salvar sua escolha", { description: error.message }); return; }
-    setCreatorType(creatorTypes[0]);
     setSetupOpen(false);
     setSection(creatorTypes.includes("dev") ? "workspace" : "publish");
     toast.success("Creator configurado");
@@ -241,16 +239,16 @@ function Creator() {
       <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         {setupLoading ? <div className="py-20 text-center text-sm text-muted-foreground">Carregando Creator...</div> : <>
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div><p className="font-mono text-[10px] tracking-[.24em] text-muted-foreground">CHROMAX / CREATOR</p><h1 className="mt-2 text-3xl font-bold tracking-tight">{creatorTypes.includes("dev") ? "Seu espaço de criação." : creatorTypes.includes("gamer") ? "Seu espaço gamer." : "Sua área de mentoria."}</h1></div>
+          <div><p className="font-mono text-[10px] tracking-[.24em] text-muted-foreground">CHROMAX / CREATOR</p><h1 className="mt-2 text-3xl font-bold tracking-tight">{creatorTypes.length > 1 ? "Seu espaço de criação." : creatorTypes.includes("dev") ? "Seu espaço de criação." : creatorTypes.includes("gamer") ? "Seu espaço gamer." : "Sua área de mentoria."}</h1></div>
           <div className="flex flex-wrap gap-2">
-            {creatorType === "dev" && <><button onClick={() => setSection("workspace")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "workspace" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><HardDrive className="mr-2 inline" size={14}/>Projetos</button><button onClick={() => setSection("publish")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "publish" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Package className="mr-2 inline" size={14}/>Marketplace</button><button onClick={() => setSection("subscribers")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "subscribers" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Star className="mr-2 inline" size={14}/>Assinantes</button></>}
+            {creatorTypes.includes("dev") && <><button onClick={() => setSection("workspace")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "workspace" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><HardDrive className="mr-2 inline" size={14}/>Projetos</button><button onClick={() => setSection("publish")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "publish" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Package className="mr-2 inline" size={14}/>Marketplace</button><button onClick={() => setSection("subscribers")} className={"rounded-xl border px-4 py-2.5 text-xs font-semibold " + (section === "subscribers" ? "border-foreground bg-foreground text-background" : "border-border bg-card")}><Star className="mr-2 inline" size={14}/>Assinantes</button></>}
             <button onClick={() => setSetupOpen(true)} className="rounded-xl border border-border px-3 py-2.5 text-xs">Editar perfil</button>
           </div>
         </div>
-        {creatorType === "gamer" && <div className="mt-8 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-card p-5"><Gamepad2 size={22}/><p className="mt-3 text-xs text-muted-foreground">Jogo</p><h2 className="mt-1 text-lg font-semibold">{game || "Não definido"}</h2></div><div className="rounded-2xl bg-card p-5"><Star size={22}/><p className="mt-3 text-xs text-muted-foreground">O que oferece</p><p className="mt-1 text-sm">{offering || "Adicione sua oferta"}</p></div></div>}
+        {creatorTypes.includes("gamer") && <div className="mt-8 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-card p-5"><Gamepad2 size={22}/><p className="mt-3 text-xs text-muted-foreground">Jogo</p><h2 className="mt-1 text-lg font-semibold">{game || "Não definido"}</h2></div><div className="rounded-2xl bg-card p-5"><Star size={22}/><p className="mt-3 text-xs text-muted-foreground">O que oferece</p><p className="mt-1 text-sm">{offering || "Adicione sua oferta"}</p></div></div>}
         {creatorTypes.includes("mentoria") && <div className="mt-8 rounded-2xl bg-card p-5"><GraduationCap size={22}/><p className="mt-3 text-xs text-muted-foreground">Sua mentoria</p><p className="mt-1 text-sm">{offering || "Configure sua mentoria"}</p></div>}
 
-        {creatorType === "dev" && section === "workspace" && (
+        {creatorTypes.includes("dev") && section === "workspace" && (
           <div className="mt-8">
             {!activeProject ? <>
               <div className="mb-5 flex items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">Seus projetos</h2><p className="mt-1 text-xs text-muted-foreground">{projects.length} projeto(s) no workspace</p></div><button onClick={() => { setModal("project"); setModalName(""); }} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground"><Plus size={15}/>Novo projeto</button></div>
@@ -270,7 +268,7 @@ function Creator() {
           </div>
         )}
 
-        {creatorType === "dev" && section === "publish" && <div className="mt-8 grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
+        {creatorTypes.includes("dev") && section === "publish" && <div className="mt-8 grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
           <div className="h-fit rounded-3xl border border-border bg-card p-6"><p className="font-mono text-[10px] tracking-[.2em] text-muted-foreground">CHROMAX MARKETPLACE</p><h2 className="mt-3 text-2xl font-bold">Leve seu projeto ao mercado.</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">Publique plugins, templates, SaaS, ferramentas, códigos e outros ativos digitais. Seus arquivos privados do workspace continuam separados dos produtos anunciados.</p><div className="mt-6 space-y-3 text-xs text-muted-foreground"><p><Check className="mr-2 inline" size={14}/>Prévia com imagens</p><p><Check className="mr-2 inline" size={14}/>Entrega por texto ou arquivo</p><p><Check className="mr-2 inline" size={14}/>Venda automática ou negociação por chat</p></div></div>
           <form onSubmit={submitProduct} className="space-y-4 rounded-3xl border border-border bg-card p-5 sm:p-7"><div><p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Novo anúncio</p><h3 className="mt-1 text-xl font-semibold">Detalhes do produto</h3></div>
             <div><p className={label}>Fotos de prévia (mín. 3) — {images.length}</p><div className="mt-2 grid grid-cols-3 gap-2">{images.map((img, i) => <div key={img.name + i} className="relative aspect-square overflow-hidden rounded-xl border border-border"><img src={URL.createObjectURL(img)} alt="" className="h-full w-full object-cover"/><button type="button" aria-label="Remover imagem" onClick={() => setImages(images.filter((_, k) => k !== i))} className="absolute right-1 top-1 rounded-full bg-background p-1"><X size={12}/></button></div>)}{images.length < 8 && <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border text-xs text-muted-foreground"><ImagePlus size={20}/>Adicionar<input type="file" accept="image/*" multiple hidden onChange={(e) => setImages([...images, ...Array.from(e.target.files ?? [])].slice(0, 8))}/></label>}</div></div>
@@ -280,7 +278,7 @@ function Creator() {
             <button disabled={busy} className="w-full rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? "Publicando..." : "Publicar no marketplace"} <ArrowUpRight className="ml-1 inline" size={16}/></button>
           </form>
         </div>}
-        {creatorType === "dev" && section === "subscribers" && <div className="mt-8"><div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-semibold">Assinantes</h2><span className="text-xs text-muted-foreground">{subscriberRows.length}</span></div>{subscriberRows.length ? <div className="divide-y divide-border">{subscriberRows.map((row: any) => { const p = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles; return <div key={row.id} className="flex items-center gap-3 py-3"><span className="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-card">{p?.logo_url ? <img src={p.logo_url} alt="" className="h-full w-full object-cover"/> : (p?.display_name || p?.username || "?").slice(0,1)}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{p?.display_name || p?.username || "Assinante"}</p><p className="text-[11px] text-muted-foreground">@{p?.username || "usuário"}</p></div><span className="text-[10px] text-emerald-400">Ativo</span></div>; })}</div> : <p className="py-14 text-center text-sm text-muted-foreground">Seus assinantes aparecerão aqui.</p>}</div>}
+        {creatorTypes.includes("dev") && section === "subscribers" && <div className="mt-8"><div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-semibold">Assinantes</h2><span className="text-xs text-muted-foreground">{subscriberRows.length}</span></div>{subscriberRows.length ? <div className="divide-y divide-border">{subscriberRows.map((row: any) => { const p = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles; return <div key={row.id} className="flex items-center gap-3 py-3"><span className="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-card">{p?.logo_url ? <img src={p.logo_url} alt="" className="h-full w-full object-cover"/> : (p?.display_name || p?.username || "?").slice(0,1)}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{p?.display_name || p?.username || "Assinante"}</p><p className="text-[11px] text-muted-foreground">@{p?.username || "usuário"}</p></div><span className="text-[10px] text-emerald-400">Ativo</span></div>; })}</div> : <p className="py-14 text-center text-sm text-muted-foreground">Seus assinantes aparecerão aqui.</p>}</div>}
       </>}
       </section>
 
