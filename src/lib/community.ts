@@ -12,11 +12,12 @@ async function friendIds(userId: string) {
 }
 
 /** friends = you + accepted friends (posts and their reposts). global = everyone else. */
-export const postsQuery = (scope: "global" | "friends", userId?: string) => queryOptions({
+export const postsQuery = (scope: "global" | "friends" | "all", userId?: string) => queryOptions({
   queryKey: ["posts", scope, userId],
   queryFn: async (): Promise<CommunityPost[]> => {
     let query = supabase.from("feed_posts").select(POST_SELECT).eq("archived", false).order("created_at", { ascending: false }).limit(100);
-    if (scope === "friends") {
+    if (scope === "all") { /* Unified home timeline: include friends and the wider community. */ }
+    else if (scope === "friends") {
       if (!userId) return [];
       const ids = [...(await friendIds(userId)), userId];
       const { data: reps } = await supabase.from("post_reposts").select("post_id").in("user_id", ids).limit(100);
