@@ -19,7 +19,8 @@ export function PostComposer() {
   const [preview, setPreview] = useState("");
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  useEffect(() => { if (composing && draftFile) setFile(draftFile); }, [composing, draftFile]);\n  useEffect(() => { if (!file) { setPreview(""); return; } const url = URL.createObjectURL(file); setPreview(url); return () => URL.revokeObjectURL(url); }, [file]);
+  useEffect(() => { if (composing && draftFile) setFile(draftFile); }, [composing, draftFile]);
+  useEffect(() => { if (!file) { setPreview(""); return; } const url = URL.createObjectURL(file); setPreview(url); return () => URL.revokeObjectURL(url); }, [file]);
   async function publish() {
     if (!user || !isValidPost(body)) return;
     setBusy(true);
