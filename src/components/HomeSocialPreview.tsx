@@ -8,7 +8,8 @@ import { useCommunity } from "./CommunityProvider";
 type PreviewMode = "notes" | "stories";
 
 export function HomeSocialPreview() {
-  const { user } = useCommunity();
+  const { user, composeStory } = useCommunity();
+  const [activeStory, setActiveStory] = useState<any>(null);
   const [mode, setMode] = useState<PreviewMode>("stories");
 
   const notes = useQuery({
@@ -24,10 +25,9 @@ export function HomeSocialPreview() {
   const stories = useQuery({
     queryKey: ["home-story-previews"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("feed_posts")
-        .select("id,body,image_url,author_id,profiles(display_name,username,logo_url)")
-        .eq("archived", false).not("image_url", "is", null)
-        .order("created_at", { ascending: false }).limit(16);
+      const { data, error } = await supabase.from("stories")
+        .select("id,media_url,media_type,author_id,created_at,expires_at,profiles(display_name,username,logo_url)")
+        .gt("expires_at", new Date().toISOString()).order("created_at", { ascending: false }).limit(40);
       if (error) throw error;
       return data ?? [];
     },
@@ -59,7 +59,7 @@ export function HomeSocialPreview() {
         <div key={mode} className="min-h-[66px] animate-in fade-in slide-in-from-right-2 duration-300">
           {mode === "notes" ? (
             <div className="scrollbar-none flex items-center gap-2 overflow-x-auto pb-0.5">
-              {user && <button type="button" onClick={() => window.dispatchEvent(new Event("chromax:open-camera"))} className="flex h-11 min-w-[132px] shrink-0 items-center gap-2 rounded-full border border-white/15 bg-white/[.045] px-2.5 text-left transition hover:bg-white/[.08]">
+              {user && <button type="button" onClick={() => composeStory()} className="flex h-11 min-w-[132px] shrink-0 items-center gap-2 rounded-full border border-white/15 bg-white/[.045] px-2.5 text-left transition hover:bg-white/[.08]">
                 <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-dashed border-white/35 text-white/70"><Plus size={15}/></span>
                 <span className="text-[11px] font-medium text-white/75">Sua nota</span>
               </button>}
@@ -80,16 +80,17 @@ export function HomeSocialPreview() {
               {storyAuthors.map((post) => {
                 const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
                 const name = profile?.display_name || profile?.username || "Membro";
-                return <Link key={post.author_id} to="/post/$id" params={{ id: post.id }} className="flex w-14 shrink-0 flex-col items-center gap-1.5">
+                return <button key={post.author_id} type="button" onClick={() => setActiveStory(post)} className="flex w-14 shrink-0 flex-col items-center gap-1.5">
                   <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-white/80 via-white/35 to-white/10 p-[2px]"><span className="h-full w-full overflow-hidden rounded-full border-2 border-[#0d0d11] bg-[#17171c]">{profile?.logo_url ? <img src={profile.logo_url} alt="" className="h-full w-full object-cover"/> : <span className="flex h-full items-center justify-center text-xs text-white/80">{name.slice(0,1).toUpperCase()}</span>}</span></span>
                   <span className="max-w-full truncate text-[10px] text-white/55">{name}</span>
-                </Link>;
+                </button>;
               })}
               {!stories.isLoading && !storyAuthors.length && <p className="py-3 text-[11px] text-white/35">Nenhum story por enquanto.</p>}
             </div>
           )}
         </div>
       </div>
+      {activeStory && <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/90 p-3" role="dialog" aria-modal="true" onClick={() => setActiveStory(null)}><div className="relative flex h-[min(86vh,760px)] w-full max-w-md items-center justify-center overflow-hidden rounded-2xl bg-[#111]" onClick={(event) => event.stopPropagation()}><button type="button" onClick={() => setActiveStory(null)} className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-3 py-2 text-sm text-white">Fechar</button>{activeStory.media_type === "video" ? <video src={activeStory.media_url} autoPlay controls playsInline className="h-full w-full object-contain" /> : <img src={activeStory.media_url} alt="Story" className="h-full w-full object-contain" />}</div></div>}
     </section>
   );
 }
