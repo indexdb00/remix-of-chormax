@@ -3,9 +3,8 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { useState } from "react";
 import { z } from "zod";
-import { Search, Package, SlidersHorizontal, X, Play, Image as ImageIcon } from "lucide-react";
+import { Search, SlidersHorizontal, X, Play, Image as ImageIcon } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { productsQuery, formatPrice } from "@/lib/products";
 import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
