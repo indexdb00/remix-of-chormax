@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +45,11 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) toast.error("E-mail ou senha incorretos");
     } else {
+      if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+        toast.error("Use 8+ caracteres, com maiúscula, minúscula, número e símbolo.");
+        setBusy(false);
+        return;
+      }
       const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
       if (error) toast.error(error.message);
       else toast.success("Conta criada! Confira seu e-mail para confirmar.");
@@ -86,7 +91,9 @@ function AuthPage() {
 
         <form onSubmit={submit} className="space-y-3">
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" className="w-full border border-border bg-card px-4 py-3 font-mono text-sm outline-none focus:border-primary" />
-          <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Senha" className="w-full border border-border bg-card px-4 py-3 font-mono text-sm outline-none focus:border-primary" />
+          <input type="password" required minLength={mode === "up" ? 8 : 6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Senha" className="w-full border border-border bg-card px-4 py-3 font-mono text-sm outline-none focus:border-primary" />
+          {mode === "up" && <p className="text-xs text-muted-foreground">Use 8+ caracteres, com maiúscula, minúscula, número e símbolo.</p>}
+          {mode === "in" && <div className="text-right"><Link to="/reset-password" className="font-mono text-xs text-muted-foreground hover:text-foreground">Esqueceu sua senha?</Link></div>}
           <button disabled={busy} className="w-full bg-primary px-6 py-3 font-mono text-sm font-bold uppercase text-primary-foreground hover:bg-foreground disabled:opacity-50">
             {busy ? "..." : mode === "in" ? "Entrar" : "Criar conta"}
           </button>
