@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import { useCommunity } from "./CommunityProvider";
 
 export function CameraSwipe() {
-  const { compose } = useCommunity();
+  const { compose, composeStory } = useCommunity();
+  const [storyMode, setStoryMode] = useState(false);
   const [open, setOpen] = useState(false);
   const [facing, setFacing] = useState<"user" | "environment">("environment");
   const [recording, setRecording] = useState(false);
@@ -47,9 +48,11 @@ export function CameraSwipe() {
   }, [facing, stopCamera]);
 
   useEffect(() => {
-    const openCamera = () => setOpen(true);
+    const openCamera = () => { setStoryMode(false); setOpen(true); };
+    const openStoryCamera = () => { setStoryMode(true); setOpen(true); };
     window.addEventListener("chromax:open-camera", openCamera);
-    return () => window.removeEventListener("chromax:open-camera", openCamera);
+    window.addEventListener("chromax:open-story-camera", openStoryCamera);
+    return () => { window.removeEventListener("chromax:open-camera", openCamera); window.removeEventListener("chromax:open-story-camera", openStoryCamera); };
   }, []);
 
   useEffect(() => {
@@ -76,7 +79,7 @@ export function CameraSwipe() {
       const file = new File([blob], `chromax-${Date.now()}.jpg`, { type: "image/jpeg" });
       stopCamera();
       setOpen(false);
-      compose(file);
+      (storyMode ? composeStory : compose)(file);
     }, "image/jpeg", 0.92);
   };
 
@@ -122,7 +125,7 @@ export function CameraSwipe() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/70" />
       <header className="relative z-10 flex items-center justify-between p-5 pt-[max(20px,env(safe-area-inset-top))]">
         <button type="button" onClick={() => setOpen(false)} aria-label="Fechar câmera" className="rounded-full bg-black/35 p-3 backdrop-blur"><X /></button>
-        <span className="text-xs font-semibold tracking-[.18em] text-white/80">CÂMERA</span>
+        <span className="text-xs font-semibold tracking-[.18em] text-white/80">{storyMode ? "NOVO STORY" : "CÂMERA"}</span>
         <button type="button" onClick={() => setFacing((value) => value === "user" ? "environment" : "user")} aria-label="Alternar câmera" className="rounded-full bg-black/35 p-3 backdrop-blur"><FlipHorizontal /></button>
       </header>
       {!supported && <div className="relative z-10 m-auto flex items-center gap-2"><CameraOff /> Câmera indisponível</div>}
