@@ -9,7 +9,7 @@ import { FriendConnections } from "./FriendConnections";
 import { PostCard } from "./PostCard";
 import { postsQuery } from "@/lib/community";
 
-function Posts({ scope, userId }: { scope: "global" | "friends"; userId: string | undefined }) {
+function Posts({ scope, userId }: { scope: "global" | "friends" | "all"; userId: string | undefined }) {
   const { data } = useSuspenseQuery(postsQuery(scope, userId));
   const { compose } = useCommunity();
   if (!data.length) return <div className="flex min-h-80 flex-col items-center justify-center px-6 py-16 text-center"><div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full border border-border bg-secondary">{scope === "friends" ? <Users size={23} /> : <MessageSquare size={23} />}</div><h2 className="text-lg font-semibold">{scope === "friends" ? "Sua roda começa aqui" : "A primeira conversa é sua"}</h2><p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">{scope === "friends" ? "Ainda não há posts dos seus amigos. Encontre a comunidade e faça novas conexões." : "Compartilhe uma ideia, peça ajuda ou mostre o que está criando."}</p>{scope === "friends" ? <Button asChild variant="secondary" className="mt-6"><Link to="/feed">Encontrar a comunidade<ArrowUpRight /></Link></Button> : <Button className="mt-6" onClick={compose}><Plus />Novo post</Button>}</div>;
